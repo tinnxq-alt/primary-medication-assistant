@@ -1,10 +1,88 @@
-<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>基层用药助手 Pro V2</title><link rel="stylesheet" href="assets/style.css"></head>
-<body><main class="app">
-<header class="top"><div class="brand"><h1>基层用药助手 Pro</h1><p>V2 · 药品库存库 + 说明书结构化 + 数据质控</p></div>
-<div class="actions"><button id="import">导入药品 CSV</button><button class="secondary" id="export">导出数据库</button><input id="file" type="file" accept=".csv" hidden></div></header>
-<section class="filters"><input id="search" placeholder="搜索药品名称、通用名、规格、厂家…"><select id="category"></select><select id="status"><option>全部</option><option>已核验</option><option>待核验</option><option>数据异常待核验</option><option>高风险待核验</option><option>别名记录</option></select><button onclick="document.getElementById('search').focus()">搜索</button></section>
-<section class="panel"><div class="panel-head"><span>药品数据库</span><span id="count">0 条</span></div><div id="list"></div></section>
-</main><aside id="detailPanel" class="detail-panel"><div class="detail" id="detail"></div></aside>
-<script src="assets/drugs.js"></script><script src="assets/app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>基层用药助手 Pro</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+<h1>基层用药助手 Pro</h1>
+<p>药品数据库 · 说明书结构化 · 基层用药参考</p>
+</header>
+
+
+<div class="search-box">
+
+<input id="searchInput" 
+placeholder="搜索药品名称、通用名">
+
+<select id="category">
+<option value="">全部分类</option>
+<option>降压药</option>
+<option>降糖药</option>
+<option>心血管</option>
+<option>抗感染</option>
+<option>呼吸系统</option>
+<option>消化系统</option>
+</select>
+
+<button onclick="searchDrug()">搜索</button>
+
+</div>
+
+
+<div class="menu">
+
+<button onclick="filterCategory('降压药')">
+💊 降压药
+</button>
+
+<button onclick="filterCategory('降糖药')">
+💉 降糖药
+</button>
+
+<button onclick="filterCategory('心血管')">
+❤️ 心血管
+</button>
+
+<button onclick="filterCategory('抗感染')">
+🦠 抗感染
+</button>
+
+</div>
+
+
+<h2>
+药品数据库：
+<span id="count">0</span> 条
+</h2>
+
+
+<div id="drugList"></div>
+
+
+<div id="detail" class="hidden">
+
+<div class="card">
+
+<h2 id="detailName"></h2>
+
+<p id="detailContent"></p>
+
+<button onclick="closeDetail()">
+关闭
+</button>
+
+</div>
+
+</div>
+
+
+<script src="app.js"></script>
+
+</body>
+</html>
