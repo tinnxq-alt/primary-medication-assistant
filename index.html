@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f766e">
+  <meta name="description" content="基层用药助手：药品目录、收藏、笔记与离线缓存。仅供医务人员核对资料，不替代诊疗决策。">
+  <title>基层用药助手 Pro</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="offlineBanner" class="offline-banner" hidden>当前离线：仅可查看本机已缓存资料</div>
+  <header class="app-header">
+    <button id="backBtn" class="icon-btn" type="button" aria-label="返回" hidden>←</button>
+    <div>
+      <p class="eyebrow">PRIMARY CARE</p>
+      <h1 id="pageTitle">基层用药助手 Pro</h1>
+    </div>
+    <button id="homeBtn" class="icon-btn" type="button" aria-label="首页">⌂</button>
+  </header>
+
+  <main id="app" class="app-shell" aria-live="polite"></main>
+
+  <nav class="bottom-nav" aria-label="主要导航">
+    <button type="button" data-route="home"><span>⌂</span>首页</button>
+    <button type="button" data-route="categories"><span>▦</span>分类</button>
+    <button type="button" data-route="search"><span>⌕</span>搜索</button>
+    <button type="button" data-route="favorites"><span>★</span>收藏</button>
+    <button type="button" data-route="notebook"><span>✎</span>笔记</button>
+  </nav>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="modalRoot"></div>
+
+  <script src="drugs.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
