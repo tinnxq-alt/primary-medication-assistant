@@ -444,7 +444,7 @@
         <h3>选择中文资料自动填充</h3>
         <p class="muted">在上方输入中文药品名，点击“查找中文资料”，再选择候选自动填充。仅使用本项目已核验的国家药监局中文资料，不导入或翻译英文标签。</p>
         <div class="toolbar"><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局联网核验</a></div>
-        <div id="lookupStatus" class="muted"></div><div id="lookupResults" class="card-list lookup-results"></div>
+        <div id="lookupStatus" class="muted" role="status" aria-live="polite"></div><div id="lookupResults" class="card-list lookup-results"></div>
       </section>
       <section class="panel section">
         <h3>药盒图片 OCR</h3>
@@ -467,9 +467,11 @@
     };
     const renderLookupResults = candidates => {
       const results = document.getElementById("lookupResults");
+      lookupCandidates.clear();
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
       results.innerHTML = candidates.length ? candidates.map(candidate => `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待核验")} · ${esc(candidate.specification || "规格待核验")} · ${esc(candidate.manufacturer || "厂家待核验")}</p><p class="drug-sub"><span class="badge warn">待复核</span> ${esc(candidate.source.label)}${candidate.clinical ? " · 含中文临床字段" : ""}</p></div><button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">自动填充此项</button></article>`).join("") : empty("未找到可自动填充的中文核验资料。请在国家药监局联网核验后手动录入；本工具不会使用英文结果。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
+    const revealLookupFeedback = () => requestAnimationFrame(() => document.getElementById("lookupStatus").scrollIntoView({ behavior: "smooth", block: "center" }));
     document.getElementById("lookupResults").addEventListener("click", event => {
       const button = event.target.closest("[data-use-lookup]");
       if (button) useCandidate(lookupCandidates.get(button.dataset.useLookup));
@@ -480,14 +482,18 @@
       if (!hasChineseText(query)) return toast("请输入中文药品名称");
       const button = document.getElementById("lookupDrugBtn"); const status = document.getElementById("lookupStatus");
       button.disabled = true; button.textContent = "查找中…"; status.textContent = "正在联网读取中文核验资料…";
+      revealLookupFeedback();
       try {
         const result = await searchDrugCandidates(query); const candidates = result.candidates;
         renderLookupResults(candidates);
         status.textContent = result.networkError
           ? (candidates.length ? `联网中文库暂不可用，已显示 ${candidates.length} 个本机中文候选。` : `联网中文库暂不可用：${result.networkError.message || "网络不可用"}`)
           : (candidates.length ? `联网找到 ${candidates.length} 个中文候选；请选择一项自动填充并核对全部字段。` : "联网中文库没有匹配项，不会返回英文资料。");
+        toast(candidates.length ? `找到 ${candidates.length} 个中文候选，请选择自动填充` : "未找到中文候选，请在国家药监局核验");
+        revealLookupFeedback();
       } catch (error) {
         renderLookupResults([]); status.textContent = `中文资料检索失败：${error.message || "网络不可用"}`;
+        toast("中文资料检索失败，请检查网络"); revealLookupFeedback();
       } finally { button.disabled = false; button.textContent = "查找中文资料"; }
     });
     let ocrImageUrl = "";
