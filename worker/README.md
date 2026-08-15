@@ -17,6 +17,18 @@ npm run deploy
 
 部署成功后复制终端显示的 `https://…workers.dev` 地址。在网站打开“缓存管理” → “智能检索服务”，粘贴地址，依次点击“保存地址”和“测试连接”。连接成功后，在“添加药物”页输入中文药名并点击“智能检索”。
 
+## 手机端通过 Cloudflare 控制台部署
+
+没有电脑终端时，可让 Cloudflare 直接从 GitHub 自动部署：
+
+1. 在 Cloudflare 控制台进入 **Workers & Pages**，创建一个 Hello World Worker，名称必须是 `primary-medication-smart-search`，先完成首次部署。
+2. 打开该 Worker 的 **Settings → Variables and Secrets → Add**，类型选择 **Secret**，名称填写 `OPENAI_API_KEY`，在 Cloudflare 官方输入框中填写密钥并部署。不要把密钥发送到聊天。
+3. 打开 **Settings → Builds → Connect**，连接 GitHub 仓库 `tinnxq-alt/primary-medication-assistant`。
+4. 生产分支选择 `main`，Root directory 填写 `/worker`，Build command 留空，Deploy command 使用 `npm run deploy`。
+5. 保存后触发构建。部署成功时复制该 Worker 的 `workers.dev` 地址，回到网站“缓存管理 → 智能检索服务”保存并测试。
+
+以后 `main` 分支中的 `worker/` 发生修改时，Cloudflare 会自动重新构建并部署。
+
 ## 本地检查
 
 ```bash

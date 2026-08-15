@@ -167,7 +167,7 @@ async function handleSearch(request, env, origin) {
   }
   try { return json(await callOpenAI(query, env), 200, origin, env); }
   catch (error) {
-    console.error("smart-search failed", error instanceof Error ? error.message : "unknown");
+    console.error(JSON.stringify({ message: "smart-search failed", error: error instanceof Error ? error.message : "unknown" }));
     return json({ error: "智能检索暂时失败，请稍后重试" }, 502, origin, env);
   }
 }
