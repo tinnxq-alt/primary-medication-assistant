@@ -215,6 +215,37 @@ window.DRUG_CATALOG = (() => {
     }
   };
 
+  const safetyNotices = {
+    "左氧氟沙星片": {
+      title: "国家药监局：左氧氟沙星口服剂说明书修订",
+      summary: "国家药监局根据不良反应监测结果，要求修订左氧氟沙星口服剂的警示语、不良反应和注意事项。使用前必须核对当前批准文号对应的最新版说明书，不得仅依据旧版摘要。",
+      url: "https://www.nmpa.gov.cn/xxgk/ggtg/ypggtg/ypshmshxdgg/20121231120001515.html",
+      publishedAt: "2012-12-31",
+      checkedAt: "2026-08-16"
+    },
+    "左氧氟沙星氯化钠注射液": {
+      title: "国家药监局：左氧氟沙星注射剂说明书修订",
+      summary: "国家药监局根据不良反应监测结果，要求修订左氧氟沙星注射剂的警示语、不良反应和注意事项。注射剂须由医务人员结合感染诊断、患者风险和现行说明书使用。",
+      url: "https://www.nmpa.gov.cn/xxgk/ggtg/ypggtg/ypshmshxdgg/20121231120001515.html",
+      publishedAt: "2012-12-31",
+      checkedAt: "2026-08-16"
+    },
+    "珍菊降压片": {
+      title: "国家药监局：珍菊降压片说明书修订",
+      summary: "国家药监局修订公告明确：本品不宜作为高血压治疗首选药物；需注意其含盐酸可乐定、氢氯噻嗪和芦丁，并关注合并用药、肝肾功能及电解质。",
+      url: "https://www.nmpa.gov.cn/directory/web/nmpa/xxgk/ggtg/ypggtg/ypshmshxdgg/20130320120001911.html",
+      publishedAt: "2013-03-20",
+      checkedAt: "2026-08-16"
+    },
+    "珍菊降压片(薄膜衣片)": {
+      title: "国家药监局：珍菊降压片说明书修订",
+      summary: "国家药监局修订公告明确：本品不宜作为高血压治疗首选药物；需注意其含盐酸可乐定、氢氯噻嗪和芦丁，并关注合并用药、肝肾功能及电解质。",
+      url: "https://www.nmpa.gov.cn/directory/web/nmpa/xxgk/ggtg/ypggtg/ypshmshxdgg/20130320120001911.html",
+      publishedAt: "2013-03-20",
+      checkedAt: "2026-08-16"
+    }
+  };
+
   const issues = {
     "格列吡嗪片": "原始行复制了阿卡波糖的50mg规格、通用名和厂家；已纠正名称字段，规格/厂家继续锁定待核验。",
     "克罗米通乳膏": "原始通用名误填为商品名“百多邦”，且厂家疑似复制自上一行；已纠正通用名，厂家待核验。",
@@ -251,6 +282,7 @@ window.DRUG_CATALOG = (() => {
       insuranceClass: rawName.includes("(甲)") ? "甲类" : "未标注",
       qualityIssue: sourceIssue,
       clinical: clinical[drugName] || null,
+      safetyNotice: safetyNotices[drugName] || null,
       source: clinical[drugName]?.source || defaultSource
     };
   });
