@@ -96,6 +96,15 @@ button { cursor: pointer; }
 .category-card { padding: 16px; border-radius: 18px; text-align: left; }
 .category-card strong { display: block; margin-bottom: 4px; }
 .category-card span { color: var(--muted); font-size: 13px; }
+.custom-category-card { border-style: dashed; border-color: #5eead4; touch-action: manipulation; -webkit-touch-callout: none; }
+.group-admin-grid { display: grid; gap: 10px; }
+.group-admin-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 16px; background: white; box-shadow: var(--shadow); }
+.group-admin-card > button { border: 0; padding: 4px; color: var(--ink); text-align: left; background: transparent; }
+.group-admin-card > button strong, .group-admin-card > button small { display: block; }
+.group-admin-card > button small { margin-top: 3px; color: var(--muted); }
+.group-admin-card > div { display: flex; gap: 5px; }
+.favorite-entry { display: grid; gap: 6px; }
+.favorite-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 10px 6px; color: var(--muted); font-size: 12px; }
 
 .card-list { display: grid; gap: 11px; }
 .card { padding: 16px; border-radius: 18px; transition: transform .12s, box-shadow .12s; }
