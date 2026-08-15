@@ -1,0 +1,10 @@
+{
+  "name": "基层用药助手 Pro",
+  "short_name": "用药助手",
+  "description": "基层药品目录、说明书核验、收藏、笔记与离线缓存工具",
+  "start_url": "./#/home",
+  "display": "standalone",
+  "background_color": "#f4f8f7",
+  "theme_color": "#0f766e",
+  "lang": "zh-CN"
+}
