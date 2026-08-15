@@ -34,6 +34,7 @@
     hidden: read("hidden", []),
     categoryOverrides: read("categoryOverrides", {}),
     drugOverrides: read("drugOverrides", {}),
+    smartSearchEndpoint: read("smartSearchEndpoint", ""),
     history: []
   };
   const BACKUP_ARRAY_KEYS = ["favorites", "groups", "notes", "customDrugs", "customCategories", "contraindications", "marks", "remembered", "cached", "hidden"];
@@ -80,6 +81,15 @@
   const safeExternalUrl = value => {
     try { const url = new URL(String(value || ""), location.href); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; }
     catch { return ""; }
+  };
+  const normalizeServiceEndpoint = value => {
+    const raw = String(value || "").trim().replace(/\/+$/, "");
+    if (!raw) return "";
+    const url = new URL(raw);
+    const local = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+    if (url.protocol !== "https:" && !(local && url.protocol === "http:")) throw new Error("服务地址必须使用 HTTPS");
+    url.search = ""; url.hash = "";
+    return url.href.replace(/\/+$/, "");
   };
   const catalogDrugs = () => [...window.DRUG_CATALOG, ...state.customDrugs];
   const applyLocalOverrides = drug => {
@@ -418,11 +428,12 @@
     app.innerHTML = `
       <section class="panel section">
         <h2>手动添加自定义药品</h2>
-        <p class="notice">可先联网检索并填入候选字段。目录信息和临床内容保存后仍标记为“待复核”，必须对照批准文号和现行说明书确认。</p>
+        <p class="notice">可先智能检索中文网页并选择候选填入。目录信息和适应症等临床内容保存后仍标记为“待复核”，必须对照批准文号和具体厂家现行说明书确认。</p>
         <form id="drugForm" style="margin-top:16px">
           <div class="form-grid">
-            <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required placeholder="输入中文药品名"><button class="btn secondary" id="lookupDrugBtn" type="button">查找中文资料</button></div></div>
+            <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required placeholder="输入中文药品名"><button class="btn secondary" id="lookupDrugBtn" type="button">智能检索</button></div></div>
             <div class="field"><label>通用名</label><input name="genericName"></div>
+            <div class="field"><label>商品名</label><input name="tradeName"></div>
             <div class="field"><label>规格</label><input name="specification"></div>
             <div class="field"><label>剂型</label><input name="dosageForm"></div>
             <div class="field"><label>类别</label><input name="category" list="categoryOptions"><datalist id="categoryOptions"><option value="西药"><option value="中成药">${state.customCategories.map(c => `<option value="${esc(c)}">`).join("")}</datalist></div>
@@ -441,9 +452,9 @@
         </form>
       </section>
       <section class="panel section">
-        <h3>选择中文资料自动填充</h3>
-        <p class="muted">在上方输入中文药品名，点击“查找中文资料”，再选择候选自动填充。仅使用本项目已核验的国家药监局中文资料，不导入或翻译英文标签。</p>
-        <div class="toolbar"><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局联网核验</a></div>
+        <h3>智能全网检索</h3>
+        <p class="muted">检索中文网页，优先采用国家药监局、生产企业和医疗机构资料；通常需要 20–60 秒。不会导入英文临床内容，也不会自动保存。</p>
+        <div class="toolbar"><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局联网核验</a>${state.smartSearchEndpoint ? "" : '<button class="btn ghost" type="button" data-route-link="cache">配置智能检索</button>'}</div>
         <div id="lookupStatus" class="muted" role="status" aria-live="polite"></div><div id="lookupResults" class="card-list lookup-results"></div>
       </section>
       <section class="panel section">
@@ -456,12 +467,12 @@
         <div class="field"><label>识别文字（可修改）</label><textarea id="ocrText" rows="6" placeholder="识别结果会显示在这里"></textarea></div>
       </section>`;
     const form = document.getElementById("drugForm");
-    const setField = (name, value) => { const field = form.elements.namedItem(name); if (field && value) field.value = value; };
+    const setField = (name, value) => { const field = form.elements.namedItem(name); if (field && value !== undefined && value !== null) field.value = value; };
     const useCandidate = candidate => {
-      ["drugName", "genericName", "specification", "dosageForm", "category", "manufacturer"].forEach(name => setField(name, candidate[name]));
+      ["drugName", "genericName", "tradeName", "specification", "dosageForm", "category", "manufacturer"].forEach(name => setField(name, candidate[name]));
       ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(name, candidate.clinical?.[name]));
-      setField("sourceLabel", candidate.source.label); setField("sourceUrl", candidate.source.url); setField("sourceCheckedAt", candidate.source.checkedAt);
-      document.getElementById("selectedSource").textContent = `当前来源：${candidate.source.label}（待人工复核）`;
+      setField("sourceLabel", candidate.source?.label || "智能检索候选"); setField("sourceUrl", candidate.source?.url || ""); setField("sourceCheckedAt", candidate.source?.checkedAt || "");
+      document.getElementById("selectedSource").textContent = `当前来源：${candidate.source?.label || "智能检索候选"}（待人工复核）`;
       if (candidate.clinical) form.querySelector(".clinical-editor").open = true;
       form.scrollIntoView({ behavior: "smooth", block: "start" }); toast("候选信息已填入，请核对后保存");
     };
@@ -469,7 +480,12 @@
       const results = document.getElementById("lookupResults");
       lookupCandidates.clear();
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
-      results.innerHTML = candidates.length ? candidates.map(candidate => `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待核验")} · ${esc(candidate.specification || "规格待核验")} · ${esc(candidate.manufacturer || "厂家待核验")}</p><p class="drug-sub"><span class="badge warn">待复核</span> ${esc(candidate.source.label)}${candidate.clinical ? " · 含中文临床字段" : ""}</p></div><button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">自动填充此项</button></article>`).join("") : empty("未找到可自动填充的中文核验资料。请在国家药监局联网核验后手动录入；本工具不会使用英文结果。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
+      results.innerHTML = candidates.length ? candidates.map(candidate => {
+        const sourceUrl = safeExternalUrl(candidate.source?.url);
+        const confidence = { high: "高", medium: "中", low: "低" }[candidate.smartMeta?.confidence] || "";
+        const meta = [confidence && `可信度：${confidence}`, candidate.smartMeta?.approvalNumber && `批准文号：${candidate.smartMeta.approvalNumber}`].filter(Boolean).join(" · ");
+        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待核验")} · ${esc(candidate.specification || "规格待核验")} · ${esc(candidate.manufacturer || "厂家待核验")}</p><p class="drug-sub"><span class="badge warn">待复核</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">自动填充此项</button></div></div></article>`;
+      }).join("") : empty("未找到可自动填充的中文资料。请在国家药监局核验后手动录入；本工具不会使用英文临床内容。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
     const revealLookupFeedback = () => requestAnimationFrame(() => document.getElementById("lookupStatus").scrollIntoView({ behavior: "smooth", block: "center" }));
     document.getElementById("lookupResults").addEventListener("click", event => {
@@ -481,20 +497,21 @@
       if (!query) return toast("请先输入药品名");
       if (!hasChineseText(query)) return toast("请输入中文药品名称");
       const button = document.getElementById("lookupDrugBtn"); const status = document.getElementById("lookupStatus");
-      button.disabled = true; button.textContent = "查找中…"; status.textContent = "正在联网读取中文核验资料…";
+      button.disabled = true; button.textContent = "检索中…"; status.textContent = state.smartSearchEndpoint ? "正在智能检索中文网页，请稍候…" : "智能服务未配置，正在读取项目中文核验库…";
       revealLookupFeedback();
       try {
         const result = await searchDrugCandidates(query); const candidates = result.candidates;
         renderLookupResults(candidates);
-        status.textContent = result.networkError
-          ? (candidates.length ? `联网中文库暂不可用，已显示 ${candidates.length} 个本机中文候选。` : `联网中文库暂不可用：${result.networkError.message || "网络不可用"}`)
-          : (candidates.length ? `联网找到 ${candidates.length} 个中文候选；请选择一项自动填充并核对全部字段。` : "联网中文库没有匹配项，不会返回英文资料。");
-        toast(candidates.length ? `找到 ${candidates.length} 个中文候选，请选择自动填充` : "未找到中文候选，请在国家药监局核验");
+        if (result.smartError) status.textContent = `智能检索暂不可用，已回退到项目中文核验库${candidates.length ? `，显示 ${candidates.length} 个候选` : ""}：${result.smartError.message}`;
+        else if (!result.smartConfigured) status.textContent = `智能服务未配置，当前只显示项目中文核验库${candidates.length ? `的 ${candidates.length} 个候选` : ""}。请到缓存管理页配置。`;
+        else status.textContent = candidates.length ? `智能全网找到 ${candidates.length} 个中文候选；请选择一项并核对全部字段和来源。` : "智能全网未找到可靠的中文候选，请手动到国家药监局核验。";
+        if (result.warnings?.length) status.textContent += ` 提示：${result.warnings.join("；")}`;
+        toast(candidates.length ? `找到 ${candidates.length} 个中文候选，请选择` : "未找到可靠中文候选");
         revealLookupFeedback();
       } catch (error) {
         renderLookupResults([]); status.textContent = `中文资料检索失败：${error.message || "网络不可用"}`;
         toast("中文资料检索失败，请检查网络"); revealLookupFeedback();
-      } finally { button.disabled = false; button.textContent = "查找中文资料"; }
+      } finally { button.disabled = false; button.textContent = "智能检索"; }
     });
     let ocrImageUrl = "";
     const applyOcrText = () => {
@@ -548,7 +565,7 @@
         rawName: data.drugName.trim(),
         drugName: data.drugName.trim(),
         genericName: data.genericName.trim(),
-        tradeName: "",
+        tradeName: data.tradeName.trim(),
         specification: data.specification.trim(),
         dosageForm: data.dosageForm.trim(),
         category: data.category.trim() || "自定义",
@@ -622,17 +639,54 @@
       .filter(isChineseCandidate).slice(0, 8);
   }
 
+  async function fetchSmartSearchCandidates(query) {
+    const endpoint = normalizeServiceEndpoint(state.smartSearchEndpoint);
+    if (!endpoint) return { candidates: [], warnings: [] };
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 70000);
+    try {
+      const response = await fetch(`${endpoint}/v1/drugs/search`, {
+        method: "POST", cache: "no-store", signal: controller.signal,
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({ query })
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.error || `智能检索服务返回 ${response.status}`);
+      if (!Array.isArray(payload.candidates)) throw new Error("智能检索结果格式无效");
+      const qualityLabels = { regulator: "药监部门", manufacturer: "生产企业", hospital: "医疗机构", "medical-database": "医药数据库", other: "其他中文来源" };
+      const candidates = payload.candidates.map(candidate => ({
+        drugName: candidate.drugName || "", genericName: candidate.genericName || "", tradeName: candidate.tradeName || "",
+        specification: candidate.specification || "", dosageForm: candidate.dosageForm || "", category: candidate.category || "", manufacturer: candidate.manufacturer || "",
+        clinical: candidate.clinical ? { ...candidate.clinical } : null,
+        source: {
+          status: "needs-review",
+          label: `智能全网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
+          url: candidate.sourceUrl || "", checkedAt: candidate.sourceCheckedAt || new Date().toISOString().slice(0, 10)
+        },
+        smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "" }
+      })).filter(isChineseCandidate).slice(0, 6);
+      return { candidates, warnings: Array.isArray(payload.warnings) ? payload.warnings.filter(hasChineseText).slice(0, 8) : [] };
+    } catch (error) {
+      if (error.name === "AbortError") throw new Error("检索超时，请稍后重试");
+      throw error;
+    } finally { clearTimeout(timeout); }
+  }
+
   async function searchDrugCandidates(query) {
     if (!hasChineseText(query)) throw new Error("仅支持中文药品名称");
-    let remote = []; let networkError = null;
+    const smartConfigured = Boolean(state.smartSearchEndpoint);
+    let smart = []; let warnings = []; let smartError = null; let remote = []; let networkError = null;
+    if (smartConfigured) {
+      try { ({ candidates: smart, warnings } = await fetchSmartSearchCandidates(query)); } catch (error) { smartError = error; }
+    }
     try { remote = await fetchChineseCatalogCandidates(query); } catch (error) { networkError = error; }
     const local = localLookupCandidates(query);
     const seen = new Set();
-    const candidates = [...remote, ...local].filter(candidate => {
+    const candidates = [...smart, ...remote, ...local].filter(candidate => {
       const key = normalize(`${candidate.genericName}|${candidate.specification}|${candidate.manufacturer}`);
       if (seen.has(key)) return false; seen.add(key); return true;
     }).slice(0, 8);
-    return { candidates, networkError };
+    return { candidates, networkError, smartError, warnings, smartConfigured };
   }
 
   function renderInteractions() {
@@ -738,6 +792,13 @@
         <div class="toolbar"><button class="btn secondary" id="cacheVerified">预加载已核验条目</button><button class="btn secondary" id="cacheBatchMode">批量操作</button><button class="btn ghost" id="detectDuplicates">检测重复</button><button class="btn ghost" id="exportCache">导出 JSON</button><button class="btn danger" id="clearCache">清空缓存</button></div>
       </section>
       <section class="panel section">
+        <div class="section-title"><h2>智能检索服务</h2><span class="badge ${state.smartSearchEndpoint ? "ok" : "warn"}" id="smartSearchBadge">${state.smartSearchEndpoint ? "已配置" : "未配置"}</span></div>
+        <p class="muted">填写已部署的 Cloudflare Worker 地址。这里只保存公开服务地址；不要在网页中填写 OpenAI API 密钥。</p>
+        <div class="field"><label>Worker 地址</label><input id="smartSearchEndpoint" inputmode="url" placeholder="https://primary-medication-smart-search.你的账号.workers.dev" value="${esc(state.smartSearchEndpoint)}"></div>
+        <div class="toolbar"><button class="btn primary" id="saveSmartSearchEndpoint">保存地址</button><button class="btn secondary" id="testSmartSearchEndpoint">测试连接</button><button class="btn ghost" id="clearSmartSearchEndpoint">清除</button></div>
+        <p class="muted" id="smartSearchStatus" role="status" aria-live="polite"></p>
+      </section>
+      <section class="panel section">
         <div class="section-title"><h2>应用与数据</h2><span class="badge info" id="installStatus">浏览器模式</span></div>
         <p class="muted" id="installHelp">可安装到手机桌面；完整备份包含收藏、分组、自定义药品、笔记、标记、禁忌和本机编辑字段。</p>
         <div class="toolbar"><button class="btn primary" id="installApp" hidden>安装到桌面</button><button class="btn ghost" id="checkAppUpdate">检查应用更新</button><button class="btn secondary" id="exportAllData">导出完整备份</button><label class="btn ghost link-btn">恢复完整备份<input id="importAllData" type="file" accept="application/json,.json" hidden></label></div>
@@ -748,6 +809,32 @@
       </section>
       <section id="duplicateResults" class="section" hidden></section>
       <section class="section"><div id="cacheList" class="card-list"></div></section>`;
+    const endpointInput = document.getElementById("smartSearchEndpoint");
+    const endpointStatus = document.getElementById("smartSearchStatus");
+    const saveEndpoint = () => {
+      try {
+        state.smartSearchEndpoint = normalizeServiceEndpoint(endpointInput.value);
+        write("smartSearchEndpoint", state.smartSearchEndpoint); endpointInput.value = state.smartSearchEndpoint;
+        document.getElementById("smartSearchBadge").textContent = state.smartSearchEndpoint ? "已配置" : "未配置";
+        document.getElementById("smartSearchBadge").className = `badge ${state.smartSearchEndpoint ? "ok" : "warn"}`;
+        endpointStatus.textContent = state.smartSearchEndpoint ? "地址已保存，可到添加药物页使用智能检索。" : "智能检索地址已清除。";
+        toast(state.smartSearchEndpoint ? "智能检索地址已保存" : "智能检索地址已清除"); return true;
+      } catch (error) { endpointStatus.textContent = error.message; toast(error.message); return false; }
+    };
+    document.getElementById("saveSmartSearchEndpoint").onclick = saveEndpoint;
+    document.getElementById("clearSmartSearchEndpoint").onclick = () => { endpointInput.value = ""; saveEndpoint(); };
+    document.getElementById("testSmartSearchEndpoint").onclick = async event => {
+      if (!saveEndpoint() || !state.smartSearchEndpoint) return;
+      const button = event.currentTarget; button.disabled = true; button.textContent = "测试中…"; endpointStatus.textContent = "正在连接智能检索服务…";
+      try {
+        const response = await fetch(`${state.smartSearchEndpoint}/health`, { cache: "no-store", headers: { Accept: "application/json" } });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok || !payload.ok) throw new Error(payload.error || `服务返回 ${response.status}`);
+        endpointStatus.textContent = payload.configured ? "连接成功，OpenAI 密钥已配置。" : "服务可访问，但尚未配置 OPENAI_API_KEY。";
+        toast(payload.configured ? "智能检索服务连接成功" : "服务尚未配置 API 密钥");
+      } catch (error) { endpointStatus.textContent = `连接失败：${error.message || "请检查地址和 Worker 设置"}`; toast("智能检索服务连接失败"); }
+      finally { button.disabled = false; button.textContent = "测试连接"; }
+    };
     const draw = () => {
       const cached = getCached();
       document.getElementById("cacheCount").textContent = `${cached.length} 个品规`;
