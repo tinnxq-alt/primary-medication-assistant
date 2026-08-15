@@ -36,6 +36,11 @@
     drugOverrides: read("drugOverrides", {}),
     history: []
   };
+  const BACKUP_ARRAY_KEYS = ["favorites", "groups", "notes", "customDrugs", "customCategories", "contraindications", "marks", "remembered", "cached", "hidden"];
+  const BACKUP_OBJECT_KEYS = ["favoriteMap", "categoryOverrides", "drugOverrides"];
+  const BACKUP_KEYS = [...BACKUP_ARRAY_KEYS, ...BACKUP_OBJECT_KEYS];
+  let deferredInstallPrompt = null;
+  let tesseractLoader = null;
 
   const routes = {
     home: "基层用药助手 Pro",
@@ -72,6 +77,10 @@
     .replaceAll("'", "&#039;");
 
   const normalize = value => String(value ?? "").toLowerCase().replace(/[\s()（）·:：,，/\-]/g, "");
+  const safeExternalUrl = value => {
+    try { const url = new URL(String(value || ""), location.href); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; }
+    catch { return ""; }
+  };
   const catalogDrugs = () => [...window.DRUG_CATALOG, ...state.customDrugs];
   const applyLocalOverrides = drug => {
     const override = state.drugOverrides[drug.id];
@@ -286,6 +295,8 @@
       return;
     }
     const clinical = drug.clinical;
+    const safetyUrl = safeExternalUrl(drug.safetyNotice?.url);
+    const sourceUrl = safeExternalUrl(drug.source?.url);
     const notes = state.notes.filter(note => note.drugId === id);
     const clinicalFields = {
       indication: clinical?.indication || "待逐条核验具体厂家现行说明书",
@@ -301,7 +312,7 @@
           <button class="star-btn ${isFavorite(id) ? "active" : ""}" data-favorite="${esc(id)}">★</button>
         </div>
         ${drug.qualityIssue ? `<div class="notice danger" style="margin-top:14px"><strong>质控锁定：</strong>${esc(drug.qualityIssue)}</div>` : ""}
-        ${drug.safetyNotice ? `<div class="notice danger" style="margin-top:14px"><strong>官方安全警示：</strong>${esc(drug.safetyNotice.summary)}<br><a href="${esc(drug.safetyNotice.url)}" target="_blank" rel="noopener">查看国家药监局公告</a> · 发布：${esc(drug.safetyNotice.publishedAt)}</div>` : ""}
+        ${drug.safetyNotice ? `<div class="notice danger" style="margin-top:14px"><strong>官方安全警示：</strong>${esc(drug.safetyNotice.summary)}${safetyUrl ? `<br><a href="${esc(safetyUrl)}" target="_blank" rel="noopener">查看国家药监局公告</a>` : ""} · 发布：${esc(drug.safetyNotice.publishedAt)}</div>` : ""}
         <dl class="detail-grid">
           <div class="detail-item"><dt>通用名</dt><dd>${esc(drug.genericName || "待核验")}</dd></div>
           <div class="detail-item"><dt>商品名</dt><dd>${esc(drug.tradeName || "未录入")}</dd></div>
@@ -317,7 +328,7 @@
         ${clinical ? `<p class="muted" style="margin-bottom:8px">长按或拖选说明书摘要文字，然后选择标记样式。</p><div id="markToolbar" class="mark-toolbar" hidden><small id="selectedTextPreview"></small><button class="btn secondary small" data-mark-type="underline">划线</button><button class="btn secondary small" data-mark-type="bold">加粗</button><button class="btn secondary small" data-mark-type="highlight">荧光笔</button></div>` : ""}
         <div class="source-box">
           <strong>来源：</strong>${esc(drug.source?.label || "未记录")}<br>
-          ${drug.source?.url ? `<a href="${esc(drug.source.url)}" target="_blank" rel="noopener">打开来源页面</a><br>` : ""}
+          ${sourceUrl ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener">打开来源页面</a><br>` : ""}
           核验日期：${esc(drug.source?.checkedAt || "未核验")}。品种说明书范本不能替代具体厂家、批准文号对应的现行说明书。
         </div>
         <div class="toolbar" style="margin-top:16px">
@@ -434,6 +445,15 @@
         <p class="muted">中文药名先匹配本项目已核验的国家药监局范本；英文药名可检索 NLM/FDA 公开标签。不会自动生成相互作用结论。</p>
         <div class="toolbar"><input id="onlineDrugQuery" placeholder="输入药品名或通用名"><button class="btn secondary" id="lookupDrugBtn" type="button">联网检索</button><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局核验</a></div>
         <div id="lookupStatus" class="muted"></div><div id="lookupResults" class="card-list lookup-results"></div>
+      </section>
+      <section class="panel section">
+        <h3>药盒图片 OCR</h3>
+        <p class="muted">图片在当前设备中识别，不上传到本项目服务器。首次使用需联网下载简体中文/英文识别模型；识别结果必须人工核对。</p>
+        <div class="field"><label>拍照或选择药盒图片</label><input id="drugImageInput" type="file" accept="image/*" capture="environment"></div>
+        <img id="drugImagePreview" class="ocr-preview" alt="待识别药盒预览" hidden>
+        <div class="toolbar"><button class="btn secondary" id="recognizeDrugImage" type="button" disabled>识别包装文字</button><button class="btn ghost" id="useOcrText" type="button" disabled>使用文字联网检索</button></div>
+        <div class="progress" id="ocrProgress" hidden><span id="ocrProgressBar"></span></div><p id="ocrStatus" class="muted"></p>
+        <div class="field"><label>识别文字（可修改）</label><textarea id="ocrText" rows="6" placeholder="识别结果会显示在这里"></textarea></div>
       </section>`;
     const form = document.getElementById("drugForm");
     const setField = (name, value) => { const field = form.elements.namedItem(name); if (field && value) field.value = value; };
@@ -466,6 +486,44 @@
         renderLookupResults([]); status.textContent = `联网检索失败：${error.message || "网络不可用"}`;
       } finally { button.disabled = false; button.textContent = "联网检索"; }
     });
+    let ocrImageUrl = "";
+    const applyOcrText = () => {
+      const text = document.getElementById("ocrText").value.trim();
+      if (!text) return toast("没有可用的识别文字");
+      const fields = extractOcrCatalogFields(text);
+      if (!fields.drugName) return toast("未识别到药品名称，请修改识别文字");
+      setField("drugName", fields.drugName); setField("specification", fields.specification);
+      setField("dosageForm", fields.dosageForm); setField("manufacturer", fields.manufacturer);
+      document.getElementById("onlineDrugQuery").value = fields.drugName;
+      document.getElementById("lookupDrugBtn").click();
+    };
+    document.getElementById("drugImageInput").addEventListener("change", event => {
+      const file = event.target.files?.[0]; if (!file) return;
+      if (!file.type.startsWith("image/")) return toast("请选择图片文件");
+      if (file.size > 15 * 1024 * 1024) { event.target.value = ""; return toast("图片不能超过 15MB"); }
+      if (ocrImageUrl) URL.revokeObjectURL(ocrImageUrl);
+      ocrImageUrl = URL.createObjectURL(file); const preview = document.getElementById("drugImagePreview");
+      preview.src = ocrImageUrl; preview.hidden = false; document.getElementById("recognizeDrugImage").disabled = false;
+      document.getElementById("ocrStatus").textContent = "图片已选择，点击“识别包装文字”。";
+    });
+    document.getElementById("recognizeDrugImage").addEventListener("click", async () => {
+      const file = document.getElementById("drugImageInput").files?.[0]; if (!file) return toast("请先选择药盒图片");
+      const button = document.getElementById("recognizeDrugImage"); const status = document.getElementById("ocrStatus");
+      const progress = document.getElementById("ocrProgress"); const bar = document.getElementById("ocrProgressBar"); let worker = null;
+      button.disabled = true; button.textContent = "识别中…"; progress.hidden = false; bar.style.width = "2%"; status.textContent = "正在加载 OCR 组件…";
+      try {
+        const Tesseract = await loadTesseract();
+        worker = await Tesseract.createWorker(["chi_sim", "eng"], 1, { logger: message => {
+          const percent = Math.max(2, Math.round((message.progress || 0) * 100)); bar.style.width = `${percent}%`; status.textContent = `本机识别中：${percent}%`;
+        }});
+        const result = await worker.recognize(file); const text = result.data?.text?.trim() || "";
+        if (!text) throw new Error("未识别到清晰文字");
+        document.getElementById("ocrText").value = text; document.getElementById("useOcrText").disabled = false;
+        bar.style.width = "100%"; status.textContent = "识别完成，正在提取药名并检索候选。"; applyOcrText();
+      } catch (error) { status.textContent = `OCR 失败：${error.message || "请换一张清晰、正面的图片"}`; }
+      finally { if (worker) await worker.terminate().catch(() => {}); button.disabled = false; button.textContent = "重新识别"; }
+    });
+    document.getElementById("useOcrText").addEventListener("click", applyOcrText);
     form.addEventListener("submit", event => {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(event.target));
@@ -498,6 +556,33 @@
       toast("自定义药品已保存");
       navigate("detail", drug.id);
     });
+  }
+
+  function loadTesseract() {
+    if (window.Tesseract) return Promise.resolve(window.Tesseract);
+    if (tesseractLoader) return tesseractLoader;
+    tesseractLoader = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@7.0.0/dist/tesseract.min.js";
+      script.crossOrigin = "anonymous"; script.referrerPolicy = "no-referrer";
+      script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error("OCR 组件加载失败"));
+      script.onerror = () => reject(new Error("无法下载 OCR 组件，请检查网络"));
+      document.head.appendChild(script);
+    }).catch(error => { tesseractLoader = null; throw error; });
+    return tesseractLoader;
+  }
+
+  function extractOcrCatalogFields(text) {
+    const lines = String(text || "").split(/\r?\n/).map(line => line.replace(/\s+/g, " ").trim()).filter(line => line.length >= 2 && line.length <= 80);
+    const dosageForms = ["肠溶干混悬剂", "双释放肠溶胶囊", "缓释胶囊", "软胶囊", "缓释片", "控释片", "分散片", "咀嚼片", "注射液", "口服溶液", "口服液", "混悬剂", "滴眼液", "乳膏", "软膏", "凝胶", "贴膏", "胶囊", "颗粒", "合剂", "丸", "片", "散", "栓"];
+    const formPattern = new RegExp(dosageForms.join("|"));
+    const nameLines = lines.filter(line => /[\u4e00-\u9fff]{2,}/.test(line) && formPattern.test(line) && !/(用法|用量|成份|禁忌|批准文号|生产企业|有效期|说明书)/.test(line));
+    const fallbackLines = lines.filter(line => /[\u4e00-\u9fff]{3,}/.test(line) && !/(用法|用量|成份|禁忌|注意事项|批准文号|生产企业|有效期)/.test(line));
+    const drugName = (nameLines[0] || fallbackLines[0] || "").replace(/^(药品名称|通用名称|商品名称)[:：]?\s*/, "").slice(0, 60);
+    const specificationMatch = text.match(/\d+(?:\.\d+)?\s*(?:mg|g|μg|ug|ml|mL|IU|万IU|%)(?:\s*[:：×x*]\s*\d+(?:\.\d+)?\s*(?:mg|g|μg|ug|ml|mL|IU|%))?(?:\s*[×x*]\s*\d+\s*(?:片|粒|袋|支|瓶|贴))?/i);
+    const manufacturer = lines.find(line => /(有限责任公司|股份有限公司|有限公司|制药厂|药业)/.test(line)) || "";
+    const formMatch = drugName.match(formPattern) || text.match(formPattern);
+    return { drugName, specification: specificationMatch?.[0] || "", dosageForm: formMatch?.[0] || "", manufacturer: manufacturer.slice(0, 100) };
   }
 
   const clipLabelText = value => (Array.isArray(value) ? value.join("\n") : String(value || "")).trim().slice(0, 6000);
@@ -675,6 +760,11 @@
         <p class="muted">本静态站点的目录代码会随页面加载；这里记录的是你主动选择的常用药清单，便于离线优先展示。</p>
         <div class="toolbar"><button class="btn secondary" id="cacheVerified">预加载已核验条目</button><button class="btn secondary" id="cacheBatchMode">批量操作</button><button class="btn ghost" id="detectDuplicates">检测重复</button><button class="btn ghost" id="exportCache">导出 JSON</button><button class="btn danger" id="clearCache">清空缓存</button></div>
       </section>
+      <section class="panel section">
+        <div class="section-title"><h2>应用与数据</h2><span class="badge info" id="installStatus">浏览器模式</span></div>
+        <p class="muted" id="installHelp">可安装到手机桌面；完整备份包含收藏、分组、自定义药品、笔记、标记、禁忌和本机编辑字段。</p>
+        <div class="toolbar"><button class="btn primary" id="installApp" hidden>安装到桌面</button><button class="btn ghost" id="checkAppUpdate">检查应用更新</button><button class="btn secondary" id="exportAllData">导出完整备份</button><label class="btn ghost link-btn">恢复完整备份<input id="importAllData" type="file" accept="application/json,.json" hidden></label></div>
+      </section>
       <section class="panel section" id="cacheBatchBar" hidden>
         <div class="section-title"><strong id="cacheSelectedCount">已选 0 项</strong><button class="btn ghost small" id="cacheSelectAll">全选</button></div>
         <div class="toolbar"><input id="cacheBatchCategory" list="cacheCategoryOptions" placeholder="输入新分类"><datalist id="cacheCategoryOptions">${categories.map(category => `<option value="${esc(category)}">`).join("")}</datalist><button class="btn secondary" id="applyCacheCategory">批量修改分类</button><button class="btn danger" id="removeSelectedCache">批量移出缓存</button></div>
@@ -738,6 +828,30 @@
     };
     document.getElementById("exportCache").onclick = () => downloadJson("drug-cache.json", { exportedAt: new Date().toISOString(), drugs: getCached() });
     document.getElementById("clearCache").onclick = () => confirmModal("确认清空缓存清单？", () => { state.cached = []; saveState("cached"); renderCache(); toast("缓存已清空"); });
+    document.getElementById("installApp").onclick = async () => {
+      if (!deferredInstallPrompt) return toast("请使用浏览器菜单中的“添加到主屏幕”");
+      deferredInstallPrompt.prompt(); const choice = await deferredInstallPrompt.userChoice; deferredInstallPrompt = null; updateInstallControls();
+      toast(choice.outcome === "accepted" ? "已接受安装" : "已取消安装");
+    };
+    document.getElementById("checkAppUpdate").onclick = async () => {
+      if (!("serviceWorker" in navigator)) return toast("当前浏览器不支持离线应用");
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (!registration) return toast("离线服务尚未注册，请刷新页面");
+      try { await registration.update(); toast("检查完成；如有新版本，请刷新页面"); } catch { toast("更新检查失败，请检查网络"); }
+    };
+    document.getElementById("exportAllData").onclick = () => downloadJson(`medication-assistant-backup-${new Date().toISOString().slice(0, 10)}.json`, createFullBackup());
+    document.getElementById("importAllData").onchange = async event => {
+      const input = event.target; const file = input.files?.[0]; if (!file) return;
+      try {
+        if (file.size > 10 * 1024 * 1024) throw new Error("备份文件不能超过 10MB");
+        const backup = validateFullBackup(JSON.parse(await file.text()));
+        confirmModal("恢复备份会覆盖当前浏览器中的全部用户数据，是否继续？", () => {
+          BACKUP_KEYS.forEach(key => { state[key] = backup[key]; saveState(key); }); render(); toast("完整备份已恢复");
+        });
+      } catch (error) { toast(`备份无效：${error.message}`); }
+      finally { input.value = ""; }
+    };
+    updateInstallControls();
     draw();
   }
 
@@ -1078,6 +1192,37 @@
 
   function closeModal() { modalRoot.innerHTML = ""; }
 
+  function createFullBackup() {
+    return {
+      appId: "primary-medication-assistant", schemaVersion: 1, exportedAt: new Date().toISOString(),
+      data: Object.fromEntries(BACKUP_KEYS.map(key => [key, state[key]]))
+    };
+  }
+
+  function validateFullBackup(payload) {
+    if (!payload || payload.appId !== "primary-medication-assistant" || payload.schemaVersion !== 1 || !payload.data) throw new Error("不是本应用的完整备份文件");
+    const restored = {};
+    BACKUP_ARRAY_KEYS.forEach(key => {
+      if (!Array.isArray(payload.data[key])) throw new Error(`字段 ${key} 格式错误`);
+      restored[key] = payload.data[key];
+    });
+    BACKUP_OBJECT_KEYS.forEach(key => {
+      const value = payload.data[key];
+      if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`字段 ${key} 格式错误`);
+      restored[key] = value;
+    });
+    return restored;
+  }
+
+  function updateInstallControls() {
+    const button = document.getElementById("installApp"); const status = document.getElementById("installStatus"); const help = document.getElementById("installHelp");
+    if (!button || !status || !help) return;
+    const standalone = window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true;
+    if (standalone) { status.textContent = "已安装"; status.className = "badge ok"; button.hidden = true; help.textContent = "应用已在独立窗口运行；可检查更新或备份全部本机数据。"; }
+    else if (deferredInstallPrompt) { status.textContent = "可安装"; status.className = "badge ok"; button.hidden = false; help.textContent = "点击“安装到桌面”即可作为应用使用；用户数据仍保存在当前浏览器。"; }
+    else { status.textContent = "浏览器模式"; status.className = "badge info"; button.hidden = true; help.textContent = "如未显示安装按钮，请使用浏览器菜单中的“添加到主屏幕”；也可在此备份全部本机数据。"; }
+  }
+
   function downloadJson(filename, value) {
     const blob = new Blob([JSON.stringify(value, null, 2)], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob); const link = document.createElement("a");
@@ -1162,6 +1307,8 @@
   const updateNetwork = () => { offlineBanner.hidden = navigator.onLine; };
   window.addEventListener("online", updateNetwork);
   window.addEventListener("offline", updateNetwork);
+  window.addEventListener("beforeinstallprompt", event => { event.preventDefault(); deferredInstallPrompt = event; updateInstallControls(); });
+  window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; updateInstallControls(); toast("应用已安装到桌面"); });
   updateNetwork();
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));
