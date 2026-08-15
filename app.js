@@ -370,7 +370,7 @@
 
   function noteCard(note) {
     const drug = drugById(note.drugId);
-    return `<article class="card"><div class="detail-head"><div><h3>${esc(drug?.drugName || "已删除药品")}</h3><small class="muted">${new Date(note.updatedAt).toLocaleString("zh-CN")}</small></div><button class="btn ghost small" data-delete-note="${esc(note.id)}">删除</button></div><p class="drug-sub">${esc(note.content)}</p></article>`;
+    return `<article class="card"><div class="detail-head"><div><h3>${esc(drug?.drugName || "已删除药品")}</h3><small class="muted">${new Date(note.updatedAt).toLocaleString("zh-CN")}</small></div><div class="card-actions"><button class="btn ghost small" data-edit-note="${esc(note.id)}" data-note-drug="${esc(note.drugId)}">编辑</button><button class="btn ghost small" data-delete-note="${esc(note.id)}">删除</button></div></div><p class="drug-sub">${esc(note.content)}</p></article>`;
   }
 
   function renderFavorites() {
@@ -594,7 +594,7 @@
       }
       const match = state.contraindications.find(item => [item.drugA, item.drugB].includes(a) && [item.drugA, item.drugB].includes(b));
       result.innerHTML = match
-        ? `<div class="notice danger"><strong>${esc(match.severity)}：</strong>${esc(match.consequence || match.recommendation || "存在自定义禁忌记录")}</div>`
+        ? `<div class="notice danger"><strong>${esc(match.severity)}：</strong>${esc(match.consequence || "存在自定义禁忌记录")}${match.mechanism ? `<br><strong>机制：</strong>${esc(match.mechanism)}` : ""}${match.recommendation ? `<br><strong>建议：</strong>${esc(match.recommendation)}` : ""}</div>`
         : '<div class="notice">本地自定义禁忌中未匹配到记录。由于权威 API 未配置，不能据此判断可联用，请查具体说明书/指南或咨询药师。</div>';
     });
   }
@@ -610,27 +610,57 @@
   }
 
   function renderFlashcards() {
-    const candidates = allDrugs().filter(d => d.clinical && d.source?.status !== "blocked");
+    const candidates = allDrugs().filter(d => d.clinical && d.source?.status === "verified-template");
     if (!candidates.length) {
       app.innerHTML = empty("暂无已核验临床字段可用于闪卡。完成说明书核验后会自动加入。", '<button class="btn primary" data-route-link="all">查看目录</button>');
       return;
     }
-    let index = 0;
-    let flipped = false;
-    const draw = () => {
-      const drug = candidates[index];
-      app.innerHTML = `
-        <section class="section"><div class="section-title"><h2>说明书闪卡</h2><small>${index + 1} / ${candidates.length}</small></div><div class="progress"><span style="width:${((index + 1) / candidates.length) * 100}%"></span></div></section>
-        <button class="panel section" id="flashcard" style="width:100%;min-height:300px;text-align:left">
-          ${flipped ? `<span class="badge ok">背面</span><h2>${esc(drug.drugName)}</h2><div class="detail-item"><dt>适应症</dt><dd>${esc(drug.clinical.indication)}</dd></div><div class="detail-item" style="margin-top:10px"><dt>用法用量</dt><dd>${esc(drug.clinical.dosage)}</dd></div>` : `<span class="badge info">正面</span><h2>${esc(drug.drugName)}</h2><p class="muted">${esc(drug.genericName)} · ${esc(drug.specification)}</p><p style="margin-top:80px;text-align:center">点击翻转查看说明书摘要</p>`}
-        </button>
-        <div class="toolbar"><button class="btn ghost" id="prevCard">上一张</button><button class="btn ${isRemembered(drug.id) ? "secondary" : "primary"}" id="rememberCard">${isRemembered(drug.id) ? "取消已记住" : "标记已记住"}</button><button class="btn ghost" id="nextCard">下一张</button></div>`;
-      document.getElementById("flashcard").onclick = () => { flipped = !flipped; draw(); };
-      document.getElementById("prevCard").onclick = () => { index = (index - 1 + candidates.length) % candidates.length; flipped = false; draw(); };
-      document.getElementById("nextCard").onclick = () => { index = (index + 1) % candidates.length; flipped = false; draw(); };
-      document.getElementById("rememberCard").onclick = () => { toggleSet("remembered", drug.id); draw(); };
+    const categories = [...new Set(candidates.map(drug => drug.category || "未分类"))];
+    let deck = []; let index = 0; let flipped = false;
+    app.innerHTML = `
+      <section class="panel section">
+        <div class="section-title"><h2>说明书闪卡</h2><span class="badge info" id="rememberedCount"></span></div>
+        <div class="toolbar"><select id="flashCategory"><option value="">全部分类</option>${categories.map(category => `<option>${esc(category)}</option>`).join("")}</select><select id="flashMode"><option value="ordered">顺序模式</option><option value="random">随机模式</option></select><label class="switch-label"><input type="checkbox" id="unrememberedOnly"> 仅看未记住</label></div>
+        <div class="section-title"><small id="flashProgressText"></small><button class="btn ghost small" id="shuffleCards">重新洗牌</button></div><div class="progress"><span id="flashProgressBar"></span></div>
+      </section>
+      <section id="flashcardArea"></section>`;
+    const shuffled = list => {
+      const copy = [...list];
+      for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; }
+      return copy;
     };
-    draw();
+    const draw = () => {
+      const area = document.getElementById("flashcardArea");
+      document.getElementById("rememberedCount").textContent = `已记住 ${candidates.filter(drug => isRemembered(drug.id)).length} / ${candidates.length}`;
+      if (!deck.length) {
+        document.getElementById("flashProgressText").textContent = "0 张"; document.getElementById("flashProgressBar").style.width = "0";
+        area.innerHTML = empty("当前筛选下没有闪卡。", '<button class="btn ghost" id="showAllCards">显示全部</button>');
+        document.getElementById("showAllCards")?.addEventListener("click", () => { document.getElementById("flashCategory").value = ""; document.getElementById("unrememberedOnly").checked = false; buildDeck(); });
+        return;
+      }
+      index = Math.min(index, deck.length - 1); const drug = deck[index];
+      document.getElementById("flashProgressText").textContent = `${index + 1} / ${deck.length}`;
+      document.getElementById("flashProgressBar").style.width = `${((index + 1) / deck.length) * 100}%`;
+      area.innerHTML = `<button class="panel section" id="flashcard" style="width:100%;min-height:300px;text-align:left">
+        ${flipped ? `<span class="badge ok">背面</span><h2>${esc(drug.drugName)}</h2><div class="detail-item"><dt>适应症</dt><dd>${esc(drug.clinical.indication)}</dd></div><div class="detail-item" style="margin-top:10px"><dt>用法用量</dt><dd>${esc(drug.clinical.dosage)}</dd></div>` : `<span class="badge info">正面</span><h2>${esc(drug.drugName)}</h2><p class="muted">${esc(drug.genericName)} · ${esc(drug.specification)}</p><p style="margin-top:80px;text-align:center">点击翻转查看说明书摘要</p>`}
+        </button><div class="toolbar"><button class="btn ghost" id="prevCard">上一张</button><button class="btn ${isRemembered(drug.id) ? "secondary" : "primary"}" id="rememberCard">${isRemembered(drug.id) ? "取消已记住" : "标记已记住"}</button><button class="btn ghost" id="nextCard">下一张</button></div>`;
+      document.getElementById("flashcard").onclick = () => { flipped = !flipped; draw(); };
+      document.getElementById("prevCard").onclick = () => { index = (index - 1 + deck.length) % deck.length; flipped = false; draw(); };
+      document.getElementById("nextCard").onclick = () => { index = (index + 1) % deck.length; flipped = false; draw(); };
+      document.getElementById("rememberCard").onclick = () => { toggleSet("remembered", drug.id); document.getElementById("unrememberedOnly").checked ? buildDeck() : draw(); };
+    };
+    const buildDeck = () => {
+      const category = document.getElementById("flashCategory").value;
+      const onlyNew = document.getElementById("unrememberedOnly").checked;
+      deck = candidates.filter(drug => (!category || drug.category === category) && (!onlyNew || !isRemembered(drug.id)));
+      if (document.getElementById("flashMode").value === "random") deck = shuffled(deck);
+      index = 0; flipped = false; draw();
+    };
+    document.getElementById("flashCategory").onchange = buildDeck;
+    document.getElementById("flashMode").onchange = buildDeck;
+    document.getElementById("unrememberedOnly").onchange = buildDeck;
+    document.getElementById("shuffleCards").onclick = () => { document.getElementById("flashMode").value = "random"; buildDeck(); toast("闪卡已重新洗牌"); };
+    buildDeck();
   }
 
   function renderCache() {
@@ -788,27 +818,53 @@
   }
 
   function renderContraindications() {
+    let editingId = "";
     app.innerHTML = `
       <section class="panel section">
         <h2>自定义禁忌组合</h2>
         <p class="notice danger">自定义记录仅用于院内整理，不代表系统已完成临床验证。</p>
+        <div class="toolbar" style="margin-top:14px"><input id="contraQuery" placeholder="搜索药品、机制、后果或建议"><select id="contraSeverity"><option value="">全部严重程度</option><option>禁忌</option><option>严重</option><option>需监测</option></select></div>
         <form id="contraForm" style="margin-top:16px">
           <div class="form-grid">
             <div class="field"><label>药品 A *</label><select name="drugA" required><option value="">请选择</option>${drugOptions()}</select></div>
             <div class="field"><label>药品 B *</label><select name="drugB" required><option value="">请选择</option>${drugOptions()}</select></div>
             <div class="field"><label>严重程度</label><select name="severity"><option>禁忌</option><option>严重</option><option>需监测</option></select></div>
-            <div class="field"><label>建议/后果 *</label><input name="recommendation" required></div>
+            <div class="field"><label>作用机制</label><input name="mechanism" placeholder="例如：药效叠加或代谢抑制"></div>
           </div>
-          <button class="btn primary">新增记录</button>
+          <div class="field"><label>可能后果 *</label><textarea name="consequence" rows="3" required></textarea></div>
+          <div class="field"><label>处理建议 *</label><textarea name="recommendation" rows="3" required></textarea></div>
+          <div class="toolbar"><button class="btn primary" id="saveContra">新增记录</button><button class="btn ghost" type="button" id="cancelContraEdit" hidden>取消编辑</button></div>
         </form>
       </section>
-      <section class="section"><div class="card-list">${state.contraindications.length ? state.contraindications.map(item => `<article class="card"><div class="detail-head"><div><h3>${esc(drugById(item.drugA)?.drugName)} + ${esc(drugById(item.drugB)?.drugName)}</h3><span class="badge blocked">${esc(item.severity)}</span></div><button class="btn ghost small" data-delete-contra="${esc(item.id)}">删除</button></div><p class="drug-sub">${esc(item.recommendation)}</p></article>`).join("") : empty("暂无自定义禁忌记录。")}</div></section>`;
-    document.getElementById("contraForm").addEventListener("submit", event => {
+      <section class="section"><p id="contraCount" class="muted"></p><div id="contraList" class="card-list"></div></section>`;
+    const form = document.getElementById("contraForm");
+    const resetForm = () => {
+      editingId = ""; form.reset(); document.getElementById("saveContra").textContent = "新增记录"; document.getElementById("cancelContraEdit").hidden = true;
+    };
+    const draw = () => {
+      const q = normalize(document.getElementById("contraQuery").value); const severity = document.getElementById("contraSeverity").value;
+      const filtered = state.contraindications.filter(item => {
+        const text = `${drugById(item.drugA)?.drugName || ""}${drugById(item.drugB)?.drugName || ""}${item.mechanism || ""}${item.consequence || ""}${item.recommendation || ""}`;
+        return (!q || normalize(text).includes(q)) && (!severity || item.severity === severity);
+      });
+      document.getElementById("contraCount").textContent = `${filtered.length} 条记录`;
+      document.getElementById("contraList").innerHTML = filtered.length ? filtered.map(item => `<article class="card"><div class="detail-head"><div><h3>${esc(drugById(item.drugA)?.drugName || "已删除药品")} + ${esc(drugById(item.drugB)?.drugName || "已删除药品")}</h3><span class="badge blocked">${esc(item.severity)}</span></div><div class="card-actions"><button class="btn ghost small" data-edit-contra="${esc(item.id)}">编辑</button><button class="btn ghost small" data-delete-contra="${esc(item.id)}">删除</button></div></div>${item.mechanism ? `<p class="drug-sub"><strong>机制：</strong>${esc(item.mechanism)}</p>` : ""}${item.consequence ? `<p class="drug-sub"><strong>后果：</strong>${esc(item.consequence)}</p>` : ""}<p class="drug-sub"><strong>建议：</strong>${esc(item.recommendation)}</p></article>`).join("") : empty("没有匹配的禁忌记录。");
+    };
+    form.addEventListener("submit", event => {
       event.preventDefault(); const data = Object.fromEntries(new FormData(event.target));
       if (data.drugA === data.drugB) return toast("请选择两种不同药品");
-      state.contraindications.push({ id: `contra-${Date.now()}`, ...data });
-      saveState("contraindications"); toast("禁忌记录已添加"); renderContraindications();
+      if (editingId) state.contraindications = state.contraindications.map(item => item.id === editingId ? { ...item, ...data, updatedAt: new Date().toISOString() } : item);
+      else state.contraindications.push({ id: `contra-${Date.now()}`, ...data, updatedAt: new Date().toISOString() });
+      saveState("contraindications"); toast(editingId ? "禁忌记录已更新" : "禁忌记录已添加"); resetForm(); draw();
     });
+    document.getElementById("contraList").addEventListener("click", event => {
+      const button = event.target.closest("[data-edit-contra]"); if (!button) return;
+      const item = state.contraindications.find(record => record.id === button.dataset.editContra); if (!item) return;
+      editingId = item.id; ["drugA", "drugB", "severity", "mechanism", "consequence", "recommendation"].forEach(name => { form.elements.namedItem(name).value = item[name] || ""; });
+      document.getElementById("saveContra").textContent = "保存修改"; document.getElementById("cancelContraEdit").hidden = false; form.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    document.getElementById("cancelContraEdit").onclick = resetForm;
+    document.getElementById("contraQuery").oninput = draw; document.getElementById("contraSeverity").onchange = draw; draw();
   }
 
   function renderNotebook() {
@@ -847,13 +903,15 @@
     saveState("favorites"); saveState("favoriteMap"); render();
   }
 
-  function openNoteModal(drugId) {
+  function openNoteModal(drugId, noteId = "") {
     const drug = drugById(drugId);
-    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="noteForm"><h2>添加笔记</h2><p class="muted">${esc(drug?.drugName)}</p><div class="field"><label>笔记内容</label><textarea name="content" rows="6" required></textarea></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button></div></form></div>`;
+    const existing = state.notes.find(note => note.id === noteId);
+    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="noteForm"><h2>${existing ? "编辑笔记" : "添加笔记"}</h2><p class="muted">${esc(drug?.drugName)}</p><div class="field"><label>笔记内容</label><textarea name="content" rows="6" required>${esc(existing?.content)}</textarea></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button></div></form></div>`;
     document.getElementById("noteForm").onsubmit = event => {
       event.preventDefault(); const content = new FormData(event.target).get("content").trim();
-      state.notes.push({ id: `note-${Date.now()}`, drugId, content, updatedAt: new Date().toISOString() });
-      saveState("notes"); closeModal(); toast("笔记已保存"); renderDetail(drugId);
+      if (existing) state.notes = state.notes.map(note => note.id === noteId ? { ...note, content, updatedAt: new Date().toISOString() } : note);
+      else state.notes.push({ id: `note-${Date.now()}`, drugId, content, updatedAt: new Date().toISOString() });
+      saveState("notes"); closeModal(); toast(existing ? "笔记已更新" : "笔记已保存"); render();
     };
   }
 
@@ -1066,6 +1124,8 @@
     if (form) { navigate("all"); setTimeout(() => renderAll("", form.dataset.form)); }
     const note = event.target.closest("[data-delete-note]");
     if (note) confirmModal("确认删除这条笔记？", () => { state.notes = state.notes.filter(n => n.id !== note.dataset.deleteNote); saveState("notes"); render(); toast("笔记已删除"); });
+    const editNote = event.target.closest("[data-edit-note]");
+    if (editNote) { event.stopPropagation(); openNoteModal(editNote.dataset.noteDrug, editNote.dataset.editNote); }
     const contra = event.target.closest("[data-delete-contra]");
     if (contra) confirmModal("确认删除这条自定义禁忌记录？", () => { state.contraindications = state.contraindications.filter(c => c.id !== contra.dataset.deleteContra); saveState("contraindications"); render(); toast("记录已删除"); });
     const mark = event.target.closest("[data-delete-mark]");
