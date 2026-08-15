@@ -100,6 +100,16 @@ button { cursor: pointer; }
 .card-list { display: grid; gap: 11px; }
 .card { padding: 16px; border-radius: 18px; transition: transform .12s, box-shadow .12s; }
 .card:active { transform: scale(.99); }
+.swipe-row { position: relative; overflow: hidden; border-radius: 18px; touch-action: pan-y; }
+.swipe-content { position: relative; z-index: 2; width: 100%; transition: transform .2s ease; }
+.swipe-row.swiped .swipe-content { transform: translateX(-148px); }
+.swipe-actions { position: absolute; inset: 0 0 0 auto; z-index: 1; display: grid; grid-template-columns: 74px 74px; width: 148px; }
+.swipe-actions button { border: 0; color: white; font-size: 13px; font-weight: 800; background: #0d9488; }
+.swipe-actions button:last-child { background: #475569; }
+.swipe-actions button.danger { background: var(--danger); }
+.batch-card { grid-template-columns: 1fr auto; border-color: #99f6e4; background: #f0fdfa; }
+.batch-check { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; color: var(--brand); font-size: 12px; font-weight: 800; }
+.batch-check input { width: 18px; height: 18px; accent-color: var(--brand); }
 .drug-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; }
 .drug-row h3 { margin: 0 0 6px; font-size: 17px; }
 .drug-meta { display: flex; flex-wrap: wrap; gap: 6px; color: var(--muted); font-size: 12px; }
@@ -142,6 +152,15 @@ button { cursor: pointer; }
 .detail-item { padding: 13px; border-radius: 14px; background: #f7faf9; }
 .detail-item dt { margin-bottom: 5px; color: var(--muted); font-size: 12px; }
 .detail-item dd { margin: 0; line-height: 1.65; white-space: pre-wrap; }
+.markable { cursor: text; user-select: text; -webkit-user-select: text; }
+.mark-toolbar { position: sticky; bottom: 78px; z-index: 25; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 12px; padding: 10px; border: 1px solid #99f6e4; border-radius: 14px; background: rgba(240, 253, 250, .96); box-shadow: var(--shadow); }
+.mark-toolbar[hidden] { display: none; }
+.text-mark { padding: 0 1px; color: inherit; background: transparent; }
+.text-mark.highlight { border-radius: 3px; background: #fef08a; }
+.text-mark.bold { font-weight: 900; }
+.text-mark.underline { text-decoration: underline 2px #0f766e; text-underline-offset: 3px; }
+.marks-list { display: grid; gap: 8px; }
+.mark-quote { margin: 8px 0 0; padding: 9px 11px; border-left: 4px solid #facc15; border-radius: 8px; background: #fefce8; }
 .source-box { margin-top: 16px; padding: 13px; border-left: 4px solid var(--accent); border-radius: 10px; color: #713f12; font-size: 13px; line-height: 1.6; background: #fffbeb; }
 .source-box a { color: #0f766e; }
 

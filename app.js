@@ -28,8 +28,11 @@
     customDrugs: read("customDrugs", []),
     customCategories: read("customCategories", []),
     contraindications: read("contraindications", []),
+    marks: read("marks", []),
     remembered: read("remembered", []),
     cached: read("cached", []),
+    hidden: read("hidden", []),
+    categoryOverrides: read("categoryOverrides", {}),
     history: []
   };
 
@@ -68,8 +71,14 @@
     .replaceAll("'", "&#039;");
 
   const normalize = value => String(value ?? "").toLowerCase().replace(/[\s()（）·:：,，/\-]/g, "");
-  const allDrugs = () => [...window.DRUG_CATALOG, ...state.customDrugs];
-  const drugById = id => allDrugs().find(drug => drug.id === id);
+  const catalogDrugs = () => [...window.DRUG_CATALOG, ...state.customDrugs];
+  const allDrugs = () => catalogDrugs()
+    .filter(drug => !state.hidden.includes(drug.id))
+    .map(drug => state.categoryOverrides[drug.id] ? { ...drug, category: state.categoryOverrides[drug.id] } : drug);
+  const drugById = id => {
+    const drug = catalogDrugs().find(item => item.id === id);
+    return drug && state.categoryOverrides[id] ? { ...drug, category: state.categoryOverrides[id] } : drug;
+  };
   const isFavorite = id => state.favorites.includes(id);
   const isCached = id => state.cached.includes(id);
   const isRemembered = id => state.remembered.includes(id);
@@ -91,10 +100,14 @@
     return '<span class="badge info">仅目录</span>';
   }
 
-  function drugCard(drug) {
+  function drugCard(drug, options = {}) {
+    const selectable = Boolean(options.selectable);
+    const selected = Boolean(options.selected);
     return `
-      <article class="card drug-row" data-open-drug="${esc(drug.id)}" tabindex="0">
+      <div class="swipe-row" data-swipe-row>
+      <article class="card drug-row swipe-content ${selectable ? "batch-card" : ""}" ${selectable ? "" : `data-open-drug="${esc(drug.id)}" tabindex="0"`}>
         <div>
+          ${selectable ? `<label class="batch-check"><input type="checkbox" data-select-drug="${esc(drug.id)}" ${selected ? "checked" : ""}> 选择</label>` : ""}
           <h3>${esc(drug.drugName)}</h3>
           <div class="drug-meta">
             <span>${esc(drug.specification || "规格待核验")}</span>
@@ -105,8 +118,23 @@
           ${drug.qualityIssue ? `<p class="drug-sub"><span class="badge blocked">质控问题</span> ${esc(drug.qualityIssue)}</p>` : ""}
           ${statusBadge(drug)}
         </div>
-        <button class="star-btn ${isFavorite(drug.id) ? "active" : ""}" type="button" data-favorite="${esc(drug.id)}" aria-label="${isFavorite(drug.id) ? "取消收藏" : "收藏"}">★</button>
-      </article>`;
+        ${selectable ? "" : `<button class="star-btn ${isFavorite(drug.id) ? "active" : ""}" type="button" data-favorite="${esc(drug.id)}" aria-label="${isFavorite(drug.id) ? "取消收藏" : "收藏"}">★</button>`}
+      </article>
+      ${selectable ? "" : `<div class="swipe-actions"><button type="button" data-favorite="${esc(drug.id)}">${isFavorite(drug.id) ? "取消收藏" : "收藏"}</button>${drug.isCustom ? `<button class="danger" type="button" data-delete-custom="${esc(drug.id)}">删除</button>` : `<button type="button" data-cache="${esc(drug.id)}">${isCached(drug.id) ? "移出缓存" : "缓存"}</button>`}</div>`}
+      </div>`;
+  }
+
+  function renderMarkedText(drugId, field, value) {
+    let html = esc(value);
+    const marks = state.marks
+      .filter(mark => mark.drugId === drugId && mark.field === field && mark.text)
+      .sort((a, b) => b.text.length - a.text.length);
+    marks.forEach(mark => {
+      const target = esc(mark.text);
+      if (!target || !html.includes(target)) return;
+      html = html.replace(target, `<mark class="text-mark ${esc(mark.type)}" title="${esc(mark.type)}">${target}</mark>`);
+    });
+    return html;
   }
 
   function empty(message, action = "") {
@@ -225,6 +253,13 @@
     }
     const clinical = drug.clinical;
     const notes = state.notes.filter(note => note.drugId === id);
+    const clinicalFields = {
+      indication: clinical?.indication || "待逐条核验具体厂家现行说明书",
+      dosage: clinical?.dosage || "待逐条核验具体厂家现行说明书",
+      adverseReactions: clinical?.adverseReactions || "待逐条核验具体厂家现行说明书",
+      precautions: clinical?.precautions || "待逐条核验具体厂家现行说明书"
+    };
+    const markedField = (field, label) => `<div class="detail-item"><dt>${label}</dt><dd class="${clinical ? "markable" : ""}" ${clinical ? `data-mark-field="${field}"` : ""}>${renderMarkedText(id, field, clinicalFields[field])}</dd></div>`;
     app.innerHTML = `
       <section class="panel section">
         <div class="detail-head">
@@ -239,11 +274,12 @@
           <div class="detail-item"><dt>剂型</dt><dd>${esc(drug.dosageForm || "待核验")}</dd></div>
           <div class="detail-item"><dt>类别 / 医保标记</dt><dd>${esc(drug.category || "未分类")} · ${esc(drug.insuranceClass || "未标注")}</dd></div>
           <div class="detail-item"><dt>生产企业</dt><dd>${esc(drug.manufacturer || "待核验")}</dd></div>
-          <div class="detail-item"><dt>适应症</dt><dd>${esc(clinical?.indication || "待逐条核验具体厂家现行说明书")}</dd></div>
-          <div class="detail-item"><dt>用法用量</dt><dd>${esc(clinical?.dosage || "待逐条核验具体厂家现行说明书")}</dd></div>
-          <div class="detail-item"><dt>不良反应</dt><dd>${esc(clinical?.adverseReactions || "待逐条核验具体厂家现行说明书")}</dd></div>
-          <div class="detail-item"><dt>注意事项</dt><dd>${esc(clinical?.precautions || "待逐条核验具体厂家现行说明书")}</dd></div>
+          ${markedField("indication", "适应症")}
+          ${markedField("dosage", "用法用量")}
+          ${markedField("adverseReactions", "不良反应")}
+          ${markedField("precautions", "注意事项")}
         </dl>
+        ${clinical ? `<p class="muted" style="margin-bottom:8px">长按或拖选说明书摘要文字，然后选择标记样式。</p><div id="markToolbar" class="mark-toolbar" hidden><small id="selectedTextPreview"></small><button class="btn secondary small" data-mark-type="underline">划线</button><button class="btn secondary small" data-mark-type="bold">加粗</button><button class="btn secondary small" data-mark-type="highlight">荧光笔</button></div>` : ""}
         <div class="source-box">
           <strong>来源：</strong>${esc(drug.source?.label || "未记录")}<br>
           ${drug.source?.url ? `<a href="${esc(drug.source.url)}" target="_blank" rel="noopener">打开国家药监局来源</a><br>` : ""}
@@ -259,6 +295,40 @@
         <div class="card-list">${notes.length ? notes.map(note => noteCard(note)).join("") : empty("暂无笔记")}</div>
       </section>`;
     document.getElementById("addNoteBtn").addEventListener("click", () => openNoteModal(id));
+    if (clinical) setupTextMarking(id);
+  }
+
+  function setupTextMarking(drugId) {
+    const toolbar = document.getElementById("markToolbar");
+    let selectionData = null;
+    const capture = () => setTimeout(() => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) return;
+      const startNode = selection.anchorNode?.nodeType === Node.TEXT_NODE ? selection.anchorNode.parentElement : selection.anchorNode;
+      const endNode = selection.focusNode?.nodeType === Node.TEXT_NODE ? selection.focusNode.parentElement : selection.focusNode;
+      const field = startNode?.closest?.(".markable");
+      if (!field || !field.contains(endNode)) return;
+      const text = selection.toString().trim().slice(0, 240);
+      if (!text) return;
+      selectionData = { field: field.dataset.markField, text };
+      document.getElementById("selectedTextPreview").textContent = `已选：“${text.slice(0, 28)}${text.length > 28 ? "…" : ""}”`;
+      toolbar.hidden = false;
+    }, 20);
+    app.querySelectorAll(".markable").forEach(node => {
+      node.addEventListener("mouseup", capture);
+      node.addEventListener("touchend", capture, { passive: true });
+    });
+    toolbar.querySelectorAll("[data-mark-type]").forEach(button => button.addEventListener("click", () => {
+      if (!selectionData) return;
+      const duplicate = state.marks.some(mark => mark.drugId === drugId && mark.field === selectionData.field && mark.text === selectionData.text && mark.type === button.dataset.markType);
+      if (!duplicate) {
+        state.marks.push({ id: `mark-${Date.now()}`, drugId, ...selectionData, type: button.dataset.markType, createdAt: new Date().toISOString() });
+        saveState("marks");
+        toast("文本标记已保存");
+      }
+      window.getSelection()?.removeAllRanges();
+      renderDetail(drugId);
+    }));
   }
 
   function noteCard(note) {
@@ -267,7 +337,7 @@
   }
 
   function renderFavorites() {
-    const drugs = state.favorites.map(drugById).filter(Boolean);
+    const drugs = state.favorites.map(drugById).filter(drug => drug && !state.hidden.includes(drug.id));
     app.innerHTML = `
       <section class="section">
         <div class="section-title"><h2>收藏药品</h2><button class="btn secondary small" id="newGroupBtn">新建分组</button></div>
@@ -411,20 +481,76 @@
   function renderAll(filterCategory = "", filterForm = "") {
     const categories = [...new Set(allDrugs().map(d => d.category || "未分类"))];
     const forms = [...new Set(allDrugs().map(d => d.dosageForm || "剂型待核验"))];
+    let batchMode = false;
+    let currentResults = [];
+    const selected = new Set();
     app.innerHTML = `
       <section class="section">
-        <div class="toolbar"><input id="allQuery" placeholder="筛选药品"><select id="allCategory"><option value="">全部类别</option>${categories.map(c => `<option ${c === filterCategory ? "selected" : ""}>${esc(c)}</option>`).join("")}</select><select id="allForm"><option value="">全部剂型</option>${forms.map(f => `<option ${f === filterForm ? "selected" : ""}>${esc(f)}</option>`).join("")}</select></div>
+        <div class="toolbar"><input id="allQuery" placeholder="筛选药品"><select id="allCategory"><option value="">全部类别</option>${categories.map(c => `<option ${c === filterCategory ? "selected" : ""}>${esc(c)}</option>`).join("")}</select><select id="allForm"><option value="">全部剂型</option>${forms.map(f => `<option ${f === filterForm ? "selected" : ""}>${esc(f)}</option>`).join("")}</select><button class="btn secondary" id="batchModeBtn">批量操作</button></div>
+        <div id="batchBar" class="panel section" hidden>
+          <div class="section-title"><strong id="selectedCount">已选 0 项</strong><button class="btn ghost small" id="selectAllBtn">全选当前结果</button></div>
+          <div class="toolbar"><input id="batchCategory" list="batchCategoryOptions" placeholder="输入新分类"><datalist id="batchCategoryOptions">${categories.map(c => `<option value="${esc(c)}">`).join("")}</datalist><button class="btn secondary" id="applyBatchCategory">批量修改分类</button><button class="btn danger" id="deleteBatch">批量删除/隐藏</button>${state.hidden.length ? `<button class="btn ghost" id="restoreHidden">恢复已隐藏（${state.hidden.length}）</button>` : ""}</div>
+          <p class="muted">内置药品执行“删除”时仅在本机隐藏，可恢复；自定义药品会删除并需要二次确认。</p>
+        </div>
         <p id="allCount" class="muted"></p><div id="allList" class="card-list"></div>
       </section>`;
     const draw = () => {
       const q = normalize(document.getElementById("allQuery").value);
       const category = document.getElementById("allCategory").value;
       const form = document.getElementById("allForm").value;
-      const results = allDrugs().filter(d => (!q || normalize(`${d.drugName}${d.genericName}${d.specification}`).includes(q)) && (!category || d.category === category) && (!form || d.dosageForm === form));
-      document.getElementById("allCount").textContent = `${results.length} 个品规`;
-      document.getElementById("allList").innerHTML = results.length ? results.map(drugCard).join("") : empty("没有匹配的药品。");
+      currentResults = allDrugs().filter(d => (!q || normalize(`${d.drugName}${d.genericName}${d.specification}`).includes(q)) && (!category || d.category === category) && (!form || d.dosageForm === form));
+      document.getElementById("allCount").textContent = `${currentResults.length} 个品规${batchMode ? " · 批量模式" : ""}`;
+      document.getElementById("allList").innerHTML = currentResults.length ? currentResults.map(drug => drugCard(drug, { selectable: batchMode, selected: selected.has(drug.id) })).join("") : empty("没有匹配的药品。");
+      document.getElementById("selectedCount").textContent = `已选 ${selected.size} 项`;
     };
     ["allQuery", "allCategory", "allForm"].forEach(id => document.getElementById(id).addEventListener(id === "allQuery" ? "input" : "change", draw));
+    document.getElementById("batchModeBtn").addEventListener("click", () => {
+      batchMode = !batchMode;
+      if (!batchMode) selected.clear();
+      document.getElementById("batchBar").hidden = !batchMode;
+      document.getElementById("batchModeBtn").textContent = batchMode ? "退出批量" : "批量操作";
+      draw();
+    });
+    document.getElementById("allList").addEventListener("change", event => {
+      const checkbox = event.target.closest("[data-select-drug]");
+      if (!checkbox) return;
+      if (checkbox.checked) selected.add(checkbox.dataset.selectDrug);
+      else selected.delete(checkbox.dataset.selectDrug);
+      document.getElementById("selectedCount").textContent = `已选 ${selected.size} 项`;
+    });
+    document.getElementById("selectAllBtn").addEventListener("click", () => {
+      const allSelected = currentResults.length && currentResults.every(drug => selected.has(drug.id));
+      currentResults.forEach(drug => allSelected ? selected.delete(drug.id) : selected.add(drug.id));
+      draw();
+    });
+    document.getElementById("applyBatchCategory").addEventListener("click", () => {
+      const category = document.getElementById("batchCategory").value.trim();
+      if (!selected.size) return toast("请先选择药品");
+      if (!category) return toast("请输入新分类");
+      selected.forEach(id => { state.categoryOverrides[id] = category; });
+      if (!state.customCategories.includes(category)) state.customCategories.push(category);
+      saveState("categoryOverrides"); saveState("customCategories");
+      toast(`已修改 ${selected.size} 项分类`); selected.clear(); draw();
+    });
+    document.getElementById("deleteBatch").addEventListener("click", () => {
+      if (!selected.size) return toast("请先选择药品");
+      const ids = [...selected];
+      confirmModal(`确认处理选中的 ${ids.length} 项？内置药品将隐藏，自定义药品将删除。`, () => {
+        const customIds = new Set(ids.filter(id => id.startsWith("custom-")));
+        const builtInIds = ids.filter(id => !customIds.has(id));
+        state.customDrugs = state.customDrugs.filter(drug => !customIds.has(drug.id));
+        state.hidden = [...new Set([...state.hidden, ...builtInIds])];
+        state.notes = state.notes.filter(note => !customIds.has(note.drugId));
+        state.marks = state.marks.filter(mark => !customIds.has(mark.drugId));
+        state.favorites = state.favorites.filter(id => !customIds.has(id));
+        state.cached = state.cached.filter(id => !customIds.has(id));
+        ["customDrugs", "hidden", "notes", "marks", "favorites", "cached"].forEach(saveState);
+        selected.clear(); toast("批量操作已完成"); renderAll();
+      });
+    });
+    document.getElementById("restoreHidden")?.addEventListener("click", () => confirmModal(`确认恢复 ${state.hidden.length} 个已隐藏的内置品规？`, () => {
+      state.hidden = []; saveState("hidden"); toast("已恢复隐藏品规"); renderAll();
+    }));
     draw();
   }
 
@@ -453,9 +579,16 @@
   }
 
   function renderNotebook() {
+    const fieldLabels = { indication: "适应症", dosage: "用法用量", adverseReactions: "不良反应", precautions: "注意事项" };
+    const markCards = state.marks.map(mark => {
+      const drug = drugById(mark.drugId);
+      const typeLabels = { underline: "划线", bold: "加粗", highlight: "荧光笔" };
+      return `<article class="card"><div class="detail-head"><div><h3>${esc(drug?.drugName || "已删除药品")}</h3><span class="badge info">${esc(fieldLabels[mark.field] || mark.field)} · ${esc(typeLabels[mark.type] || mark.type)}</span></div><button class="btn ghost small" data-delete-mark="${esc(mark.id)}">删除</button></div><p class="mark-quote">${esc(mark.text)}</p></article>`;
+    });
     app.innerHTML = `
-      <section class="section"><div class="section-title"><h2>全部药品笔记</h2><button class="btn ghost small" id="exportNotes">导出</button></div><div class="card-list">${state.notes.length ? state.notes.sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)).map(noteCard).join("") : empty("还没有笔记。请从药品详情页添加。")}</div></section>`;
-    document.getElementById("exportNotes").onclick = () => downloadJson("drug-notes.json", state.notes);
+      <section class="section"><div class="section-title"><h2>全部药品笔记</h2><button class="btn ghost small" id="exportNotes">导出笔记本</button></div><div class="card-list">${state.notes.length ? [...state.notes].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)).map(noteCard).join("") : empty("还没有笔记。请从药品详情页添加。")}</div></section>
+      <section class="section"><div class="section-title"><h2>文本标记</h2><small>${state.marks.length} 条</small></div><div class="marks-list">${markCards.length ? markCards.join("") : empty("还没有划线、加粗或荧光笔标记。")}</div></section>`;
+    document.getElementById("exportNotes").onclick = () => downloadJson("drug-notebook.json", { exportedAt: new Date().toISOString(), notes: state.notes, marks: state.marks });
   }
 
   function drugOptions() {
@@ -542,6 +675,8 @@
     if (favorite) { event.stopPropagation(); return toggleFavorite(favorite.dataset.favorite); }
     const cache = event.target.closest("[data-cache]");
     if (cache) { toggleSet("cached", cache.dataset.cache); toast(isCached(cache.dataset.cache) ? "已加入缓存" : "已移出缓存"); return render(); }
+    const swipedContent = event.target.closest(".swipe-row.swiped .swipe-content");
+    if (swipedContent) { event.preventDefault(); swipedContent.closest(".swipe-row").classList.remove("swiped"); return; }
     const drug = event.target.closest("[data-open-drug]");
     if (drug) return navigate("detail", drug.dataset.openDrug);
     const category = event.target.closest("[data-category]");
@@ -552,7 +687,38 @@
     if (note) confirmModal("确认删除这条笔记？", () => { state.notes = state.notes.filter(n => n.id !== note.dataset.deleteNote); saveState("notes"); render(); toast("笔记已删除"); });
     const contra = event.target.closest("[data-delete-contra]");
     if (contra) confirmModal("确认删除这条自定义禁忌记录？", () => { state.contraindications = state.contraindications.filter(c => c.id !== contra.dataset.deleteContra); saveState("contraindications"); render(); toast("记录已删除"); });
+    const mark = event.target.closest("[data-delete-mark]");
+    if (mark) confirmModal("确认删除这条文本标记？", () => { state.marks = state.marks.filter(m => m.id !== mark.dataset.deleteMark); saveState("marks"); render(); toast("标记已删除"); });
+    const custom = event.target.closest("[data-delete-custom]");
+    if (custom) confirmModal("确认删除这个自定义药品及其关联笔记、标记？", () => {
+      const id = custom.dataset.deleteCustom;
+      state.customDrugs = state.customDrugs.filter(d => d.id !== id);
+      state.notes = state.notes.filter(n => n.drugId !== id);
+      state.marks = state.marks.filter(m => m.drugId !== id);
+      state.favorites = state.favorites.filter(item => item !== id);
+      state.cached = state.cached.filter(item => item !== id);
+      delete state.favoriteMap[id]; delete state.categoryOverrides[id];
+      ["customDrugs", "notes", "marks", "favorites", "cached", "favoriteMap", "categoryOverrides"].forEach(saveState);
+      render(); toast("自定义药品已删除");
+    });
     if (event.target.closest("[data-close-modal]")) closeModal();
+  });
+
+  let swipeStart = null;
+  document.addEventListener("pointerdown", event => {
+    const row = event.target.closest("[data-swipe-row]");
+    if (!row || event.target.closest("button, input, select, textarea, label")) return;
+    swipeStart = { row, x: event.clientX, y: event.clientY };
+  });
+  document.addEventListener("pointerup", event => {
+    if (!swipeStart) return;
+    const dx = event.clientX - swipeStart.x;
+    const dy = event.clientY - swipeStart.y;
+    if (Math.abs(dx) > 38 && Math.abs(dx) > Math.abs(dy)) {
+      document.querySelectorAll(".swipe-row.swiped").forEach(row => { if (row !== swipeStart.row) row.classList.remove("swiped"); });
+      swipeStart.row.classList.toggle("swiped", dx < 0);
+    }
+    swipeStart = null;
   });
 
   backBtn.addEventListener("click", () => history.back());

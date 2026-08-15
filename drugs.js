@@ -198,6 +198,20 @@ window.DRUG_CATALOG = (() => {
       adverseReactions: "偶见局部痒感或灼感。",
       precautions: "避免把商品名“百多邦”误填为通用名；本条为品种说明书范本摘要。",
       source: { status: "verified-template", label: "国家药监局：莫匹罗星软膏说明书范本", url: "https://www.nmpa.gov.cn/wwwroot/hysms3/052.htm", checkedAt: "2026-08-15" }
+    },
+    "乳果糖口服溶液": {
+      indication: "用于治疗高血氨症及由血氨升高引起的疾病；用于治疗慢性功能性便秘。具体适用范围以本品现行厂家说明书为准。",
+      dosage: "国家药监局品种范本列示口服，成人一次10ml、一日3次；不同适应症、年龄及具体制剂的剂量可能不同，须核对厂家说明书或遵医嘱。",
+      adverseReactions: "范本记载个别患者服用后可稍感恶心；实际使用仍需查看具体厂家现行说明书的完整不良反应。",
+      precautions: "本条仅为国家药监局品种说明书范本摘要；肠梗阻风险、糖代谢异常等特殊情况必须由医生结合具体产品说明书判断。",
+      source: { status: "verified-template", label: "国家药监局：乳果糖口服溶液说明书范本", url: "https://www.nmpa.gov.cn/wwwroot/hy5/074.htm", checkedAt: "2026-08-15" }
+    },
+    "酚麻美敏片(泰诺)": {
+      indication: "用于缓解普通感冒或流行性感冒引起的发热、头痛、四肢酸痛、喷嚏、流涕、鼻塞、咳嗽和咽痛等症状。",
+      dosage: "国家药监局范本列示口服，成人和12岁以上儿童每6小时1次、每次1片，24小时不超过4片；本清单包装仍须以盒内现行说明书为准。",
+      adverseReactions: "可见轻度嗜睡、头晕、乏力、恶心、上腹不适、口干及食欲缺乏等。",
+      precautions: "含多种感冒药成分；不得与成分相似的其他感冒药重复使用。服药期间避免饮酒；驾驶、操作机器及高空作业者工作时间禁用。肝肾功能不全者和特殊人群使用前咨询医生或药师。",
+      source: { status: "verified-template", label: "国家药监局：酚麻美敏片说明书范本", url: "https://www.nmpa.gov.cn/wwwroot/gsz03198/hyhx17.htm", checkedAt: "2026-08-15" }
     }
   };
 
