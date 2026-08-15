@@ -33,6 +33,7 @@
     cached: read("cached", []),
     hidden: read("hidden", []),
     categoryOverrides: read("categoryOverrides", {}),
+    drugOverrides: read("drugOverrides", {}),
     history: []
   };
 
@@ -72,12 +73,23 @@
 
   const normalize = value => String(value ?? "").toLowerCase().replace(/[\s()（）·:：,，/\-]/g, "");
   const catalogDrugs = () => [...window.DRUG_CATALOG, ...state.customDrugs];
+  const applyLocalOverrides = drug => {
+    const override = state.drugOverrides[drug.id];
+    const category = state.categoryOverrides[drug.id];
+    if (!override && !category) return drug;
+    const merged = { ...drug, ...(override || {}), ...(category ? { category } : {}) };
+    if (override && !drug.isCustom) {
+      merged.qualityIssue = [drug.qualityIssue, "本机目录字段已编辑，须按药盒、批准文号和现行说明书复核。"].filter(Boolean).join(" ");
+      merged.localEdited = true;
+    }
+    return merged;
+  };
   const allDrugs = () => catalogDrugs()
     .filter(drug => !state.hidden.includes(drug.id))
-    .map(drug => state.categoryOverrides[drug.id] ? { ...drug, category: state.categoryOverrides[drug.id] } : drug);
+    .map(applyLocalOverrides);
   const drugById = id => {
     const drug = catalogDrugs().find(item => item.id === id);
-    return drug && state.categoryOverrides[id] ? { ...drug, category: state.categoryOverrides[id] } : drug;
+    return drug ? applyLocalOverrides(drug) : drug;
   };
   const isFavorite = id => state.favorites.includes(id);
   const isCached = id => state.cached.includes(id);
@@ -310,6 +322,7 @@
         </div>
         <div class="toolbar" style="margin-top:16px">
           <button class="btn ${isCached(id) ? "ghost" : "secondary"}" data-cache="${esc(id)}">${isCached(id) ? "移出缓存" : "缓存此药"}</button>
+          ${drug.isCustom ? '<button class="btn secondary" id="editCustomDrugBtn">编辑药品</button>' : ""}
           <button class="btn primary" id="addNoteBtn">添加笔记</button>
         </div>
       </section>
@@ -318,6 +331,7 @@
         <div class="card-list">${notes.length ? notes.map(note => noteCard(note)).join("") : empty("暂无笔记")}</div>
       </section>`;
     document.getElementById("addNoteBtn").addEventListener("click", () => openNoteModal(id));
+    document.getElementById("editCustomDrugBtn")?.addEventListener("click", () => openEditDrugModal(id));
     if (clinical) setupTextMarking(id);
   }
 
@@ -498,20 +512,81 @@
   }
 
   function renderCache() {
-    const cached = state.cached.map(drugById).filter(Boolean);
+    let batchMode = false;
+    const selected = new Set();
+    const categories = [...new Set(allDrugs().map(drug => drug.category || "未分类"))];
+    const getCached = () => state.cached.map(drugById).filter(Boolean);
+    const cacheCard = drug => `<div class="cache-entry">${drugCard(drug, { selectable: batchMode, selected: selected.has(drug.id) })}${batchMode ? "" : `<div class="favorite-tools"><span>${drug.localEdited ? "本机已编辑 · 待复核" : "缓存目录字段"}</span><button class="btn ghost small" data-edit-cache="${esc(drug.id)}">编辑缓存字段</button></div>`}</div>`;
     app.innerHTML = `
       <section class="panel section">
-        <div class="section-title"><h2>离线缓存</h2><span class="badge info">${cached.length} 个品规</span></div>
+        <div class="section-title"><h2>离线缓存</h2><span class="badge info" id="cacheCount">${getCached().length} 个品规</span></div>
         <p class="muted">本静态站点的目录代码会随页面加载；这里记录的是你主动选择的常用药清单，便于离线优先展示。</p>
-        <div class="toolbar"><button class="btn secondary" id="cacheVerified">缓存已核验条目</button><button class="btn ghost" id="exportCache">导出 JSON</button><button class="btn danger" id="clearCache">清空缓存</button></div>
+        <div class="toolbar"><button class="btn secondary" id="cacheVerified">预加载已核验条目</button><button class="btn secondary" id="cacheBatchMode">批量操作</button><button class="btn ghost" id="detectDuplicates">检测重复</button><button class="btn ghost" id="exportCache">导出 JSON</button><button class="btn danger" id="clearCache">清空缓存</button></div>
       </section>
-      <section class="section"><div class="card-list">${cached.length ? cached.map(drugCard).join("") : empty("尚未缓存药品。")}</div></section>`;
+      <section class="panel section" id="cacheBatchBar" hidden>
+        <div class="section-title"><strong id="cacheSelectedCount">已选 0 项</strong><button class="btn ghost small" id="cacheSelectAll">全选</button></div>
+        <div class="toolbar"><input id="cacheBatchCategory" list="cacheCategoryOptions" placeholder="输入新分类"><datalist id="cacheCategoryOptions">${categories.map(category => `<option value="${esc(category)}">`).join("")}</datalist><button class="btn secondary" id="applyCacheCategory">批量修改分类</button><button class="btn danger" id="removeSelectedCache">批量移出缓存</button></div>
+      </section>
+      <section id="duplicateResults" class="section" hidden></section>
+      <section class="section"><div id="cacheList" class="card-list"></div></section>`;
+    const draw = () => {
+      const cached = getCached();
+      document.getElementById("cacheCount").textContent = `${cached.length} 个品规`;
+      document.getElementById("cacheSelectedCount").textContent = `已选 ${selected.size} 项`;
+      document.getElementById("cacheList").innerHTML = cached.length ? cached.map(cacheCard).join("") : empty("尚未缓存药品。");
+    };
     document.getElementById("cacheVerified").onclick = () => {
       state.cached = [...new Set([...state.cached, ...allDrugs().filter(d => d.source?.status === "verified-template").map(d => d.id)])];
       saveState("cached"); toast("已缓存核验条目"); renderCache();
     };
-    document.getElementById("exportCache").onclick = () => downloadJson("drug-cache.json", cached);
+    document.getElementById("cacheBatchMode").onclick = () => {
+      batchMode = !batchMode; selected.clear();
+      document.getElementById("cacheBatchBar").hidden = !batchMode;
+      document.getElementById("cacheBatchMode").textContent = batchMode ? "退出批量" : "批量操作";
+      draw();
+    };
+    document.getElementById("cacheList").addEventListener("change", event => {
+      const checkbox = event.target.closest("[data-select-drug]");
+      if (!checkbox) return;
+      checkbox.checked ? selected.add(checkbox.dataset.selectDrug) : selected.delete(checkbox.dataset.selectDrug);
+      document.getElementById("cacheSelectedCount").textContent = `已选 ${selected.size} 项`;
+    });
+    document.getElementById("cacheList").addEventListener("click", event => {
+      const edit = event.target.closest("[data-edit-cache]");
+      if (edit) { event.stopPropagation(); openEditDrugModal(edit.dataset.editCache); }
+    });
+    document.getElementById("cacheSelectAll").onclick = () => {
+      const cached = getCached(); const allSelected = cached.length && cached.every(drug => selected.has(drug.id));
+      cached.forEach(drug => allSelected ? selected.delete(drug.id) : selected.add(drug.id)); draw();
+    };
+    document.getElementById("applyCacheCategory").onclick = () => {
+      const category = document.getElementById("cacheBatchCategory").value.trim();
+      if (!selected.size) return toast("请先选择缓存药品");
+      if (!category) return toast("请输入新分类");
+      selected.forEach(id => { state.categoryOverrides[id] = category; });
+      if (!state.customCategories.includes(category)) state.customCategories.push(category);
+      saveState("categoryOverrides"); saveState("customCategories"); selected.clear(); toast("缓存药品分类已修改"); draw();
+    };
+    document.getElementById("removeSelectedCache").onclick = () => {
+      if (!selected.size) return toast("请先选择缓存药品");
+      confirmModal(`确认将 ${selected.size} 项移出缓存？`, () => {
+        state.cached = state.cached.filter(id => !selected.has(id)); saveState("cached"); selected.clear(); renderCache(); toast("已批量移出缓存");
+      });
+    };
+    document.getElementById("detectDuplicates").onclick = () => {
+      const groups = Object.values(getCached().reduce((map, drug) => {
+        const key = `${normalize(drug.genericName)}|${normalize(drug.specification)}`;
+        if (!normalize(drug.genericName) || !normalize(drug.specification)) return map;
+        (map[key] ||= []).push(drug); return map;
+      }, {})).filter(group => group.length > 1);
+      const panel = document.getElementById("duplicateResults"); panel.hidden = false;
+      panel.innerHTML = groups.length
+        ? `<div class="section-title"><h2>疑似重复品规</h2><span class="badge warn">${groups.length} 组</span></div><div class="card-list">${groups.map(group => `<div class="card"><strong>${esc(group[0].genericName)} · ${esc(group[0].specification)}</strong><p class="drug-sub">${group.map(drug => esc(drug.drugName)).join("、")}</p></div>`).join("")}</div>`
+        : '<div class="notice">当前缓存中未发现“通用名 + 规格”完全相同的疑似重复项。</div>';
+    };
+    document.getElementById("exportCache").onclick = () => downloadJson("drug-cache.json", { exportedAt: new Date().toISOString(), drugs: getCached() });
     document.getElementById("clearCache").onclick = () => confirmModal("确认清空缓存清单？", () => { state.cached = []; saveState("cached"); renderCache(); toast("缓存已清空"); });
+    draw();
   }
 
   function renderAll(filterCategory = "", filterForm = "") {
@@ -660,6 +735,79 @@
     };
   }
 
+  function openEditDrugModal(drugId) {
+    const drug = drugById(drugId);
+    if (!drug) return toast("未找到该药品");
+    const hasLocalOverride = Boolean(state.drugOverrides[drugId] || state.categoryOverrides[drugId]);
+    const categories = [...new Set([...allDrugs().map(item => item.category || "未分类"), ...state.customCategories])];
+    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="editDrugForm">
+      <h2>${drug.isCustom ? "编辑自定义药品" : "编辑本机缓存字段"}</h2>
+      <p class="notice ${drug.isCustom ? "" : "danger"}">${drug.isCustom ? "保存后仍保持“未核验”状态。" : "这里只修改当前浏览器中的目录字段，不会改写内置数据或说明书临床字段；保存后会显示待复核提示。"}</p>
+      <div class="form-grid" style="margin-top:16px">
+        <div class="field"><label>药品名称 *</label><input name="drugName" value="${esc(drug.drugName)}" required></div>
+        <div class="field"><label>通用名</label><input name="genericName" value="${esc(drug.genericName)}"></div>
+        <div class="field"><label>规格</label><input name="specification" value="${esc(drug.specification)}"></div>
+        <div class="field"><label>剂型</label><input name="dosageForm" value="${esc(drug.dosageForm)}"></div>
+        <div class="field"><label>类别</label><input name="category" list="editCategoryOptions" value="${esc(drug.category || "未分类")}"><datalist id="editCategoryOptions">${categories.map(category => `<option value="${esc(category)}">`).join("")}</datalist></div>
+        <div class="field"><label>生产企业</label><input name="manufacturer" value="${esc(drug.manufacturer)}"></div>
+      </div>
+      <div class="modal-actions">
+        ${drug.isCustom ? '<button type="button" class="btn danger" id="deleteEditedDrug">删除药品</button>' : hasLocalOverride ? '<button type="button" class="btn danger" id="restoreDrugFields">恢复原始字段</button>' : ""}
+        <button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button>
+      </div>
+    </form></div>`;
+    document.getElementById("editDrugForm").onsubmit = event => {
+      event.preventDefault();
+      const data = Object.fromEntries(new FormData(event.target));
+      const fields = {
+        drugName: data.drugName.trim(),
+        genericName: data.genericName.trim(),
+        specification: data.specification.trim(),
+        dosageForm: data.dosageForm.trim(),
+        manufacturer: data.manufacturer.trim()
+      };
+      const category = data.category.trim() || "未分类";
+      if (drug.isCustom) {
+        state.customDrugs = state.customDrugs.map(item => item.id === drugId
+          ? { ...item, ...fields, rawName: fields.drugName, category, source: { ...item.source, checkedAt: new Date().toISOString().slice(0, 10) } }
+          : item);
+        saveState("customDrugs");
+      } else {
+        state.drugOverrides[drugId] = { ...fields, localEditedAt: new Date().toISOString() };
+        state.categoryOverrides[drugId] = category;
+        saveState("drugOverrides"); saveState("categoryOverrides");
+      }
+      const builtInCategories = new Set(window.DRUG_CATALOG.map(item => item.category));
+      if (!builtInCategories.has(category) && !state.customCategories.includes(category)) {
+        state.customCategories.push(category); saveState("customCategories");
+      }
+      closeModal(); render(); toast(drug.isCustom ? "自定义药品已更新" : "本机缓存字段已更新，待复核");
+    };
+    document.getElementById("restoreDrugFields")?.addEventListener("click", () => {
+      closeModal();
+      confirmModal("恢复该药品的原始目录字段和分类？", () => {
+        delete state.drugOverrides[drugId]; delete state.categoryOverrides[drugId];
+        saveState("drugOverrides"); saveState("categoryOverrides"); render(); toast("已恢复原始目录字段");
+      });
+    });
+    document.getElementById("deleteEditedDrug")?.addEventListener("click", () => {
+      closeModal();
+      confirmModal("确认删除这个自定义药品及其关联笔记、标记？", () => {
+        removeCustomDrug(drugId); navigate("all"); toast("自定义药品已删除");
+      });
+    });
+  }
+
+  function removeCustomDrug(id) {
+    state.customDrugs = state.customDrugs.filter(drug => drug.id !== id);
+    state.notes = state.notes.filter(note => note.drugId !== id);
+    state.marks = state.marks.filter(mark => mark.drugId !== id);
+    state.favorites = state.favorites.filter(item => item !== id);
+    state.cached = state.cached.filter(item => item !== id);
+    delete state.favoriteMap[id]; delete state.categoryOverrides[id]; delete state.drugOverrides[id];
+    ["customDrugs", "notes", "marks", "favorites", "cached", "favoriteMap", "categoryOverrides", "drugOverrides"].forEach(saveState);
+  }
+
   function openGroupModal() {
     modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="groupForm"><h2>新建收藏分组</h2><div class="field"><label>分组名称</label><input name="name" required maxlength="30"></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">创建</button></div></form></div>`;
     document.getElementById("groupForm").onsubmit = event => {
@@ -791,13 +939,7 @@
     const custom = event.target.closest("[data-delete-custom]");
     if (custom) confirmModal("确认删除这个自定义药品及其关联笔记、标记？", () => {
       const id = custom.dataset.deleteCustom;
-      state.customDrugs = state.customDrugs.filter(d => d.id !== id);
-      state.notes = state.notes.filter(n => n.drugId !== id);
-      state.marks = state.marks.filter(m => m.drugId !== id);
-      state.favorites = state.favorites.filter(item => item !== id);
-      state.cached = state.cached.filter(item => item !== id);
-      delete state.favoriteMap[id]; delete state.categoryOverrides[id];
-      ["customDrugs", "notes", "marks", "favorites", "cached", "favoriteMap", "categoryOverrides"].forEach(saveState);
+      removeCustomDrug(id);
       render(); toast("自定义药品已删除");
     });
     if (event.target.closest("[data-close-modal]")) closeModal();
