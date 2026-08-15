@@ -106,6 +106,12 @@ button { cursor: pointer; }
 .favorite-entry { display: grid; gap: 6px; }
 .cache-entry { display: grid; gap: 6px; }
 .favorite-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 10px 6px; color: var(--muted); font-size: 12px; }
+.link-btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.lookup-results { margin-top: 12px; }
+.lookup-card { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+.clinical-editor { margin: 2px 0 14px; padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: #f8faf9; }
+.clinical-editor summary { cursor: pointer; color: var(--brand-dark); font-weight: 800; }
+.clinical-editor[open] summary { margin-bottom: 12px; }
 
 .card-list { display: grid; gap: 11px; }
 .card { padding: 16px; border-radius: 18px; transition: transform .12s, box-shadow .12s; }
