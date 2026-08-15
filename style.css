@@ -104,6 +104,7 @@ button { cursor: pointer; }
 .group-admin-card > button small { margin-top: 3px; color: var(--muted); }
 .group-admin-card > div { display: flex; gap: 5px; }
 .favorite-entry { display: grid; gap: 6px; }
+.cache-entry { display: grid; gap: 6px; }
 .favorite-tools { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 2px 10px 6px; color: var(--muted); font-size: 12px; }
 
 .card-list { display: grid; gap: 11px; }
