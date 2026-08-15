@@ -421,7 +421,7 @@
         <p class="notice">可先联网检索并填入候选字段。目录信息和临床内容保存后仍标记为“待复核”，必须对照批准文号和现行说明书确认。</p>
         <form id="drugForm" style="margin-top:16px">
           <div class="form-grid">
-            <div class="field"><label>药品名称 *</label><input name="drugName" required></div>
+            <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required placeholder="输入中文药品名"><button class="btn secondary" id="lookupDrugBtn" type="button">查找中文资料</button></div></div>
             <div class="field"><label>通用名</label><input name="genericName"></div>
             <div class="field"><label>规格</label><input name="specification"></div>
             <div class="field"><label>剂型</label><input name="dosageForm"></div>
@@ -441,14 +441,14 @@
         </form>
       </section>
       <section class="panel section">
-        <h3>联网检索自动填充</h3>
-        <p class="muted">中文药名先匹配本项目已核验的国家药监局范本；英文药名可检索 NLM/FDA 公开标签。不会自动生成相互作用结论。</p>
-        <div class="toolbar"><input id="onlineDrugQuery" placeholder="输入药品名或通用名"><button class="btn secondary" id="lookupDrugBtn" type="button">联网检索</button><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局核验</a></div>
+        <h3>选择中文资料自动填充</h3>
+        <p class="muted">在上方输入中文药品名，点击“查找中文资料”，再选择候选自动填充。仅使用本项目已核验的国家药监局中文资料，不导入或翻译英文标签。</p>
+        <div class="toolbar"><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局联网核验</a></div>
         <div id="lookupStatus" class="muted"></div><div id="lookupResults" class="card-list lookup-results"></div>
       </section>
       <section class="panel section">
         <h3>药盒图片 OCR</h3>
-        <p class="muted">图片在当前设备中识别，不上传到本项目服务器。首次使用需联网下载简体中文/英文识别模型；识别结果必须人工核对。</p>
+        <p class="muted">图片在当前设备中识别，不上传到本项目服务器。首次使用需联网下载简体中文及规格字符识别模型；识别结果必须人工核对。</p>
         <div class="field"><label>拍照或选择药盒图片</label><input id="drugImageInput" type="file" accept="image/*" capture="environment"></div>
         <img id="drugImagePreview" class="ocr-preview" alt="待识别药盒预览" hidden>
         <div class="toolbar"><button class="btn secondary" id="recognizeDrugImage" type="button" disabled>识别包装文字</button><button class="btn ghost" id="useOcrText" type="button" disabled>使用文字联网检索</button></div>
@@ -468,23 +468,27 @@
     const renderLookupResults = candidates => {
       const results = document.getElementById("lookupResults");
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
-      results.innerHTML = candidates.length ? candidates.map(candidate => `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待核验")} · ${esc(candidate.specification || "规格待核验")} · ${esc(candidate.manufacturer || "厂家待核验")}</p><p class="drug-sub"><span class="badge warn">待复核</span> ${esc(candidate.source.label)}${candidate.clinical ? " · 含临床字段" : ""}</p></div><button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">填入表单</button></article>`).join("") : empty("未找到可自动填充的候选项。请尝试通用名，或打开国家药监局核验。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
+      results.innerHTML = candidates.length ? candidates.map(candidate => `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待核验")} · ${esc(candidate.specification || "规格待核验")} · ${esc(candidate.manufacturer || "厂家待核验")}</p><p class="drug-sub"><span class="badge warn">待复核</span> ${esc(candidate.source.label)}${candidate.clinical ? " · 含中文临床字段" : ""}</p></div><button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">自动填充此项</button></article>`).join("") : empty("未找到可自动填充的中文核验资料。请在国家药监局联网核验后手动录入；本工具不会使用英文结果。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
     document.getElementById("lookupResults").addEventListener("click", event => {
       const button = event.target.closest("[data-use-lookup]");
       if (button) useCandidate(lookupCandidates.get(button.dataset.useLookup));
     });
     document.getElementById("lookupDrugBtn").addEventListener("click", async () => {
-      const query = document.getElementById("onlineDrugQuery").value.trim();
+      const query = form.elements.namedItem("drugName").value.trim();
       if (!query) return toast("请先输入药品名");
+      if (!hasChineseText(query)) return toast("请输入中文药品名称");
       const button = document.getElementById("lookupDrugBtn"); const status = document.getElementById("lookupStatus");
-      button.disabled = true; button.textContent = "检索中…"; status.textContent = "正在检索本地核验范本与公开药品标签…";
+      button.disabled = true; button.textContent = "查找中…"; status.textContent = "正在联网读取中文核验资料…";
       try {
-        const candidates = await searchDrugCandidates(query);
-        renderLookupResults(candidates); status.textContent = `找到 ${candidates.length} 个候选；请选择后核对全部字段。`;
+        const result = await searchDrugCandidates(query); const candidates = result.candidates;
+        renderLookupResults(candidates);
+        status.textContent = result.networkError
+          ? (candidates.length ? `联网中文库暂不可用，已显示 ${candidates.length} 个本机中文候选。` : `联网中文库暂不可用：${result.networkError.message || "网络不可用"}`)
+          : (candidates.length ? `联网找到 ${candidates.length} 个中文候选；请选择一项自动填充并核对全部字段。` : "联网中文库没有匹配项，不会返回英文资料。");
       } catch (error) {
-        renderLookupResults([]); status.textContent = `联网检索失败：${error.message || "网络不可用"}`;
-      } finally { button.disabled = false; button.textContent = "联网检索"; }
+        renderLookupResults([]); status.textContent = `中文资料检索失败：${error.message || "网络不可用"}`;
+      } finally { button.disabled = false; button.textContent = "查找中文资料"; }
     });
     let ocrImageUrl = "";
     const applyOcrText = () => {
@@ -494,7 +498,6 @@
       if (!fields.drugName) return toast("未识别到药品名称，请修改识别文字");
       setField("drugName", fields.drugName); setField("specification", fields.specification);
       setField("dosageForm", fields.dosageForm); setField("manufacturer", fields.manufacturer);
-      document.getElementById("onlineDrugQuery").value = fields.drugName;
       document.getElementById("lookupDrugBtn").click();
     };
     document.getElementById("drugImageInput").addEventListener("change", event => {
@@ -585,77 +588,45 @@
     return { drugName, specification: specificationMatch?.[0] || "", dosageForm: formMatch?.[0] || "", manufacturer: manufacturer.slice(0, 100) };
   }
 
-  const clipLabelText = value => (Array.isArray(value) ? value.join("\n") : String(value || "")).trim().slice(0, 6000);
+  const hasChineseText = value => /[\u3400-\u9fff]/.test(String(value || ""));
 
-  function labelSection(record, names) {
-    for (const name of names) {
-      const value = clipLabelText(record[name]);
-      if (value) return value;
-    }
-    return "";
+  function isChineseCandidate(candidate) {
+    if (!hasChineseText(`${candidate.drugName}${candidate.genericName}`)) return false;
+    if (!candidate.clinical) return true;
+    return ["indication", "dosage", "adverseReactions", "precautions"].every(name => !candidate.clinical[name] || hasChineseText(candidate.clinical[name]));
   }
 
   function localLookupCandidates(query) {
     const q = normalize(query);
-    return window.DRUG_CATALOG.filter(drug => drug.clinical && drug.source?.url && normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q)).slice(0, 4).map(drug => ({
+    return window.DRUG_CATALOG.filter(drug => drug.clinical && drug.source?.url && normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q)).slice(0, 8).map(drug => ({
       drugName: drug.drugName, genericName: drug.genericName, specification: drug.specification,
       dosageForm: drug.dosageForm, category: drug.category, manufacturer: drug.manufacturer,
       clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验范本）` }
-    }));
+    })).filter(isChineseCandidate);
   }
 
-  async function fetchOpenFdaCandidates(query) {
-    const clean = query.replace(/["\\]/g, " ").trim();
-    const search = `(openfda.generic_name:"${clean}" OR openfda.brand_name:"${clean}" OR openfda.substance_name:"${clean}")`;
-    const url = `https://api.fda.gov/drug/label.json?search=${encodeURIComponent(search)}&limit=5`;
-    const response = await fetch(url, { headers: { Accept: "application/json" } });
-    if (response.status === 404) return [];
-    if (!response.ok) throw new Error(`FDA 标签服务返回 ${response.status}`);
+  async function fetchChineseCatalogCandidates(query) {
+    const response = await fetch("./chinese-drug-labels.json?v=1", { cache: "no-store", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
-    return (payload.results || []).map(record => {
-      const meta = record.openfda || {};
-      const setId = record.set_id || meta.spl_set_id?.[0] || "";
-      const genericName = meta.generic_name?.[0] || meta.substance_name?.[0] || clean;
-      const clinical = {
-        indication: labelSection(record, ["indications_and_usage"]),
-        dosage: labelSection(record, ["dosage_and_administration"]),
-        adverseReactions: labelSection(record, ["adverse_reactions"]),
-        precautions: labelSection(record, ["warnings_and_cautions", "warnings", "precautions"])
-      };
-      return {
-        drugName: meta.brand_name?.[0] || genericName, genericName,
-        specification: labelSection(record, ["active_ingredient"]),
-        dosageForm: record.dosage_form?.[0] || meta.route?.[0] || "",
-        category: "西药", manufacturer: meta.manufacturer_name?.[0] || "",
-        clinical: Object.values(clinical).some(Boolean) ? clinical : null,
-        source: {
-          status: "needs-review", label: "FDA openFDA / NLM DailyMed 英文标签候选",
-          url: setId ? `https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=${encodeURIComponent(setId)}` : "https://open.fda.gov/apis/drug/label/",
-          checkedAt: new Date().toISOString().slice(0, 10)
-        }
-      };
-    });
+    if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
+    const q = normalize(query);
+    return payload.drugs.filter(candidate => normalize(`${candidate.drugName}${candidate.genericName}`).includes(q))
+      .map(candidate => ({ ...candidate, clinical: candidate.clinical ? { ...candidate.clinical } : null, source: { ...candidate.source, label: `${candidate.source.label}（联网中文库）` } }))
+      .filter(isChineseCandidate).slice(0, 8);
   }
 
   async function searchDrugCandidates(query) {
-    const local = localLookupCandidates(query);
+    if (!hasChineseText(query)) throw new Error("仅支持中文药品名称");
     let remote = []; let networkError = null;
-    try { remote = await fetchOpenFdaCandidates(query); } catch (error) { networkError = error; }
-    if (!remote.length) {
-      try {
-        const rxResponse = await fetch(`https://rxnav.nlm.nih.gov/REST/approximateTerm.json?term=${encodeURIComponent(query)}&maxEntries=3&option=1`);
-        if (!rxResponse.ok) throw new Error(`RxNorm 服务返回 ${rxResponse.status}`);
-        const rxData = await rxResponse.json();
-        const resolved = rxData.approximateGroup?.candidate?.find(candidate => candidate.name)?.name;
-        if (resolved && normalize(resolved) !== normalize(query)) remote = await fetchOpenFdaCandidates(resolved);
-      } catch (error) { networkError ||= error; }
-    }
-    if (!local.length && !remote.length && networkError) throw networkError;
+    try { remote = await fetchChineseCatalogCandidates(query); } catch (error) { networkError = error; }
+    const local = localLookupCandidates(query);
     const seen = new Set();
-    return [...local, ...remote].filter(candidate => {
+    const candidates = [...remote, ...local].filter(candidate => {
       const key = normalize(`${candidate.genericName}|${candidate.specification}|${candidate.manufacturer}`);
       if (seen.has(key)) return false; seen.add(key); return true;
     }).slice(0, 8);
+    return { candidates, networkError };
   }
 
   function renderInteractions() {
