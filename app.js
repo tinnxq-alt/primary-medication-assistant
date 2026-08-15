@@ -116,7 +116,7 @@
           </div>
           <p class="drug-sub">通用名：${esc(drug.genericName || "待核验")}</p>
           ${drug.qualityIssue ? `<p class="drug-sub"><span class="badge blocked">质控问题</span> ${esc(drug.qualityIssue)}</p>` : ""}
-          ${statusBadge(drug)}
+          ${statusBadge(drug)} ${drug.safetyNotice ? '<span class="badge blocked">官方安全警示</span>' : ""}
         </div>
         ${selectable ? "" : `<button class="star-btn ${isFavorite(drug.id) ? "active" : ""}" type="button" data-favorite="${esc(drug.id)}" aria-label="${isFavorite(drug.id) ? "取消收藏" : "收藏"}">★</button>`}
       </article>
@@ -208,6 +208,10 @@
       map[key] = (map[key] || 0) + 1;
       return map;
     }, {});
+    const customCards = state.customCategories.map(name => {
+      const count = allDrugs().filter(drug => drug.category === name).length;
+      return `<button class="category-card custom-category-card" data-custom-category="${esc(name)}"><strong>${esc(name)}</strong><span>${count} 个品规 · 长按编辑</span></button>`;
+    });
     app.innerHTML = `
       <section class="section">
         <div class="section-title"><h2>按药品类别</h2><small>${Object.keys(counts).length} 类</small></div>
@@ -216,7 +220,25 @@
       <section class="section">
         <div class="section-title"><h2>按剂型浏览</h2><small>${Object.keys(forms).length} 种</small></div>
         <div class="category-grid">${Object.entries(forms).sort((a,b) => b[1]-a[1]).map(([name, count]) => `<button class="category-card" data-form="${esc(name)}"><strong>${esc(name)}</strong><span>${count} 个品规</span></button>`).join("")}</div>
+      </section>
+      <section class="section">
+        <div class="section-title"><h2>自定义分类</h2><button class="btn secondary small" id="newCategoryBtn">新增分类</button></div>
+        <div class="category-grid">${customCards.length ? customCards.join("") : empty("暂无自定义分类。")}</div>
       </section>`;
+    document.getElementById("newCategoryBtn").addEventListener("click", () => openCustomCategoryModal());
+    app.querySelectorAll("[data-custom-category]").forEach(card => {
+      let timer = null;
+      let longPressed = false;
+      card.addEventListener("pointerdown", () => {
+        longPressed = false;
+        timer = setTimeout(() => { longPressed = true; openCustomCategoryModal(card.dataset.customCategory); }, 650);
+      });
+      ["pointerup", "pointercancel", "pointerleave"].forEach(type => card.addEventListener(type, () => clearTimeout(timer)));
+      card.addEventListener("click", event => {
+        if (longPressed) { event.preventDefault(); return; }
+        navigate("all"); setTimeout(() => renderAll(card.dataset.customCategory, ""));
+      });
+    });
   }
 
   function renderSearch(initial = "") {
@@ -267,6 +289,7 @@
           <button class="star-btn ${isFavorite(id) ? "active" : ""}" data-favorite="${esc(id)}">★</button>
         </div>
         ${drug.qualityIssue ? `<div class="notice danger" style="margin-top:14px"><strong>质控锁定：</strong>${esc(drug.qualityIssue)}</div>` : ""}
+        ${drug.safetyNotice ? `<div class="notice danger" style="margin-top:14px"><strong>官方安全警示：</strong>${esc(drug.safetyNotice.summary)}<br><a href="${esc(drug.safetyNotice.url)}" target="_blank" rel="noopener">查看国家药监局公告</a> · 发布：${esc(drug.safetyNotice.publishedAt)}</div>` : ""}
         <dl class="detail-grid">
           <div class="detail-item"><dt>通用名</dt><dd>${esc(drug.genericName || "待核验")}</dd></div>
           <div class="detail-item"><dt>商品名</dt><dd>${esc(drug.tradeName || "未录入")}</dd></div>
@@ -338,16 +361,29 @@
 
   function renderFavorites() {
     const drugs = state.favorites.map(drugById).filter(drug => drug && !state.hidden.includes(drug.id));
+    const groupName = id => state.groups.find(group => group.id === id)?.name || state.groups[0]?.name || "默认收藏";
+    const favoriteCard = drug => `<div class="favorite-entry">${drugCard(drug)}<div class="favorite-tools"><span>分组：${esc(groupName(state.favoriteMap[drug.id]))}</span><button class="btn ghost small" data-move-favorite="${esc(drug.id)}">移动分组</button></div></div>`;
     app.innerHTML = `
       <section class="section">
         <div class="section-title"><h2>收藏药品</h2><button class="btn secondary small" id="newGroupBtn">新建分组</button></div>
-        <div class="toolbar"><select id="favoriteGroup"><option value="">全部分组</option>${state.groups.map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}</select></div>
-        <div id="favoriteList" class="card-list">${drugs.length ? drugs.map(drugCard).join("") : empty("还没有收藏药品。")}</div>
+        <div class="group-admin-grid">${state.groups.map(group => { const count = drugs.filter(drug => (state.favoriteMap[drug.id] || state.groups[0]?.id) === group.id).length; return `<div class="group-admin-card"><button data-filter-favorite-group="${esc(group.id)}"><strong>${esc(group.name)}</strong><small>${count} 个药品</small></button><div><button class="btn ghost small" data-rename-group="${esc(group.id)}">重命名</button>${group.id === "default" ? "" : `<button class="btn ghost small" data-delete-group="${esc(group.id)}">删除</button>`}</div></div>`; }).join("")}</div>
+        <div class="toolbar" style="margin-top:12px"><select id="favoriteGroup"><option value="">全部分组</option>${state.groups.map(g => `<option value="${esc(g.id)}">${esc(g.name)}</option>`).join("")}</select></div>
+        <div id="favoriteList" class="card-list">${drugs.length ? drugs.map(favoriteCard).join("") : empty("还没有收藏药品。")}</div>
       </section>`;
-    document.getElementById("favoriteGroup").addEventListener("change", event => {
-      const group = event.target.value;
-      const filtered = group ? drugs.filter(drug => state.favoriteMap[drug.id] === group) : drugs;
-      document.getElementById("favoriteList").innerHTML = filtered.length ? filtered.map(drugCard).join("") : empty("该分组暂无药品。");
+    const draw = group => {
+      const filtered = group ? drugs.filter(drug => (state.favoriteMap[drug.id] || state.groups[0]?.id) === group) : drugs;
+      document.getElementById("favoriteList").innerHTML = filtered.length ? filtered.map(favoriteCard).join("") : empty("该分组暂无药品。");
+    };
+    document.getElementById("favoriteGroup").addEventListener("change", event => draw(event.target.value));
+    app.querySelectorAll("[data-filter-favorite-group]").forEach(button => button.addEventListener("click", () => {
+      document.getElementById("favoriteGroup").value = button.dataset.filterFavoriteGroup;
+      draw(button.dataset.filterFavoriteGroup);
+    }));
+    app.querySelectorAll("[data-rename-group]").forEach(button => button.addEventListener("click", () => openRenameGroupModal(button.dataset.renameGroup)));
+    app.querySelectorAll("[data-delete-group]").forEach(button => button.addEventListener("click", () => deleteFavoriteGroup(button.dataset.deleteGroup)));
+    document.getElementById("favoriteList").addEventListener("click", event => {
+      const button = event.target.closest("[data-move-favorite]");
+      if (button) { event.stopPropagation(); openMoveFavoriteModal(button.dataset.moveFavorite); }
     });
     document.getElementById("newGroupBtn").addEventListener("click", openGroupModal);
   }
@@ -628,8 +664,71 @@
     modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="groupForm"><h2>新建收藏分组</h2><div class="field"><label>分组名称</label><input name="name" required maxlength="30"></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">创建</button></div></form></div>`;
     document.getElementById("groupForm").onsubmit = event => {
       event.preventDefault(); const name = new FormData(event.target).get("name").trim();
+      if (state.groups.some(group => group.name === name)) return toast("分组名称已存在");
       state.groups.push({ id: `group-${Date.now()}`, name }); saveState("groups"); closeModal(); renderFavorites(); toast("分组已创建");
     };
+  }
+
+  function openRenameGroupModal(groupId) {
+    const group = state.groups.find(item => item.id === groupId);
+    if (!group) return;
+    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="renameGroupForm"><h2>重命名收藏分组</h2><div class="field"><label>分组名称</label><input name="name" value="${esc(group.name)}" required maxlength="30"></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button></div></form></div>`;
+    document.getElementById("renameGroupForm").onsubmit = event => {
+      event.preventDefault(); const name = new FormData(event.target).get("name").trim();
+      if (state.groups.some(item => item.id !== groupId && item.name === name)) return toast("分组名称已存在");
+      group.name = name; saveState("groups"); closeModal(); renderFavorites(); toast("分组已重命名");
+    };
+  }
+
+  function deleteFavoriteGroup(groupId) {
+    if (groupId === "default") return toast("默认分组不能删除");
+    const group = state.groups.find(item => item.id === groupId);
+    if (!group) return;
+    confirmModal(`删除“${group.name}”？其中药品将移入默认分组。`, () => {
+      const fallback = state.groups.find(item => item.id === "default")?.id || state.groups.find(item => item.id !== groupId)?.id || "default";
+      Object.keys(state.favoriteMap).forEach(drugId => { if (state.favoriteMap[drugId] === groupId) state.favoriteMap[drugId] = fallback; });
+      state.groups = state.groups.filter(item => item.id !== groupId);
+      saveState("groups"); saveState("favoriteMap"); renderFavorites(); toast("分组已删除，药品已移入默认分组");
+    });
+  }
+
+  function openMoveFavoriteModal(drugId) {
+    const drug = drugById(drugId);
+    if (!drug) return;
+    const current = state.favoriteMap[drugId] || state.groups[0]?.id;
+    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="moveFavoriteForm"><h2>移动收藏药品</h2><p class="muted">${esc(drug.drugName)}</p><div class="field"><label>目标分组</label><select name="groupId">${state.groups.map(group => `<option value="${esc(group.id)}" ${group.id === current ? "selected" : ""}>${esc(group.name)}</option>`).join("")}</select></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">移动</button></div></form></div>`;
+    document.getElementById("moveFavoriteForm").onsubmit = event => {
+      event.preventDefault(); state.favoriteMap[drugId] = new FormData(event.target).get("groupId");
+      saveState("favoriteMap"); closeModal(); renderFavorites(); toast("药品已移动分组");
+    };
+  }
+
+  function openCustomCategoryModal(existingName = "") {
+    const editing = Boolean(existingName);
+    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="categoryForm"><h2>${editing ? "编辑自定义分类" : "新增自定义分类"}</h2><div class="field"><label>分类名称</label><input name="name" value="${esc(existingName)}" required maxlength="30"></div><div class="modal-actions">${editing ? '<button type="button" class="btn danger" id="deleteCategoryBtn">删除分类</button>' : ""}<button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">${editing ? "保存重命名" : "创建"}</button></div></form></div>`;
+    document.getElementById("categoryForm").onsubmit = event => {
+      event.preventDefault(); const name = new FormData(event.target).get("name").trim();
+      if (!name) return;
+      if (state.customCategories.some(item => item !== existingName && item === name)) return toast("分类名称已存在");
+      if (editing) {
+        state.customCategories = state.customCategories.map(item => item === existingName ? name : item);
+        Object.keys(state.categoryOverrides).forEach(id => { if (state.categoryOverrides[id] === existingName) state.categoryOverrides[id] = name; });
+        state.customDrugs = state.customDrugs.map(drug => drug.category === existingName ? { ...drug, category: name } : drug);
+        toast("分类已重命名");
+      } else {
+        state.customCategories.push(name); toast("自定义分类已创建");
+      }
+      saveState("customCategories"); saveState("categoryOverrides"); saveState("customDrugs"); closeModal(); renderCategories();
+    };
+    document.getElementById("deleteCategoryBtn")?.addEventListener("click", () => {
+      closeModal();
+      confirmModal(`删除“${existingName}”？该分类下药品将移到“自定义”。`, () => {
+        state.customCategories = state.customCategories.filter(item => item !== existingName);
+        Object.keys(state.categoryOverrides).forEach(id => { if (state.categoryOverrides[id] === existingName) delete state.categoryOverrides[id]; });
+        state.customDrugs = state.customDrugs.map(drug => drug.category === existingName ? { ...drug, category: "自定义" } : drug);
+        saveState("customCategories"); saveState("categoryOverrides"); saveState("customDrugs"); renderCategories(); toast("自定义分类已删除");
+      });
+    });
   }
 
   function confirmModal(message, onConfirm) {
