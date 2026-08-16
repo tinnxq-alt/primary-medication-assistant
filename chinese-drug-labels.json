@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "language": "zh-CN",
-  "updatedAt": "2026-08-16",
+  "updatedAt": "2026-08-17",
   "drugs": [
     {
       "drugName": "阿卡波糖片",
@@ -1197,6 +1197,407 @@
         "label": "天际健康：开塞露（含甘油）说明书",
         "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000011407&show_navbar=true",
         "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "拉西地平分散片",
+      "genericName": "拉西地平",
+      "specification": "4mg×28片/盒",
+      "dosageForm": "分散片",
+      "category": "西药",
+      "manufacturer": "浙江贝得药业有限…",
+      "clinical": {
+        "indication": "可单独或与其他抗高血压药联合用于高血压治疗。",
+        "dosage": "通常从2mg每日一次开始，每日同一时间、最好早晨服用；充分观察后可增至4mg，必要时增至6mg，剂量调整间隔通常不少于3～4周。",
+        "adverseReactions": "可见头痛、头晕、面部潮红、心悸、心动过速和踝部水肿；少见牙龈增生、皮疹、肝功能指标异常或心绞痛加重。",
+        "precautions": "应定期监测血压，不得自行加量。严重主动脉狭窄、不稳定性心绞痛、近期心肌梗死或肝功能损害者须由医生评估；与强CYP3A4抑制剂及葡萄柚制品合用前核对相互作用。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "浙江贝得药业：拉西地平分散片说明书",
+        "url": "https://www.betterpharma.com/cn/Product_v.asp?id=1",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "兰索拉唑胶囊",
+      "genericName": "兰索拉唑",
+      "specification": "30mg×14粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "湖北潜龙药业有限…",
+      "clinical": {
+        "indication": "用于胃溃疡、十二指肠溃疡、反流性食管炎、吻合口溃疡及卓-艾综合征等酸相关疾病。",
+        "dosage": "成人常用15～30mg每日一次，通常晨起餐前服；十二指肠溃疡常用4～6周，胃溃疡或反流性食管炎常用6～8周。胶囊应整粒吞服，具体疗程遵医嘱。",
+        "adverseReactions": "可见腹泻、便秘、腹胀、恶心、口干、头痛、头晕、皮疹及肝酶升高；长期或高风险使用可发生低镁血症、维生素B12缺乏、骨折、肾损伤或艰难梭菌相关腹泻。",
+        "precautions": "存在吞咽困难、消化道出血、体重下降等报警症状时应先排除恶性疾病。应使用最低有效剂量和必要疗程；长期用药定期复核，并注意与部分抗病毒药、华法林、甲氨蝶呤等的相互作用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：兰索拉唑胶囊说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hy5/040.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "利伐沙班片",
+      "genericName": "利伐沙班",
+      "specification": "10mg×30片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "广东东阳光药业…",
+      "clinical": {
+        "indication": "用于择期髋或膝关节置换术后预防静脉血栓；也用于成人深静脉血栓、肺栓塞治疗及复发预防，并用于合适的非瓣膜性房颤患者降低卒中和体循环栓塞风险。具体适应症由医生判断。",
+        "dosage": "10mg规格用于关节置换术后预防时通常每日一次，充分止血后术后6～10小时开始；髋关节手术常35天、膝关节手术常12天。10mg可与或不与食物同服；其他适应症剂量不同，不能自行套用。",
+        "adverseReactions": "最主要风险为出血，可见贫血、鼻出血、牙龈出血、胃肠道或泌尿生殖道出血、瘀斑及伤口渗血；也可出现恶心、肝酶升高或过敏反应。",
+        "precautions": "用药前及期间评估肾功能、肝功能和出血风险，不得擅自停药或加量。活动性出血、凝血障碍性肝病等禁用；与其他抗凝/抗血小板药、NSAID及强CYP3A4/P-gp抑制剂合用须谨慎。手术、拔牙或椎管内麻醉前必须告知医生。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：利伐沙班片说明书（10mg给药信息）",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000010473&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "利伐沙班片",
+      "genericName": "利伐沙班",
+      "specification": "15mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "广东东阳光药业…",
+      "clinical": {
+        "indication": "用于成人深静脉血栓和肺栓塞的治疗及复发预防，也用于合适的非瓣膜性房颤患者降低卒中和体循环栓塞风险；具体适应症和肾功能条件必须由医生确认。",
+        "dosage": "急性深静脉血栓或肺栓塞初始治疗通常15mg每日2次、连续21天，随后改用20mg每日一次；15mg和20mg必须随餐服用。非瓣膜性房颤的15mg每日一次仅适用于说明书规定的部分肾功能受损患者，不能自行降量。",
+        "adverseReactions": "最主要风险为出血，可见贫血、鼻出血、牙龈出血、胃肠道或泌尿生殖道出血、瘀斑及伤口渗血；也可出现恶心、肝酶升高或过敏反应。",
+        "precautions": "不得因漏服或担心出血自行停药、减量或重复加倍。治疗前和期间评估肾肝功能及出血风险；活动性出血者禁用。与其他抗凝/抗血小板药、NSAID及强CYP3A4/P-gp抑制剂合用须谨慎，手术或椎管内操作前必须告知医生。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：利伐沙班片说明书（15mg给药信息）",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000010473&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "利肺片",
+      "genericName": "利肺片",
+      "specification": "0.25g×36片/盒",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "三普药业有限公司",
+      "clinical": {
+        "indication": "驱痨补肺、镇咳祛痰，用于肺痨咳嗽、咯痰、咯血、气虚哮喘及慢性气管炎等。",
+        "dosage": "口服，一次2片，一日3次；具体疗程须遵医嘱。",
+        "adverseReactions": "现有公开说明书标示尚不明确；出现皮疹、胃肠不适、呼吸困难或其他异常应停药并就医。",
+        "precautions": "本品不能替代结核病、咯血或哮喘的规范诊断和治疗。出现咯血增多、发热、胸痛、呼吸困难或症状持续应及时就医；孕妇、哺乳期妇女、儿童及合并其他药物者使用前核对具体厂家说明书。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医联媒体：利肺片说明书资料",
+        "url": "https://mzyp.yilianmeiti.com/instructions/146530.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "利可君片",
+      "genericName": "利可君",
+      "specification": "20mg×48片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "江苏吉贝尔药业…",
+      "clinical": {
+        "indication": "用于预防和治疗白细胞减少症及血小板减少症，包括部分肿瘤放疗、化疗相关血细胞减少。",
+        "dosage": "口服，一次20mg，一日3次，或遵医嘱；应结合血常规和病因调整。",
+        "adverseReactions": "公开说明书标示尚未发现明确的不良反应报告，但不等于没有风险；出现皮疹、发热或血象进一步恶化应及时复诊。",
+        "precautions": "用药前应明确血细胞减少原因并定期复查血常规。对本品过敏者禁用，急、慢性髓细胞白血病或骨髓恶性肿瘤患者须按具体说明书禁忌或慎用；不得用本品延误对严重骨髓疾病的诊断。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：利可君片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=4910",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "联苯苄唑乳膏",
+      "genericName": "联苯苄唑",
+      "specification": "15g×2支/盒",
+      "dosageForm": "乳膏剂",
+      "category": "西药",
+      "manufacturer": "黑龙江天龙药业有…",
+      "clinical": {
+        "indication": "用于皮肤癣菌、酵母菌、霉菌等引起的手足癣、体癣、股癣、花斑癣和皮肤念珠菌病。",
+        "dosage": "外用，每日一次，最好晚间薄涂患处并轻揉吸收；通常需连续2～4周，不同感染部位疗程不同，症状缓解后仍应完成说明书规定疗程。",
+        "adverseReactions": "用药部位可发生疼痛、水肿、红斑、瘙痒、皮疹、荨麻疹、水疱、脱皮、干燥、刺痛、浸渍、灼热感或接触性皮炎。",
+        "precautions": "仅供皮肤外用，避免接触眼睛和黏膜；用药前清洁并干燥患处。对本品或咪唑类抗真菌药过敏者禁用；出现明显刺激或过敏应停药清洗。诊断不明确、甲癣或反复感染应就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：联苯苄唑乳膏说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=5570&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "林可霉素滴眼液",
+      "genericName": "盐酸林可霉素",
+      "specification": "8ml:0.2g/支",
+      "dosageForm": "滴眼剂",
+      "category": "西药",
+      "manufacturer": "新乡华青药业有限…",
+      "clinical": {
+        "indication": "用于敏感菌所致的眼部感染，如结膜炎、角膜炎等；不用于病毒性或真菌性眼病。",
+        "dosage": "滴眼，一次1～2滴，一日3～5次；重症、儿童或疗程超过数日者应由眼科医生决定。",
+        "adverseReactions": "偶见局部刺激、眼部不适、皮疹、瘙痒等过敏反应；长期不当使用可导致非敏感菌或真菌过度生长。",
+        "precautions": "对林可霉素或克林霉素过敏者禁用或慎用。滴管口不得接触眼睛、手或其他表面，开封后按说明书期限使用；出现眼痛、视力下降、明显红肿或用药数日无改善应停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "眼科通：盐酸林可霉素滴眼液说明书资料",
+        "url": "https://www.iophthal.com/index/drug/detail?id=144",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "磷霉素氨丁三醇散",
+      "genericName": "磷霉素氨丁三醇",
+      "specification": "3g×1瓶/盒",
+      "dosageForm": "散剂",
+      "category": "西药",
+      "manufacturer": "东北制药集团沈阳…",
+      "qualityIssue": "原始剂型误填为口服溶液剂，已修正为散剂；仍须按批准文号复核具体注册信息。",
+      "clinical": {
+        "indication": "用于敏感菌所致的急性单纯性下尿路感染，如膀胱炎、尿道膀胱综合征等；部分产品也用于泌尿道操作相关感染预防。",
+        "dosage": "成人单剂量3g，溶于约50～70ml水后立即口服；应空腹、最好睡前排空膀胱后服用。预防泌尿道操作时的第二剂方案仅按具体说明书和医嘱执行。",
+        "adverseReactions": "常见腹泻、软便、恶心和腹痛；还可见头痛、眩晕、阴道炎、皮疹，少见严重过敏或艰难梭菌相关性腹泻。",
+        "precautions": "单剂量方案不适用于肾盂肾炎、菌血症或其他复杂严重感染的自行治疗。用药前评估肾功能、妊娠状态及病原体；症状2～3天无改善、出现发热腰痛或血尿加重应就医。不得干吞粉末。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "成都倍特药业：磷霉素氨丁三醇散说明书",
+        "url": "https://www.cy-pharm.com/storage/202312/0119e0955718fdf7e4b56651ee343aed.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "磷酸奥司他韦胶囊",
+      "genericName": "奥司他韦",
+      "specification": "75mg×10粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "广州一品红制药有…",
+      "clinical": {
+        "indication": "用于甲型和乙型流感的治疗，以及符合条件人群的流感暴露后预防；对普通感冒和其他病毒感染无效。",
+        "dosage": "成人和13岁以上青少年治疗通常75mg每日2次、连用5天，并尽量在症状出现48小时内开始；暴露后预防通常75mg每日一次、至少10天。肾功能损害者须调整剂量。",
+        "adverseReactions": "常见恶心、呕吐和头痛，多在用药初期发生；还可见腹痛、失眠和眩晕，少见严重皮肤反应、过敏反应、肝损伤或神经精神异常。",
+        "precautions": "不能替代流感疫苗，也不应在无流感指征时滥用。儿童、妊娠哺乳期和肾功能不全者应按具体说明书使用；若出现意识异常、幻觉、惊厥、严重皮疹或呼吸困难应立即停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：磷酸奥司他韦胶囊说明书",
+        "url": "https://drugs.dxy.cn/pc/drug/p-S01plLW3azrID1Sr1A8pQ",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "灵泽片",
+      "genericName": "灵泽片",
+      "specification": "0.58g×48片/盒",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "浙江佐力药业股份…",
+      "clinical": {
+        "indication": "益肾活血、散结利水，用于轻、中度良性前列腺增生肾虚血瘀湿阻证所见尿频、排尿困难、尿线变细、淋漓不尽和腰膝酸软。",
+        "dosage": "口服，一次4片，一日3次，疗程通常6周；疗效及继续用药由医生复评。",
+        "adverseReactions": "部分患者出现口干、呃逆、恶心、胃胀、反酸、胃痛或腹泻；少数可见ALT、AST升高。曾报告尿中红白细胞、心动过缓或房室传导异常，但因果关系未明。",
+        "precautions": "胃十二指肠溃疡、急慢性胃炎或肠炎患者慎用。用药前应排除前列腺癌、尿路梗阻等疾病；出现尿潴留、肉眼血尿、发热、明显心动过缓或肝功能异常应停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国控恒兴药网：灵泽片说明书",
+        "url": "https://www.511yaohx.com/goodsList-api/goodsList/detailGoods?goodscode=2173600",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "硫酸吗啡缓释片",
+      "genericName": "硫酸吗啡",
+      "specification": "30mg×10片/盒",
+      "dosageForm": "缓释片",
+      "category": "西药",
+      "manufacturer": "萌蒂(中国)制药有…",
+      "clinical": {
+        "indication": "用于需要阿片类药物持续、按时镇痛的中重度慢性疼痛，主要包括重度癌痛；不用于轻度、短暂或按需即可控制的疼痛。",
+        "dosage": "剂量须按疼痛程度、既往阿片暴露和耐受性个体化，通常每12小时按时一次。30mg规格不是所有患者的起始剂量；缓释片必须整片吞服，不得掰开、碾碎、咀嚼或溶解。",
+        "adverseReactions": "常见便秘、恶心、呕吐、嗜睡、头晕、瘙痒、出汗、口干、排尿困难和低血压；严重者可发生致命性呼吸抑制、意识障碍、依赖、耐受和戒断。",
+        "precautions": "属于麻醉药品，必须严格按处方管理。开始或加量后密切观察呼吸和意识，并预防便秘；严禁与酒精、苯二氮卓类或其他中枢抑制药自行合用。严重呼吸抑制、急性重症哮喘或麻痹性肠梗阻者禁用，不得突然停药。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家卫健委：癌症疼痛诊疗规范（吗啡缓释片用药要求）",
+        "url": "https://www.nhc.gov.cn/ewebeditor/uploadfile/2018/09/20180918161638365.docx",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "硫酸吗啡控释片",
+      "genericName": "硫酸吗啡",
+      "specification": "30mg×10片/盒",
+      "dosageForm": "控释片",
+      "category": "西药",
+      "manufacturer": "萌蒂(中国)制药有…",
+      "clinical": {
+        "indication": "用于需要阿片类药物持续、按时镇痛的中重度慢性疼痛，主要包括重度癌痛；不用于轻度、短暂或按需即可控制的疼痛。",
+        "dosage": "剂量须按疼痛程度、既往阿片暴露和耐受性个体化，通常每12小时按时一次。30mg规格不是所有患者的起始剂量；控释片必须整片吞服，不得掰开、碾碎、咀嚼或溶解。",
+        "adverseReactions": "常见便秘、恶心、呕吐、嗜睡、头晕、瘙痒、出汗、口干、排尿困难和低血压；严重者可发生致命性呼吸抑制、意识障碍、依赖、耐受和戒断。",
+        "precautions": "属于麻醉药品，必须严格按处方管理。不得把缓释片与控释片仅凭相同毫克数自行互换；开始或加量后密切观察呼吸和意识。严禁与酒精或其他中枢抑制药自行合用，严重呼吸抑制、急性重症哮喘或麻痹性肠梗阻者禁用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家卫健委：癌症疼痛诊疗规范（吗啡缓控释制剂要求）",
+        "url": "https://www.nhc.gov.cn/ewebeditor/uploadfile/2018/09/20180918161638365.docx",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "硫酸氢氯吡格雷片",
+      "genericName": "氯吡格雷",
+      "specification": "75mg×7片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "深圳信立泰药业股…",
+      "clinical": {
+        "indication": "用于近期心肌梗死、缺血性卒中或确诊外周动脉病患者预防动脉粥样硬化血栓事件；也用于急性冠脉综合征及部分经皮冠状动脉介入患者，常需与阿司匹林联合。",
+        "dosage": "成人和老年人常用75mg每日一次，可与或不与食物同服。急性冠脉综合征可能需要300mg或更高负荷剂量后改75mg每日一次，但负荷剂量和联合阿司匹林方案只能由医生决定。",
+        "adverseReactions": "最主要为出血，包括鼻出血、瘀斑、胃肠道或颅内出血；可见腹泻、腹痛、消化不良和皮疹。少见血栓性血小板减少性紫癜、严重血细胞减少、肝损伤或严重过敏。",
+        "precautions": "不得因手术、拔牙或出现轻微瘀斑自行停药，应先联系医生。活动性出血者禁用；与抗凝药、其他抗血小板药或NSAID合用会增加出血风险。奥美拉唑/艾司奥美拉唑等CYP2C19抑制剂可能影响疗效，合用前须核对。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：硫酸氢氯吡格雷片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=8422&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "潞党参口服液",
+      "genericName": "潞党参口服液",
+      "specification": "10ml×6支/盒",
+      "dosageForm": "口服液",
+      "category": "中成药",
+      "manufacturer": "山西正来制药有限…",
+      "clinical": {
+        "indication": "补中益气、健脾益肺，用于脾肺虚弱所致气短心悸、食少便溏、虚喘咳嗽。",
+        "dosage": "口服，一次10ml，一日2次；如有少量沉淀应摇匀后服。",
+        "adverseReactions": "监测资料报告恶心、呕吐、便秘、皮肤发热、红斑和瘙痒等；出现过敏表现应停药。",
+        "precautions": "不宜与藜芦同用，对本品成分过敏者禁用。服药期间忌油腻食物；感冒发热、咳喘突然加重或症状持续者应就医。儿童、孕妇、哺乳期妇女及糖尿病患者使用前核对辅料和现行说明书。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "河南省医药服务平台：潞党参口服液说明书资料",
+        "url": "https://www.hnysfww.com/mobile/goods.php?id=13028",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "螺内酯片",
+      "genericName": "螺内酯",
+      "specification": "20mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海上药信谊药厂…",
+      "clinical": {
+        "indication": "用于充血性心衰、肝硬化腹水、肾性水肿等水肿性疾病，高血压，以及原发性醛固酮增多症的诊断和治疗；心衰适应症按具体说明书和指南使用。",
+        "dosage": "剂量随适应症差异很大。水肿成人常用每日40～120mg、分2～4次；高血压常从每日40～80mg分次开始。心衰和醛固酮增多症方案不同，必须由医生结合血钾和肾功能个体化。",
+        "adverseReactions": "高钾血症最重要，可导致严重心律失常；还可见恶心、呕吐、腹泻、低钠血症、头晕、肾功能恶化、男性乳房发育、性功能异常和月经紊乱。",
+        "precautions": "高钾血症、无尿或严重肾功能障碍者禁用。开始和调整剂量后监测血钾、肾功能和血压；避免自行补钾、含钾盐替代品及与其他保钾药重复使用。与ACEI/ARB、NSAID等合用可增加高钾或肾损伤风险。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：螺内酯片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=4778&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "洛索洛芬钠凝胶贴膏",
+      "genericName": "洛索洛芬钠",
+      "specification": "0.1g×8贴/盒",
+      "dosageForm": "贴膏剂",
+      "category": "西药",
+      "manufacturer": "湖南九典制药股份…",
+      "clinical": {
+        "indication": "用于骨关节炎、肌肉痛及外伤后肿胀疼痛的消炎镇痛。",
+        "dosage": "外用，将一贴贴于患处，一日一次；贴敷时间、疗程及同一时间可用贴数应按具体说明书或医嘱。",
+        "adverseReactions": "主要为局部接触性皮炎、瘙痒、红斑、皮疹、灼热、刺痛或水疱；大面积或长期使用时仍可能出现非甾体抗炎药相关全身反应。",
+        "precautions": "不得用于破损、感染、湿疹皮肤或眼和黏膜。对洛索洛芬、阿司匹林或其他NSAID过敏及有阿司匹林哮喘史者禁用；避免长期、大面积使用，出现哮喘、呼吸困难或严重皮肤反应应立即停用就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：洛索洛芬钠凝胶贴膏",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=100001018",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "铝镁匹林片(II)",
+      "genericName": "铝镁匹林片(II)",
+      "specification": "114mg×30片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "山东中健康桥制药…",
+      "clinical": {
+        "indication": "用于需要阿司匹林抑制血小板黏附和聚集、但不能耐受其胃肠道反应的患者，如不稳定型心绞痛、急性心肌梗死或缺血性脑血管病。",
+        "dosage": "成人口服一日一次、一次1片；说明书虽列病情需要时一次最多4片，但必须由医生决定，不得自行加量。每片通常含阿司匹林81mg、重质碳酸镁22mg和甘羟铝11mg。",
+        "adverseReactions": "可见食欲减退、恶心、呕吐、腹痛等胃肠道反应和荨麻疹、眩晕；仍可发生消化道或其他部位出血、溃疡、哮喘、休克及严重过敏。",
+        "precautions": "含镁铝成分不消除阿司匹林的出血风险。活动性消化性溃疡、出血倾向、阿司匹林哮喘及对成分过敏者禁用；手术前、妊娠晚期、肝肾功能异常及与抗凝药/NSAID合用时须由医生评估，服药期间避免饮酒。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "39药品通：铝镁匹林片(II)说明书",
+        "url": "https://ypk.39.net/884303/manual/",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "铝碳酸镁咀嚼片",
+      "genericName": "铝碳酸镁",
+      "specification": "0.5g×48片/盒",
+      "dosageForm": "咀嚼片",
+      "category": "西药",
+      "manufacturer": "重庆华森制药股份…",
+      "clinical": {
+        "indication": "用于急、慢性胃炎，胃及十二指肠溃疡、反流性食管炎，与胃酸有关的胃痛、烧心、酸性嗳气和饱胀等，并可用于预防NSAID相关胃黏膜损伤。",
+        "dosage": "成人通常一次0.5～1.0g（1～2片），一日3～4次，在饭后1～2小时、睡前或胃部不适时充分咀嚼后咽下；溃疡治疗剂量和疗程遵医嘱。",
+        "adverseReactions": "大剂量可导致软便、腹泻、呕吐，偶见便秘、口干和食欲减退；长期使用可引起血清电解质变化，并可能发生过敏反应。",
+        "precautions": "重度肾损害、低磷血症、重症肌无力或对成分过敏者禁用。与其他口服药通常应间隔至少1～2小时，部分抗菌药、铁剂等需更长间隔；连续自行使用不超过7天，症状不缓解或有消化道出血征象应就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：铝碳酸镁咀嚼片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000012737&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氯化钾缓释片",
+      "genericName": "氯化钾",
+      "specification": "0.5g×48片/盒",
+      "dosageForm": "缓释片",
+      "category": "西药",
+      "manufacturer": "深圳市中联制药有…",
+      "clinical": {
+        "indication": "用于治疗和预防低钾血症，也用于部分洋地黄中毒相关快速性心律失常；必须结合血钾和病因使用。",
+        "dosage": "成人常用一次0.5～1g，一日2～4次，饭后整片吞服并按血钾调整；一般成人每日最大6g。缓释片不得掰开、碾碎或咀嚼。",
+        "adverseReactions": "可见恶心、呕吐、咽部或食管刺激、胸痛、腹胀、腹痛、腹泻，严重时可致消化道溃疡、出血、穿孔或梗阻；过量或肾功能不全可引起致命性高钾血症和心律失常。",
+        "precautions": "高钾血症、少尿/无尿及使用部分保钾利尿剂者禁用。治疗期间监测血钾、肾功能和必要时心电图；避免与螺内酯、ACEI/ARB及其他升钾药自行合用。出现黑便、持续腹痛、肌无力、麻木或心悸应立即就医。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "丁香园用药助手：深圳中联氯化钾缓释片说明书",
+        "url": "https://drugs.dxy.cn/drug/myCpWb4556zLOwfplsplsOLzF8w%3D%3D",
+        "checkedAt": "2026-08-17"
       }
     },
     {

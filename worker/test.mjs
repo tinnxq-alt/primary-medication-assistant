@@ -114,6 +114,19 @@ try {
   assert.equal(hospitalSource.sourceQuality, "hospital");
   assert.equal(hospitalSource.confidence, "high");
 
+  const healthCommissionSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.nhc.gov.cn/example.docx" }
+  });
+  assert.equal(healthCommissionSource.sourceQuality, "regulator");
+  assert.equal(healthCommissionSource.confidence, "high");
+
+  const additionalManufacturerSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.betterpharma.com/example/" }
+  });
+  assert.equal(additionalManufacturerSource.sourceQuality, "manufacturer");
+
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
