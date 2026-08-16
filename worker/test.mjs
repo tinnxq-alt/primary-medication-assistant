@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import worker from "./src/index.js";
+import worker, { cleanCatalogCandidate } from "./src/index.js";
 
 const origin = "https://tinnxq-alt.github.io";
 const catalogUrl = "https://example.test/chinese-drug-labels.json";
@@ -48,7 +48,7 @@ let catalog = {
   drugs: [{
     drugName: "阿司匹林肠溶片", genericName: "阿司匹林", tradeName: "", specification: "100mg",
     dosageForm: "肠溶片", category: "西药", manufacturer: "某制药企业",
-    clinical: { indication: "用于抗血小板治疗。", dosage: "请按现行说明书及医嘱使用。", adverseReactions: "可见胃肠道不适。", precautions: "English only" },
+    clinical: { indication: "用于抗血小板治疗。", dosage: "请按现行说明书及医嘱使用。", adverseReactions: "可见胃肠道不适。", precautions: "使用前核对禁忌和出血风险。" },
     source: { status: "verified-template", label: "国家药监局中文说明书", url: "https://www.nmpa.gov.cn/example/aspirin.html", checkedAt: "2026-08-16" }
   }]
 };
@@ -66,7 +66,7 @@ try {
   let payload = await response.json();
   assert.equal(payload.mode, "free-verified");
   assert.equal(payload.candidates.length, 1);
-  assert.equal(payload.candidates[0].precautions, "");
+  assert.match(payload.candidates[0].precautions, /出血风险/);
   assert.equal(payload.candidates[0].drugName, "阿司匹林");
   assert.equal(payload.candidates[0].category, "抗凝抗血小板");
   assert.match(payload.candidates[0].indications, /抗血小板/);
@@ -74,6 +74,18 @@ try {
   assert.equal(payload.candidates[0].verified, true);
   assert.equal(payload.candidates[0].editable, true);
   assert.equal(aiCalls, 0, "有核验资料时不应调用 AI");
+
+  const blocked = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, status: "blocked" }
+  });
+  assert.equal(blocked, null, "锁定条目不得作为已核验智能搜索结果");
+
+  const incomplete = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    clinical: { ...catalog.drugs[0].clinical, adverseReactions: "" }
+  });
+  assert.equal(incomplete, null, "临床字段不完整的条目不得作为已核验智能搜索结果");
 
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
