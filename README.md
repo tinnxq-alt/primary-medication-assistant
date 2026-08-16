@@ -46,7 +46,7 @@
 
 Worker 使用 Cloudflare Workers Free 计划，不调用 OpenAI 或其他收费 API。GitHub 仓库只需设置 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID` 两个 Actions secrets；合并部署工作流后会自动发布。
 
-部署完成后复制 `https://…workers.dev` 地址，打开网站“缓存管理” → “免费中文检索服务”，粘贴并测试。完整步骤和安全说明见 [`worker/README.md`](worker/README.md)。
+网站已默认使用 `https://primary-medication-smart-search.tinnxq.workers.dev`；打开“缓存管理” → “免费中文检索服务”可测试连接或更换地址。完整步骤和安全说明见 [`worker/README.md`](worker/README.md)。
 
 ## 数据维护规则
 

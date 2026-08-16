@@ -2,6 +2,7 @@
   "use strict";
 
   const STORAGE_PREFIX = "primary-medication-pro:v1:";
+  const DEFAULT_SMART_SEARCH_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
   const app = document.getElementById("app");
   const pageTitle = document.getElementById("pageTitle");
   const backBtn = document.getElementById("backBtn");
@@ -34,7 +35,7 @@
     hidden: read("hidden", []),
     categoryOverrides: read("categoryOverrides", {}),
     drugOverrides: read("drugOverrides", {}),
-    smartSearchEndpoint: read("smartSearchEndpoint", ""),
+    smartSearchEndpoint: read("smartSearchEndpoint", DEFAULT_SMART_SEARCH_ENDPOINT),
     history: []
   };
   const BACKUP_ARRAY_KEYS = ["favorites", "groups", "notes", "customDrugs", "customCategories", "contraindications", "marks", "remembered", "cached", "hidden"];
