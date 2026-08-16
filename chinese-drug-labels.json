@@ -1601,6 +1601,407 @@
       }
     },
     {
+      "drugName": "氯化钠注射液",
+      "genericName": "氯化钠",
+      "specification": "0.9% 500ml/瓶",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "浙江天瑞药业有限…",
+      "clinical": {
+        "indication": "用于各种原因所致的失水，包括低渗性、等渗性和高渗性失水，以及低氯性代谢性碱中毒；也可按具体处方作为静脉用药溶媒。",
+        "dosage": "仅限医疗机构静脉使用。输注量和速度必须按失水类型与程度、年龄体重、血钠/血氯、酸碱和心肾功能个体化；输注后复查并调整，不可把单一固定体积用于所有患者。",
+        "adverseReactions": "输注过快或过量可致高钠血症、高氯性酸中毒、液体潴留、水肿、血压升高、心动过速、胸闷、呼吸困难或肺水肿；局部可发生疼痛、渗漏和静脉炎。",
+        "precautions": "用前核对浓度、澄明度、容器完整性和配伍相容性，严格无菌操作。治疗中监测电解质、酸碱平衡、出入量和心肾状态；心衰、肾功能不全、高血压、水肿或肝硬化患者慎用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：氯化钠注射液说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hy5/048.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氯化钠注射液",
+      "genericName": "氯化钠",
+      "specification": "0.9% 100ml/袋",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "浙江天瑞药业有限…",
+      "clinical": {
+        "indication": "用于各种原因所致的失水，包括低渗性、等渗性和高渗性失水，以及低氯性代谢性碱中毒；也可按具体处方作为静脉用药溶媒。",
+        "dosage": "仅限医疗机构静脉使用。输注量和速度必须按失水类型与程度、年龄体重、血钠/血氯、酸碱和心肾功能个体化；本袋含量不等于单次固定剂量。",
+        "adverseReactions": "输注过快或过量可致高钠血症、高氯性酸中毒、液体潴留、水肿、血压升高、心动过速、胸闷、呼吸困难或肺水肿；局部可发生疼痛、渗漏和静脉炎。",
+        "precautions": "用前核对浓度、澄明度、容器完整性和配伍相容性，严格无菌操作。治疗中监测电解质、酸碱平衡、出入量和心肾状态；心衰、肾功能不全、高血压、水肿或肝硬化患者慎用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：氯化钠注射液说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hy5/048.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氯化钠注射液",
+      "genericName": "氯化钠",
+      "specification": "0.9% 250ml/袋",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "浙江天瑞药业有限…",
+      "clinical": {
+        "indication": "用于各种原因所致的失水，包括低渗性、等渗性和高渗性失水，以及低氯性代谢性碱中毒；也可按具体处方作为静脉用药溶媒。",
+        "dosage": "仅限医疗机构静脉使用。输注量和速度必须按失水类型与程度、年龄体重、血钠/血氯、酸碱和心肾功能个体化；本袋含量不等于单次固定剂量。",
+        "adverseReactions": "输注过快或过量可致高钠血症、高氯性酸中毒、液体潴留、水肿、血压升高、心动过速、胸闷、呼吸困难或肺水肿；局部可发生疼痛、渗漏和静脉炎。",
+        "precautions": "用前核对浓度、澄明度、容器完整性和配伍相容性，严格无菌操作。治疗中监测电解质、酸碱平衡、出入量和心肾状态；心衰、肾功能不全、高血压、水肿或肝硬化患者慎用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：氯化钠注射液说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hy5/048.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氯化钠注射液",
+      "genericName": "氯化钠",
+      "specification": "0.9% 500ml/袋",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "浙江天瑞药业有限…",
+      "clinical": {
+        "indication": "用于各种原因所致的失水，包括低渗性、等渗性和高渗性失水，以及低氯性代谢性碱中毒；也可按具体处方作为静脉用药溶媒。",
+        "dosage": "仅限医疗机构静脉使用。输注量和速度必须按失水类型与程度、年龄体重、血钠/血氯、酸碱和心肾功能个体化；输注后复查并调整，不可把单一固定体积用于所有患者。",
+        "adverseReactions": "输注过快或过量可致高钠血症、高氯性酸中毒、液体潴留、水肿、血压升高、心动过速、胸闷、呼吸困难或肺水肿；局部可发生疼痛、渗漏和静脉炎。",
+        "precautions": "用前核对浓度、澄明度、容器完整性和配伍相容性，严格无菌操作。治疗中监测电解质、酸碱平衡、出入量和心肾状态；心衰、肾功能不全、高血压、水肿或肝硬化患者慎用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：氯化钠注射液说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hy5/048.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氯雷他定片",
+      "genericName": "氯雷他定",
+      "specification": "10mg×12片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "扬子江药业集团上…",
+      "clinical": {
+        "indication": "用于缓解过敏性鼻炎相关喷嚏、流涕、鼻痒、鼻塞和眼部痒/灼热，也用于缓解慢性荨麻疹、瘙痒性皮肤病等过敏症状。",
+        "dosage": "成人及12岁以上儿童一次10mg、一日一次。2～12岁儿童按体重使用：体重超过30kg一次10mg、一日一次；30kg及以下一次5mg、一日一次，应选择便于准确给药的剂型。",
+        "adverseReactions": "可见乏力、头痛、嗜睡、口干、胃肠不适和皮疹；少见严重过敏、肝功能异常、心动过速或心悸。",
+        "precautions": "对本品成分过敏者禁用。严重肝功能不全者需由医生调整给药间隔；服药后出现嗜睡者不得驾驶或操作机械。过敏原皮试前应按医嘱提前停药。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "恒瑞制药：氯雷他定片中文说明书资料",
+        "url": "https://www.santao.com.cn/index.php?a=show&c=index&catid=18&id=16&m=content",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氯硝西泮片",
+      "genericName": "氯硝西泮",
+      "specification": "2mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海上药信谊药厂…",
+      "clinical": {
+        "indication": "用于控制失神发作、婴儿痉挛症、肌阵挛性发作、运动不能性发作及Lennox-Gastaut综合征等多种癫痫发作；具体适应症由专科医生判断。",
+        "dosage": "成人抗癫痫通常从一次0.5mg、一日3次开始，每3日增加0.5～1mg，维持量须按发作控制和耐受性个体化，每日最大20mg。当前2mg片不等于起始剂量，能否分片须核对刻痕和说明书。",
+        "adverseReactions": "常见嗜睡、头晕、共济失调、记忆或注意力受损、乏力和唾液增多；可出现反常兴奋或行为异常。长期使用可产生耐受、依赖和戒断反应，与阿片类、酒精等合用可致严重镇静和呼吸抑制。",
+        "precautions": "属于第二类精神药品，必须凭处方使用，不得突然停药。避免饮酒及自行合用阿片类或其他中枢抑制药；服后不得驾驶。呼吸功能不全、睡眠呼吸暂停、重症肌无力、肝肾损害及妊娠患者须专科评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：氯硝西泮片说明书；国家卫健委精神药品管理指导",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=13272&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "麻仁丸",
+      "genericName": "麻仁丸",
+      "specification": "6g×10袋/盒",
+      "dosageForm": "丸剂",
+      "category": "中成药",
+      "manufacturer": "太极集团重庆桐君…",
+      "clinical": {
+        "indication": "润肠通便，用于肠燥便秘。",
+        "dosage": "口服，一次6g，一日2次；具体丸型和量具以盒内现行说明书为准。",
+        "adverseReactions": "国家药监局公开范本未列明确发生率；用药后如出现明显腹痛、腹泻、恶心或皮疹等不适，应停药并咨询医生或药师。",
+        "precautions": "孕妇禁用。忌食生冷、辛辣、油腻食物，不宜长期连续自行服用；不明原因腹痛、呕吐、便血或疑似肠梗阻者先就医。服药3天症状无改善或加重应就诊。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：麻仁丸非处方药说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/otc2zy/0541.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "玛巴洛沙韦片",
+      "genericName": "玛巴洛沙韦",
+      "specification": "20mg×2片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "Roche Pharma AG",
+      "clinical": {
+        "indication": "用于符合现行说明书年龄范围、症状不超过48小时的单纯性甲型或乙型流感患者，包括部分流感并发症高风险患者；不能替代流感疫苗，也不治疗细菌感染。",
+        "dosage": "在症状出现48小时内单次口服。体重20kg至不足80kg者单次40mg（本规格2片），体重80kg及以上者单次80mg；低体重儿童应使用可准确按体重给药的合适剂型。不得自行重复服药。",
+        "adverseReactions": "可见腹泻、恶心和头痛；上市后报告包括过敏反应、血管性水肿、皮疹/荨麻疹、呕吐、血便或结肠炎，以及谵妄、异常行为或幻觉等神经精神事件。",
+        "precautions": "不得与乳制品、钙强化饮料，或含钙、铁、镁、锌等多价阳离子的抗酸剂、泻药和补充剂同时服用，以免影响吸收。出现呼吸困难、严重皮疹、血便或异常行为立即就医；年龄、妊娠哺乳及高风险适用范围须核对现行说明书。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "罗氏：速福达（玛巴洛沙韦片）中文说明书，2026-03-28",
+        "url": "https://assets.roche.com/f/249469/x/d8977d1f34/mabaluoshaweipian_1_20260328.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "美阿沙坦钾片",
+      "genericName": "美阿沙坦钾",
+      "specification": "80mg×14片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京福元医药股份…",
+      "clinical": {
+        "indication": "用于治疗成人原发性高血压。",
+        "dosage": "成人通常起始40mg每日一次，可与食物同服或空腹服；根据血压和耐受性调整，最大80mg每日一次。当前80mg片不等于所有患者的起始剂量。",
+        "adverseReactions": "可见头晕、乏力和低血压；可能出现血肌酐升高、肾功能恶化及高钾血症。",
+        "precautions": "妊娠期使用可致胎儿损害，发现妊娠应立即停药并就医。治疗前后监测血压、血钾和肾功能；容量不足、肾动脉狭窄或肾功能损害者慎用。糖尿病患者避免与阿利吉仑合用，其他双重肾素-血管紧张素系统阻断方案也须医生评估。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "北京福元医药：美阿沙坦钾片产品说明书资料",
+        "url": "https://www.foyou.com.cn/product/product_inner/id/72",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "美愈伪麻口服溶液",
+      "genericName": "美愈伪麻",
+      "specification": "10ml×6支/盒",
+      "dosageForm": "口服溶液剂",
+      "category": "西药",
+      "manufacturer": "江苏恒瑞医药股份…",
+      "clinical": {
+        "indication": "用于缓解普通感冒或流行性感冒引起的咳嗽、咳痰和鼻塞等症状。",
+        "dosage": "成人口服一次10ml，每6小时一次，24小时不超过4次；使用随附量具准确量取。儿童和特殊人群按具体说明书或医嘱，不照搬成人剂量。",
+        "adverseReactions": "可见头晕、头痛、嗜睡或失眠、口干、恶心、胃部不适、心悸、血压升高、排尿困难和皮疹。",
+        "precautions": "不得与含右美沙芬、伪麻黄碱或愈创甘油醚的其他感冒药重复使用；服药期间避免饮酒，嗜睡者不得驾驶。严重高血压、心脏病、青光眼、前列腺肥大及甲亢患者先咨询医生；使用单胺氧化酶抑制剂及停药未满2周者禁用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：美愈伪麻口服溶液说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/otc3p1/h10.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "萘普生钠片",
+      "genericName": "萘普生钠",
+      "specification": "0.275g×24片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "山西皇城相府药业…",
+      "clinical": {
+        "indication": "用于缓解轻至中度疼痛和炎症，如关节炎、肌肉骨骼疼痛、牙痛、头痛及痛经，也可用于退热；具体适应症以处方或非处方说明书为准。",
+        "dosage": "成人止痛常首剂0.55g（2片），以后需要时每6～8小时0.275g（1片）；必须按盒内说明书限制每日最大量和疗程，并采用最低有效剂量、最短疗程。关节炎等长期方案须由医生制定。",
+        "adverseReactions": "常见胃痛、恶心、消化不良、腹泻或便秘、头晕和嗜睡；可发生消化道溃疡/出血、肾损伤、水肿和血压升高，少见心血管血栓、严重过敏、支气管痉挛或严重皮肤反应。",
+        "precautions": "不得与其他NSAID自行合用，服药期间避免饮酒。活动性消化道溃疡或出血、NSAID过敏、冠状动脉搭桥围术期及严重心肝肾功能不全者禁用；妊娠晚期禁用，抗凝/抗血小板治疗者先咨询医生。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：萘普生钠片说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hysms3/053.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "脑心通胶囊",
+      "genericName": "脑心通胶囊",
+      "specification": "0.4g×36粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "陕西步长制药有限…",
+      "clinical": {
+        "indication": "益气活血、化瘀通络。用于气虚血滞、脉络瘀阻所致中风中经络及胸痹，症见半身不遂、肢体麻木、口眼歪斜、言语不利、胸闷、心悸、气短；用于符合证候的脑梗死、冠心病心绞痛。",
+        "dosage": "口服，一次2～4粒，一日3次，饭后服用，或遵医嘱。",
+        "adverseReactions": "可见恶心、呕吐、腹胀、腹痛、腹泻、胃部不适、口干、头晕、头痛、皮疹、瘙痒、心悸、气短、面部潮红或过敏反应。",
+        "precautions": "孕妇及对本品成分过敏者禁用。出血倾向、月经期以及正在使用抗凝或抗血小板药者慎用并观察出血；胃肠功能较弱和过敏体质者慎用。不宜与藜芦同用，急性卒中或急性胸痛不能以本品替代急救。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "步长制药：脑心通胶囊完整说明书",
+        "url": "https://www.buchang.com/wgw/FormWeiGuanWang/product/product_detail.aspx?ID=e7dd3913-50bf-498a-897d-7dab32f005b4",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "尿素乳膏",
+      "genericName": "尿素",
+      "specification": "4g:40g/支",
+      "dosageForm": "乳膏剂",
+      "category": "西药",
+      "manufacturer": "上海运佳黄浦制药…",
+      "clinical": {
+        "indication": "用于手足皲裂，也可用于角化型手足癣所引起的皲裂。",
+        "dosage": "局部外用，涂于患处并轻轻揉搓，一日2～3次。",
+        "adverseReactions": "偶见局部刺激、烧灼、红斑、瘙痒或过敏反应。",
+        "precautions": "仅供外用，避免接触眼睛和其他黏膜；患处有破溃、渗出或感染时先咨询医生。出现明显烧灼、红肿应停药并洗净。若怀疑真菌感染，本品只能改善角化皲裂，不能替代抗真菌治疗。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：尿素乳膏非处方药说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/otc2h/x138.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "枇杷止咳软胶囊",
+      "genericName": "枇杷止咳软胶囊",
+      "specification": "0.55g×18粒/盒",
+      "dosageForm": "软胶囊剂",
+      "category": "中成药",
+      "manufacturer": "江西津大制药有限…",
+      "clinical": {
+        "indication": "止嗽化痰，用于咳嗽及支气管炎咳嗽。",
+        "dosage": "口服，一次2粒，一日3次；严格按说明书使用，不得自行加量或延长疗程。",
+        "adverseReactions": "监测数据显示可见恶心、呕吐、腹泻、胃部不适、反酸、瘙痒、皮疹和头晕等。",
+        "precautions": "儿童、孕妇及哺乳期妇女禁用。本品含罂粟壳，不宜久服；忌烟酒及辛辣、生冷、油腻食物。服药3天症状无缓解，或伴高热、气促、咯血等应就医；过敏体质者和运动员慎用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：枇杷止咳软胶囊说明书资料",
+        "url": "https://www.yaopinnet.com/zhongyao/zy82864zyk.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "脯氨酸恒格列净片",
+      "genericName": "脯氨酸恒格列净",
+      "specification": "10mg×10片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "江苏恒瑞医药股份…",
+      "qualityIssue": "原始目录通用名明显串行错配，已修正为脯氨酸恒格列净。",
+      "clinical": {
+        "indication": "配合饮食控制和运动，用于改善成人2型糖尿病患者的血糖控制；不用于1型糖尿病或糖尿病酮症酸中毒。",
+        "dosage": "成人通常起始5mg，每日一次，晨间服用，可与或不与食物同服；需要加强控制且耐受者可增至10mg每日一次。治疗前按说明书评估肾功能和容量状态。",
+        "adverseReactions": "可见生殖器真菌感染、尿路感染、排尿增多、口渴和容量不足/低血压；与胰岛素或磺脲类合用可低血糖。少见但严重者包括酮症酸中毒、急性肾损伤、尿脓毒症和会阴坏死性筋膜炎。",
+        "precautions": "急性重病、禁食或手术前按医嘱暂时停药；出现恶心、腹痛、呼吸急促等即使血糖不高也应排查酮症。监测肾功能和容量状态，注意外阴清洁；反复泌尿生殖感染、低血压风险或肾功能损害者慎用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：脯氨酸恒格列净片说明书",
+        "url": "https://drugs.dxy.cn/drug/AobOIRKYi7twaVXPR5IQyg%3D%3D",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "葡萄糖注射液",
+      "genericName": "葡萄糖",
+      "specification": "5% 250ml",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "浙江天瑞药业有限…",
+      "clinical": {
+        "indication": "用于补充能量和体液、纠正低血糖，也可按具体处方作为静脉给药溶媒；不同临床目的须分别评估。",
+        "dosage": "仅限医疗机构静脉使用。输注量和速度按血糖、液体与能量需求、年龄体重、心肾功能及合并用药个体化；本袋250ml不是所有患者的固定剂量。",
+        "adverseReactions": "可致高血糖、糖尿、低钠或其他电解质紊乱和液体超负荷；局部可发生疼痛、渗漏、静脉炎或感染，输注不当可加重脑水肿等情况。",
+        "precautions": "用前检查澄明度、容器和配伍相容性，严格无菌操作。治疗中监测血糖、电解质、酸碱和出入量；糖尿病、心肾功能不全及颅内压相关疾病患者须谨慎。不得未经核对与血液制品或其他药物同一通路混合。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：葡萄糖注射液说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000010999&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "普瑞巴林胶囊",
+      "genericName": "普瑞巴林",
+      "specification": "75mg×32粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "齐鲁制药(海南)…",
+      "clinical": {
+        "indication": "用于治疗带状疱疹后神经痛；其他神经病理性疼痛、纤维肌痛或癫痫相关用途必须以本品获批适应症和医嘱为准。",
+        "dosage": "肾功能正常成人治疗带状疱疹后神经痛常从75mg每日2次开始，可在一周内按疗效和耐受性增至150mg每日2次；超过300mg/日仅限特定持续疼痛且已耐受者由医生决定。肾功能减退必须按肌酐清除率减量。",
+        "adverseReactions": "常见头晕、嗜睡、外周水肿、体重增加、视物模糊、口干和注意力下降；可发生血管性水肿、自杀意念、严重呼吸抑制、滥用或依赖及停药反应。",
+        "precautions": "服后不得驾驶或从事危险作业；与阿片类、酒精或其他中枢抑制药合用会增加镇静和呼吸抑制风险。停药至少用1周逐渐减量，不得骤停；开始治疗前评估肾功能，出现面舌肿胀、呼吸困难或情绪行为显著变化立即就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：普瑞巴林胶囊说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000010420&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "芪黄通秘软胶囊",
+      "genericName": "芪黄通秘软胶囊",
+      "specification": "0.5g×24粒/盒",
+      "dosageForm": "软胶囊剂",
+      "category": "中成药",
+      "manufacturer": "神威药业集团有限…",
+      "clinical": {
+        "indication": "益气养血、润肠通便，用于功能性便秘属气血虚证，症见排便困难、排便次数减少、便质干硬、腹胀及乏力等。",
+        "dosage": "口服，一次3粒，一日2次，饭后30分钟服用；疗程及是否继续使用应按现行说明书和医嘱。",
+        "adverseReactions": "可见轻度腹泻、腹痛或腹部不适；症状明显或持续时应停药并就医。",
+        "precautions": "孕妇及对本品成分过敏者禁用。用药前排除肠梗阻、急腹症和器质性病变；出现持续剧烈腹痛、呕吐、便血或停止排气应立即就医。不宜自行长期使用，哺乳期及特殊人群先咨询医生。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：芪黄通秘软胶囊说明书",
+        "url": "https://drugs.dxy.cn/drug/HWuaZW2TPixK9NDwMx83jA%3D%3D",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "氢溴酸替格列汀片",
+      "genericName": "氢溴酸替格列汀",
+      "specification": "20mg×20片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "四川科伦药业股份…",
+      "clinical": {
+        "indication": "用于改善成人2型糖尿病患者的血糖控制，可单药使用或与二甲双胍等联合；不用于1型糖尿病或糖尿病酮症酸中毒。",
+        "dosage": "成人通常20mg每日一次；疗效不足且耐受者可在医生评估后增至40mg每日一次，不得超过40mg/日。可与食物同服或空腹服。",
+        "adverseReactions": "可见低血糖（与胰岛素或磺脲类合用时风险更高）、便秘及其他胃肠不适、皮疹和肝酶升高；少见急性胰腺炎、严重过敏、大疱性类天疱疮或肠梗阻。",
+        "precautions": "联合胰岛素或磺脲类时可能需下调后者剂量并监测血糖。出现持续剧烈上腹痛、皮肤水疱、黄疸或严重便秘腹胀应停药就医；急性感染、手术、严重肝肾损害及QT间期延长风险患者须由医生评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "乐普药业：氢溴酸替格列汀片说明书资料",
+        "url": "https://www.lehuopharm.com/products/%E5%BA%B7%E5%A6%87%E7%89%B9",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸曲美他嗪片",
+      "genericName": "盐酸曲美他嗪",
+      "specification": "20mg×60片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京福元医药股份…",
+      "clinical": {
+        "indication": "仅作为添加药物，用于对一线抗心绞痛治疗控制不佳或不能耐受的一线治疗的稳定型心绞痛成年患者的对症治疗；不再用于眩晕或耳鸣。",
+        "dosage": "成人一次20mg、一日3次，三餐时服用；治疗3个月后评价疗效，无治疗作用应停药。中度肾功能损害者20mg每日2次，早晚餐时服；老年患者按肾功能调整。",
+        "adverseReactions": "可见头晕、头痛、腹痛、腹泻、消化不良、恶心、呕吐、皮疹和乏力；重要风险包括帕金森综合征、震颤、运动不能、肌张力增高、步态不稳或不宁腿，少见血细胞减少和肝炎。",
+        "precautions": "不能用于急性心绞痛发作、急性心肌梗死初始治疗或替代标准抗心绞痛治疗。帕金森病或其他运动障碍、严重肾功能损害者禁用；出现震颤、步态异常或不宁腿应立即停药并由神经科评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家药监局：盐酸曲美他嗪说明书修订及安全性通报",
+        "url": "https://www.nmpa.gov.cn/directory/web/nmpa/xxgk/ggtg/ypggtg/ypshmshxdgg/20140808101201306.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",
