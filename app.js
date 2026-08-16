@@ -429,7 +429,7 @@
     app.innerHTML = `
       <section class="panel section">
         <h2>手动添加自定义药品</h2>
-        <p class="notice">可先使用免费中文联网核验并选择已核验候选填入。目录信息和适应症等临床内容保存后仍标记为“待复核”，必须对照批准文号和具体厂家现行说明书确认。</p>
+        <p class="notice">输入中文药名后可自动填充：优先使用项目核验资料；没有核验资料时生成“未核验草稿”。所有目录字段、适应症、用法用量、不良反应和注意事项均可修改，未核验草稿可直接保存。</p>
         <form id="drugForm" style="margin-top:16px">
           <div class="form-grid">
             <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required placeholder="输入中文药品名"><button class="btn secondary" id="lookupDrugBtn" type="button">中文联网检索</button></div></div>
@@ -447,14 +447,14 @@
             <div class="field"><label>不良反应</label><textarea name="adverseReactions" rows="4"></textarea></div>
             <div class="field"><label>注意事项</label><textarea name="precautions" rows="4"></textarea></div>
           </details>
-          <input type="hidden" name="sourceLabel"><input type="hidden" name="sourceUrl"><input type="hidden" name="sourceCheckedAt">
+          <input type="hidden" name="sourceLabel"><input type="hidden" name="sourceUrl"><input type="hidden" name="sourceCheckedAt"><input type="hidden" name="sourceStatus">
           <p id="selectedSource" class="muted">当前来源：用户手动录入</p>
           <button class="btn primary" type="submit">保存自定义药品</button>
         </form>
       </section>
       <section class="panel section">
         <h3>免费中文联网检索</h3>
-        <p class="muted">自动填充仅使用项目中有明确中文来源的核验资料；其他药品提供国家药监局和全网中文搜索入口，须人工核验，不调用任何收费 API。</p>
+        <p class="muted">项目核验资料优先；无匹配时由免费的 Cloudflare Workers AI 生成中文未核验草稿并自动填入。草稿不是说明书核验结果，但全部内容可编辑并可直接保存，不调用收费 API。</p>
         <div class="toolbar"><a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">国家药监局联网核验</a>${state.smartSearchEndpoint ? "" : '<button class="btn ghost" type="button" data-route-link="cache">配置免费检索</button>'}</div>
         <div id="lookupStatus" class="muted" role="status" aria-live="polite"></div><div id="lookupLinks" class="toolbar"></div><div id="lookupResults" class="card-list lookup-results"></div>
       </section>
@@ -473,9 +473,14 @@
       ["drugName", "genericName", "tradeName", "specification", "dosageForm", "category", "manufacturer"].forEach(name => setField(name, candidate[name]));
       ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(name, candidate.clinical?.[name]));
       setField("sourceLabel", candidate.source?.label || "中文联网候选"); setField("sourceUrl", candidate.source?.url || ""); setField("sourceCheckedAt", candidate.source?.checkedAt || "");
-      document.getElementById("selectedSource").textContent = `当前来源：${candidate.source?.label || "中文联网候选"}（待人工复核）`;
+      setField("sourceStatus", candidate.source?.status || "needs-review");
+      const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
+      document.getElementById("selectedSource").textContent = isDraft
+        ? `当前来源：${candidate.source?.label || "中文未核验草稿"}（未核验草稿；全部字段可编辑，可直接保存）`
+        : `当前来源：${candidate.source?.label || "中文联网候选"}（来源已核验；填入内容仍可编辑）`;
       if (candidate.clinical) form.querySelector(".clinical-editor").open = true;
-      form.scrollIntoView({ behavior: "smooth", block: "start" }); toast("候选信息已填入，请核对后保存");
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+      toast(isDraft ? "未核验草稿已自动填入，可修改后直接保存" : "核验资料已填入，所有字段均可修改");
     };
     const renderLookupResults = candidates => {
       const results = document.getElementById("lookupResults");
@@ -483,10 +488,11 @@
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
       results.innerHTML = candidates.length ? candidates.map(candidate => {
         const sourceUrl = safeExternalUrl(candidate.source?.url);
+        const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
         const confidence = { high: "高", medium: "中", low: "低" }[candidate.smartMeta?.confidence] || "";
         const meta = [confidence && `可信度：${confidence}`, candidate.smartMeta?.approvalNumber && `批准文号：${candidate.smartMeta.approvalNumber}`].filter(Boolean).join(" · ");
-        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待核验")} · ${esc(candidate.specification || "规格待核验")} · ${esc(candidate.manufacturer || "厂家待核验")}</p><p class="drug-sub"><span class="badge warn">待复核</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">自动填充此项</button></div></div></article>`;
-      }).join("") : empty("未找到可自动填充的中文资料。请在国家药监局核验后手动录入；本工具不会使用英文临床内容。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
+        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.genericName || "通用名待补充")} · ${esc(candidate.specification || "规格待补充")} · ${esc(candidate.manufacturer || "厂家待补充")}</p><p class="drug-sub"><span class="badge ${isDraft ? "warn" : "ok"}">${isDraft ? "未核验草稿" : "核验资料"}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
+      }).join("") : empty("暂未生成可自动填充的中文资料。可稍后重试，或使用下方中文搜索入口手动补充。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
     const renderVerificationLinks = links => {
       document.getElementById("lookupLinks").innerHTML = (links || []).map(link => {
@@ -510,11 +516,14 @@
         const result = await searchDrugCandidates(query); const candidates = result.candidates;
         renderLookupResults(candidates);
         renderVerificationLinks(result.verificationLinks);
+        const autoDraft = candidates.find(candidate => candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft);
+        if (autoDraft) useCandidate(autoDraft);
         if (result.smartError) status.textContent = `免费联网检索暂不可用，已回退到项目中文核验库${candidates.length ? `，显示 ${candidates.length} 个候选` : ""}：${result.smartError.message}`;
         else if (!result.smartConfigured) status.textContent = `免费检索服务未配置，当前只显示项目中文核验库${candidates.length ? `的 ${candidates.length} 个候选` : ""}。请到缓存管理页配置。`;
-        else status.textContent = candidates.length ? `找到 ${candidates.length} 个有中文来源的候选；请选择一项并核对全部字段和来源。` : "核验库中暂无可自动填充候选，请使用下方入口检索并人工核验。";
+        else if (autoDraft) status.textContent = "未找到核验资料，已生成并自动填入未核验草稿；所有字段都可编辑，可直接保存。";
+        else status.textContent = candidates.length ? `找到 ${candidates.length} 个带中文来源的核验候选；请选择一项自动填充。` : "暂未生成候选，请稍后重试或使用下方中文搜索入口。";
         if (result.warnings?.length) status.textContent += ` 提示：${result.warnings.join("；")}`;
-        toast(candidates.length ? `找到 ${candidates.length} 个中文候选，请选择` : "未找到可靠中文候选");
+        if (!autoDraft) toast(candidates.length ? `找到 ${candidates.length} 个中文候选，请选择` : "暂未生成中文候选");
         revealLookupFeedback();
       } catch (error) {
         renderLookupResults([]); status.textContent = `中文资料检索失败：${error.message || "网络不可用"}`;
@@ -567,7 +576,9 @@
         adverseReactions: data.adverseReactions.trim(), precautions: data.precautions.trim()
       };
       const clinical = Object.values(clinicalFields).some(Boolean) ? clinicalFields : null;
-      const networkImported = Boolean(data.sourceUrl.trim());
+      const sourceStatus = data.sourceStatus.trim();
+      const unverifiedDraft = sourceStatus === "unverified-draft";
+      const networkImported = Boolean(data.sourceUrl.trim()) || unverifiedDraft;
       const drug = {
         id: `custom-${Date.now()}`,
         rawName: data.drugName.trim(),
@@ -580,8 +591,8 @@
         manufacturer: data.manufacturer.trim(),
         insuranceClass: "未标注",
         clinical,
-        qualityIssue: networkImported ? "联网候选字段尚未按批准文号和具体厂家现行说明书人工复核。" : "自定义药品尚未核验说明书与批准文号。",
-        source: { status: "needs-review", label: data.sourceLabel.trim() || "用户手动录入", url: data.sourceUrl.trim(), checkedAt: data.sourceCheckedAt.trim() || now.slice(0, 10) },
+        qualityIssue: unverifiedDraft ? "此条目由 AI 自动生成，属于未核验草稿；全部字段可编辑，且不能替代对应厂家现行说明书。" : networkImported ? "联网候选字段尚未按批准文号和具体厂家现行说明书复核。" : "自定义药品尚未核验说明书与批准文号。",
+        source: { status: unverifiedDraft ? "unverified-draft" : "needs-review", label: data.sourceLabel.trim() || "用户手动录入", url: data.sourceUrl.trim(), checkedAt: data.sourceCheckedAt.trim() || now.slice(0, 10) },
         importedFromNetwork: networkImported,
         isCustom: true
       };
@@ -647,6 +658,17 @@
       .filter(isChineseCandidate).slice(0, 8);
   }
 
+  function directoryHintFor(query) {
+    const q = normalize(query);
+    const matches = window.DRUG_CATALOG.filter(drug => normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q));
+    const drug = matches.find(item => [item.drugName, item.genericName, item.tradeName].some(value => normalize(value) === q)) || matches[0];
+    if (!drug) return {};
+    return {
+      drugName: drug.drugName || "", genericName: drug.genericName || "", tradeName: drug.tradeName || "",
+      specification: drug.specification || "", dosageForm: drug.dosageForm || "", category: drug.category || "", manufacturer: drug.manufacturer || ""
+    };
+  }
+
   async function fetchSmartSearchCandidates(query) {
     const endpoint = normalizeServiceEndpoint(state.smartSearchEndpoint);
     if (!endpoint) return { candidates: [], warnings: [] };
@@ -656,23 +678,25 @@
       const response = await fetch(`${endpoint}/v1/drugs/search`, {
         method: "POST", cache: "no-store", signal: controller.signal,
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query })
+        body: JSON.stringify({ query, directoryHint: directoryHintFor(query) })
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || `免费检索服务返回 ${response.status}`);
       if (!Array.isArray(payload.candidates)) throw new Error("免费检索结果格式无效");
       const qualityLabels = { regulator: "药监部门", manufacturer: "生产企业", hospital: "医疗机构", "medical-database": "医药数据库", other: "其他中文来源" };
-      const candidates = payload.candidates.map(candidate => ({
+      const candidates = payload.candidates.map(candidate => {
+        const draft = candidate.draft === true || candidate.verified === false;
+        return ({
         drugName: candidate.drugName || "", genericName: candidate.genericName || "", tradeName: candidate.tradeName || "",
         specification: candidate.specification || "", dosageForm: candidate.dosageForm || "", category: candidate.category || "", manufacturer: candidate.manufacturer || "",
         clinical: candidate.clinical ? { ...candidate.clinical } : null,
         source: {
-          status: "needs-review",
-          label: `免费联网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
+          status: draft ? "unverified-draft" : "needs-review",
+          label: draft ? `未核验 AI 草稿：${candidate.sourceTitle || "中文资料草稿"}` : `免费联网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
           url: candidate.sourceUrl || "", checkedAt: candidate.sourceCheckedAt || new Date().toISOString().slice(0, 10)
         },
-        smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "" }
-      })).filter(isChineseCandidate).slice(0, 6);
+        smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "", draft, verified: candidate.verified === true, editable: candidate.editable !== false }
+      }); }).filter(isChineseCandidate).slice(0, 6);
       const verificationLinks = Array.isArray(payload.verificationLinks)
         ? payload.verificationLinks.map(link => ({ label: String(link.label || ""), url: safeExternalUrl(link.url) })).filter(link => link.label && link.url).slice(0, 6)
         : [];
@@ -804,7 +828,7 @@
       </section>
       <section class="panel section">
         <div class="section-title"><h2>免费中文检索服务</h2><span class="badge ${state.smartSearchEndpoint ? "ok" : "warn"}" id="smartSearchBadge">${state.smartSearchEndpoint ? "已配置" : "未配置"}</span></div>
-        <p class="muted">填写已部署的 Cloudflare Worker 地址。服务不调用收费 API，也不需要在网页或 Cloudflare 中填写 OpenAI 密钥。</p>
+        <p class="muted">填写已部署的 Cloudflare Worker 地址。核验资料优先，缺失时使用 Workers AI 免费额度生成可编辑的未核验中文草稿；不需要 OpenAI 密钥。</p>
         <div class="field"><label>Worker 地址</label><input id="smartSearchEndpoint" inputmode="url" placeholder="https://primary-medication-smart-search.你的账号.workers.dev" value="${esc(state.smartSearchEndpoint)}"></div>
         <div class="toolbar"><button class="btn primary" id="saveSmartSearchEndpoint">保存地址</button><button class="btn secondary" id="testSmartSearchEndpoint">测试连接</button><button class="btn ghost" id="clearSmartSearchEndpoint">清除</button></div>
         <p class="muted" id="smartSearchStatus" role="status" aria-live="polite"></p>
@@ -841,8 +865,8 @@
         const response = await fetch(`${state.smartSearchEndpoint}/health`, { cache: "no-store", headers: { Accept: "application/json" } });
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || !payload.ok) throw new Error(payload.error || `服务返回 ${response.status}`);
-        if (payload.mode !== "free-verified" || payload.requiresPaidApi !== false) throw new Error("部署的不是免费核验模式");
-        endpointStatus.textContent = "连接成功：免费中文核验模式，不使用收费 API。";
+        if (!["free-verified", "free-ai-draft"].includes(payload.mode) || payload.requiresPaidApi !== false || payload.configured === false) throw new Error("免费智能检索服务尚未正确部署");
+        endpointStatus.textContent = "连接成功：核验资料优先，缺失时生成可编辑的未核验草稿；不使用收费 API。";
         toast("免费中文检索服务连接成功");
       } catch (error) { endpointStatus.textContent = `连接失败：${error.message || "请检查地址和 Worker 设置"}`; toast("免费中文检索服务连接失败"); }
       finally { button.disabled = false; button.textContent = "测试连接"; }

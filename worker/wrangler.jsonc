@@ -5,9 +5,13 @@
   "compatibility_date": "2026-08-16",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  "ai": {
+    "binding": "AI"
+  },
   "vars": {
     "ALLOWED_ORIGINS": "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000",
-    "CATALOG_URL": "https://tinnxq-alt.github.io/primary-medication-assistant/chinese-drug-labels.json"
+    "CATALOG_URL": "https://tinnxq-alt.github.io/primary-medication-assistant/chinese-drug-labels.json",
+    "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast"
   },
   "observability": {
     "enabled": true,
