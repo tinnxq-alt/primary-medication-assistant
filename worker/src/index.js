@@ -100,9 +100,9 @@ function cleanCatalogCandidate(candidate) {
   const precautions = chineseField(candidate.clinical?.precautions);
   if (![indications, dosage, adverseReactions, precautions].every(Boolean)) return null;
   const hostname = new URL(sourceUrl).hostname.toLowerCase();
-  const regulator = hostname === "nmpa.gov.cn" || hostname.endsWith(".nmpa.gov.cn") || hostname === "nhsa.gov.cn" || hostname.endsWith(".nhsa.gov.cn");
-  const manufacturerDomains = ["labeling.pfizer.com", "santao.com.cn", "lingrui.com", "jf-pharma.com", "e-cspc.com", "grandpharm.com", "diao.com", "sinepromod.com", "tianhengyaoye.com", "topfond.com", "huasungrp.com", "medco.com.cn", "dinglu.com", "youcareyk.com", "cnkh.com", "yiling.cn"];
-  const medicalDatabaseDomains = ["drugs.dxy.cn", "zy91.com", "yaopinnet.com", "hnysfww.com", "meditool.cn", "315jiage.cn", "511yaohx.com", "yzsbh.com", "39.net", "298.cn"];
+  const regulator = hostname === "nmpa.gov.cn" || hostname.endsWith(".nmpa.gov.cn") || hostname === "nhsa.gov.cn" || hostname.endsWith(".nhsa.gov.cn") || hostname === "nhc.gov.cn" || hostname.endsWith(".nhc.gov.cn");
+  const manufacturerDomains = ["labeling.pfizer.com", "santao.com.cn", "lingrui.com", "jf-pharma.com", "e-cspc.com", "grandpharm.com", "diao.com", "sinepromod.com", "tianhengyaoye.com", "topfond.com", "huasungrp.com", "medco.com.cn", "dinglu.com", "youcareyk.com", "cnkh.com", "yiling.cn", "betterpharma.com", "cy-pharm.com"];
+  const medicalDatabaseDomains = ["drugs.dxy.cn", "zy91.com", "yaopinnet.com", "hnysfww.com", "meditool.cn", "315jiage.cn", "511yaohx.com", "yzsbh.com", "39.net", "298.cn", "yilianmeiti.com", "iophthal.com"];
   const hospitalDomains = ["bdfs.org.cn", "sustech-hospital.cn"];
   const domainMatches = domain => hostname === domain || hostname.endsWith(`.${domain}`);
   const manufacturer = manufacturerDomains.some(domainMatches);
