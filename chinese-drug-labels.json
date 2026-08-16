@@ -2002,6 +2002,367 @@
       }
     },
     {
+      "drugName": "去乙酰毛花苷注射液",
+      "genericName": "去乙酰毛花苷",
+      "specification": "2ml:0.4mg/支",
+      "dosageForm": "注射剂",
+      "category": "西药",
+      "manufacturer": "成都倍特药业股份…",
+      "clinical": {
+        "indication": "主要用于急性心功能不全或慢性心功能不全急性加重，也可控制伴快速心室率的心房颤动、心房扑动；用于室上性心动过速已较少。",
+        "dosage": "仅限医院静脉用药。成人通常以5%葡萄糖注射液稀释后缓慢静脉注射，首剂0.4～0.6mg，必要时每2～4小时追加0.2～0.4mg，总量通常1～1.6mg；须按既往洋地黄用药、肾功能、电解质和心电图个体化。",
+        "adverseReactions": "常见毒性表现包括新发或加重的心律失常、心动过缓、房室传导阻滞、恶心、呕吐、食欲减退和头痛；可出现视物模糊或黄视、意识改变，严重时危及生命。",
+        "precautions": "给药前核对近期地高辛等强心苷用药，持续监测心电图、心率、肾功能和钾/镁/钙。低钾、低镁、高钙、肾功能不全和老年患者更易中毒；疑似洋地黄中毒、室颤或明显传导阻滞时禁忌/慎用并立即专科处理。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：去乙酰毛花苷注射液说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=4143&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "瑞舒伐他汀依折麦布片",
+      "genericName": "瑞舒伐他汀/依折麦布",
+      "specification": "10mg:10mg×20片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京福元医药股份…",
+      "clinical": {
+        "indication": "配合饮食控制，用于需要同时接受瑞舒伐他汀和依折麦布治疗的原发性高胆固醇血症或纯合子家族性高胆固醇血症患者；不应作为未经评估的自行起始降脂方案。",
+        "dosage": "口服一次1片、每日一次，可在一天任意时间与或不与食物同服；开始前须确认患者适合固定的瑞舒伐他汀10mg/依折麦布10mg剂量。",
+        "adverseReactions": "可见头痛、胃肠不适、肝酶升高和肌痛；少见但严重者包括肌病/横纹肌溶解、严重肝损伤、过敏反应和肾功能损害。",
+        "precautions": "活动性肝病、原因不明的持续转氨酶升高及妊娠期禁用。治疗前后按风险监测血脂、肝功能，出现不明原因肌痛、无力或深色尿立即就医；重度肾损害及与环孢素、部分抗病毒药等合用须核对禁忌和剂量。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "正大天晴：瑞舒伐他汀依折麦布片(I)中文说明书",
+        "url": "https://www.njcttq.com/web/upload/2026/04/23/17769112502255h4i60.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "三七通舒胶囊",
+      "genericName": "三七通舒胶囊",
+      "specification": "0.2g×12粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "成都华神集团股份…",
+      "clinical": {
+        "indication": "活血化瘀、活络通脉，用于脑梗死、脑缺血所致的偏瘫、偏身麻木、言语不利等缺血性中风相关症状；不用于脑出血急性期。",
+        "dosage": "口服，一次1粒，一日3次，4周为一个疗程；胃部不适者可在医生指导下改为餐后服。",
+        "adverseReactions": "个别患者可出现恶心或上腹部不适；出现出血征象、明显皮疹或其他异常应停药就医。",
+        "precautions": "孕妇和脑出血患者禁用；产妇慎用，出血性中风在出血期间禁用，出血后瘀血症状也须谨慎。正在使用抗凝或抗血小板药、存在出血倾向或拟手术者应先由医生评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "河南省医药服务平台：三七通舒胶囊说明书",
+        "url": "https://www.hnysfww.com/mobile/goods.php?id=5261",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "沙格列汀二甲双胍缓释片(II)",
+      "genericName": "沙格列汀/二甲双胍",
+      "specification": "2.5mg:1000mg（包装待核验）",
+      "dosageForm": "缓释片",
+      "category": "西药",
+      "manufacturer": "北京福元医药股份…",
+      "qualityIssue": "原始规格“1002.5mg”缺少成分分隔，暂规范为2.5mg:1000mg，包装数量仍待核验。",
+      "clinical": {
+        "indication": "配合饮食和运动，用于适合同时接受沙格列汀和二甲双胍治疗的成人2型糖尿病患者；不用于1型糖尿病或糖尿病酮症酸中毒。",
+        "dosage": "剂量按既往治疗个体化，通常晚餐时每日一次并整片吞服，不得压碎、切开或咀嚼。每日最大建议量为沙格列汀5mg和二甲双胍缓释剂2000mg；本规格不适合所有起始或调整方案。",
+        "adverseReactions": "可见腹泻、恶心等胃肠反应、头痛和上呼吸道感染；与胰岛素或磺脲类合用可低血糖。重要风险包括二甲双胍相关乳酸性酸中毒、急性胰腺炎、心力衰竭、严重过敏和大疱性类天疱疮。",
+        "precautions": "开始及治疗期间评估eGFR；说明书所列本固定复方禁用于eGFR低于45ml/min/1.73m²者。碘造影、手术、缺氧、严重感染或大量饮酒时按医嘱停药；出现呼吸急促、异常乏力、持续腹痛或心衰加重立即就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医药百科：沙格列汀二甲双胍缓释片(I)/(II)/(III)说明书",
+        "url": "https://drugs.meditool.cn/Drugtype/druginfo?datatype=0&druginfoid=8338&msgtype=0",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "沙库巴曲阿利沙坦钙片",
+      "genericName": "沙库巴曲/阿利沙坦钙",
+      "specification": "240mg×7片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "深圳信立泰药业股…",
+      "clinical": {
+        "indication": "用于治疗成人原发性高血压；当前获批信息不支持把本品直接按沙库巴曲缬沙坦的心衰适应症使用。",
+        "dosage": "成人推荐起始一次240mg、一日一次；控制不足时可由医生增至一次480mg、一日一次。可单独使用，或与ACEI和ARB以外的其他降压药合用。",
+        "adverseReactions": "可见头晕、低血压和高钾血症；也需警惕肾功能损害、血管性水肿和严重过敏反应。",
+        "precautions": "妊娠期禁用，发现妊娠立即停药。不得与ACEI或其他ARB合用；从ACEI转换通常须留足洗脱期并按现行说明书执行。监测血压、血钾和肾功能，既往血管性水肿、容量不足、肾动脉狭窄或重度肾损害患者须专科评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医药百科：沙库巴曲阿利沙坦钙片说明书",
+        "url": "https://drugs.meditool.cn/Drugtype/druginfo?datatype=0&druginfoid=8742&msgtype=0",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "沙库巴曲缬沙坦钠片",
+      "genericName": "沙库巴曲/缬沙坦",
+      "specification": "200mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京诺华制药有限…",
+      "clinical": {
+        "indication": "用于射血分数降低的慢性心力衰竭成人患者，以及成人原发性高血压；两种适应症的给药频次不同，不可混用。",
+        "dosage": "心衰通常从100mg每日2次开始，未用或低剂量ACEI/ARB者常从50mg每日2次开始，耐受后每2～4周倍增至目标200mg每日2次。高血压通常200mg每日一次，控制不足可增至400mg每日一次。必须按适应症和既往用药开具。",
+        "adverseReactions": "常见低血压、高钾血症和肾功能损害；可发生咳嗽、头晕和血管性水肿，后者可能危及生命。",
+        "precautions": "妊娠期禁用。不得与ACEI合用，停用ACEI后至少间隔36小时；不得与其他ARB重复。监测血压、血钾和肾功能，容量不足、肾动脉狭窄、重度肾/肝损害及既往血管性水肿患者须谨慎。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：沙库巴曲缬沙坦钠片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000012829&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "麝香追风止痛膏",
+      "genericName": "麝香追风止痛膏",
+      "specification": "7cm×10cm×6贴/盒",
+      "dosageForm": "贴膏剂",
+      "category": "中成药",
+      "manufacturer": "重庆希尔安药业有…",
+      "clinical": {
+        "indication": "祛风除湿、散寒止痛，用于寒湿痹阻所致关节或肌肉疼痛、扭伤疼痛。",
+        "dosage": "外用，一次1贴，一日1次；贴敷部位和时间以盒内说明书为准，出现刺激立即揭除。",
+        "adverseReactions": "可引起局部瘙痒、刺痛和皮疹，如红斑、丘疹或水疱；严重过敏反应应立即就医。",
+        "precautions": "含生草乌、生川乌、生马钱子等毒性中药，只可外用，严禁口服。孕妇、儿童、皮肤破溃/感染者及对橡胶膏或成分过敏者禁用；避免接触眼口黏膜，不得大面积、超量或长期使用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "河南省医药服务平台：麝香追风止痛膏说明书",
+        "url": "https://www.hnysfww.com/mobile/goods.php?id=8213",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "肾衰宁胶囊",
+      "genericName": "肾衰宁胶囊",
+      "specification": "0.35g×36粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "云南雷允上理想药…",
+      "clinical": {
+        "indication": "益气健脾、活血化瘀、通腑泄浊，用于脾胃气虚、浊瘀内阻所致面色萎黄、腰痛倦怠、恶心、食欲不振、小便不利、大便黏滞；慢性肾功能不全见上述证候者。",
+        "dosage": "口服，一次4～6粒，一日3～4次；疗程按现行说明书和肾专科医嘱。服后大便以每日2～3次为宜，超过4次应减量并咨询医生或药师。",
+        "adverseReactions": "可见恶心、呕吐、腹痛、腹泻、腹胀、大便次数增加、皮疹和瘙痒；有头晕、乏力、心悸等个案报告。",
+        "precautions": "孕妇及有出血倾向者禁用。高钾血症、脾胃虚寒、哺乳期或月经期患者慎用；含法半夏和大黄，慎与乌头碱类药物合用，不建议与其他含大黄制剂重复使用。治疗期间仍须监测肾功能、电解质和基础病。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "云南雷允上：肾衰宁胶囊现行说明书资料",
+        "url": "https://www.lys.cn/wap/productsandintroductions/info.aspx?itemid=516&lcid=36",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "生血宝合剂",
+      "genericName": "生血宝合剂",
+      "specification": "100ml×2瓶/盒",
+      "dosageForm": "合剂",
+      "category": "中成药",
+      "manufacturer": "清华德人西安幸福…",
+      "clinical": {
+        "indication": "滋补肝肾、益气生血，用于肝肾不足、气血两虚相关乏力、腰膝酸软、头晕耳鸣、心悸气短等；也用于放化疗所致白细胞减少及缺铁性贫血见上述证候者。",
+        "dosage": "口服，一次15ml，一日3次，用前摇匀。不同用途疗程不同：放化疗相关白细胞减少通常3周、缺铁性贫血4周、相关失眠眩晕等2周为一个疗程，继续使用须复评。",
+        "adverseReactions": "可见恶心、呕吐、胃部不适、腹泻、腹痛、腹胀、便秘、皮疹和瘙痒；已有肝功能生化指标异常病例报告。",
+        "precautions": "对本品成分过敏者禁用。含制何首乌，治疗前后关注肝功能；出现乏力加重、食欲明显下降、尿黄或黄疸应停药就医。贫血和白细胞减少病因复杂，本品不能替代病因检查、铁剂或其他必要治疗。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：生血宝合剂说明书（2025-04-15修订）",
+        "url": "https://drugs.dxy.cn/drug/mepepmZGDeY68oV63Xg5amepepmZQOYg%3D%3D",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "石杉碱甲片",
+      "genericName": "石杉碱甲",
+      "specification": "0.05mg×40片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海复旦复华药业…",
+      "clinical": {
+        "indication": "用于良性记忆障碍，可改善指向记忆、图像回忆、联想学习等记忆能力；对脑器质性病变引起的记忆障碍和痴呆也可改善症状。",
+        "dosage": "口服，通常一次0.1～0.2mg（本规格2～4片），一日2次，每日最大不超过0.45mg（9片）；属胆碱酯酶抑制剂，应从小剂量开始并按疗效和耐受性调整。",
+        "adverseReactions": "剂量较大时可出现头晕、恶心、胃肠不适、乏力、出汗、流涎、心率减慢或肌肉颤动等胆碱能反应。",
+        "precautions": "心动过缓、房室传导阻滞、支气管哮喘、消化性溃疡、癫痫及泌尿道梗阻患者慎用。避免与其他胆碱酯酶抑制剂自行合用；与抗胆碱药作用相互拮抗。出现晕厥、喘息或显著心动过缓应停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：石杉碱甲片说明书资料",
+        "url": "https://www.298.cn/show-106548.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "双氯芬酸钠双释放肠溶胶囊",
+      "genericName": "双氯芬酸钠",
+      "specification": "75mg×20粒/盒",
+      "dosageForm": "双释放肠溶胶囊",
+      "category": "西药",
+      "manufacturer": "Aenova IP GmbH",
+      "clinical": {
+        "indication": "用于缓解类风湿关节炎、骨关节炎、强直性脊柱炎、急性痛风、软组织损伤以及痛经、牙痛和术后疼痛等炎症和疼痛。",
+        "dosage": "成人通常一次75mg（1粒）、一日1次，空腹用足量水整粒吞服；易有胃肠反应者可随餐服。症状严重时是否增至每日2粒必须由医生决定，不得掰开、咀嚼或自行加量。",
+        "adverseReactions": "常见胃痛、恶心、消化不良、腹泻、头痛和头晕；可发生消化道溃疡/出血/穿孔、肾损伤、水肿和血压升高，少见心血管血栓、严重皮肤反应、肝损伤或严重过敏。",
+        "precautions": "采用最低有效剂量和最短疗程，不与其他NSAID自行合用。活动性消化道溃疡或出血、NSAID过敏/阿司匹林哮喘、冠状动脉搭桥围术期、严重心肝肾功能不全及妊娠晚期禁用；抗凝/抗血小板治疗者须医生评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家人口健康科学数据中心：双氯芬酸钠双释放肠溶胶囊注册资料",
+        "url": "https://pharm.ncmi.cn/zysjk/ypjkyp/202312/t20231205_399409.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "双石通淋胶囊",
+      "genericName": "双石通淋胶囊",
+      "specification": "0.5g×36粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "陕西摩美得气血和…",
+      "clinical": {
+        "indication": "清热利湿、化浊通淋，用于慢性前列腺炎属湿热壅阻证，症见尿频、尿急、尿痛、尿后滴白或会阴不适等。",
+        "dosage": "口服，一次4粒，一日3次，28天为一个疗程；宜按处方和中医辨证使用。",
+        "adverseReactions": "可见恶心、呕吐、反酸、腹胀、腹痛、腹泻等胃肠道症状以及皮疹、瘙痒等过敏反应；既往说明书亦报告个别胃脘胀满。",
+        "precautions": "忌食辛辣刺激物。出现发热、尿潴留、肉眼血尿、腰痛或症状迅速加重时应先排除急性感染、结石等疾病；疗程结束仍无改善应复诊，不宜自行长期连续服用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：双石通淋胶囊说明书",
+        "url": "https://drugs.dxy.cn/pc/drug/jc4dizplsplsiTW8dZwzCPvzCcA%3D%3D",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "四季抗病毒合剂",
+      "genericName": "四季抗病毒合剂",
+      "specification": "10ml×6支/盒",
+      "dosageForm": "合剂",
+      "category": "中成药",
+      "manufacturer": "陕西海天制药有限…",
+      "clinical": {
+        "indication": "清热解毒、消炎退热，用于上呼吸道感染、病毒性感冒、流感、腮腺炎等病毒感染相关头痛、发热、流涕和咳嗽。",
+        "dosage": "口服，成人一次10～20ml，一日3次；2～5岁儿童一次5ml，5～7岁一次5～10ml，一日3次。其他年龄儿童按盒内说明书或儿科医嘱，不套用相邻年龄剂量。",
+        "adverseReactions": "不良反应监测显示可见恶心、呕吐、腹痛、腹泻、皮疹和瘙痒等。",
+        "precautions": "忌烟酒及辛辣、生冷、油腻食物，不宜同时服滋补性中药。体温超过38.5℃、持续高热、呼吸困难或服药3天无缓解应就医；严重慢性病、儿童和年老体弱者在医生指导下使用。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：四季抗病毒合剂非处方药说明书范本公告",
+        "url": "https://www.nmpa.gov.cn/directory/web/nmpa/xxgk/ggtg/ypggtg/ypqtggtg/20201217165821163.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "呋塞米片",
+      "genericName": "呋塞米",
+      "specification": "20mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海朝晖药业有限…",
+      "clinical": {
+        "indication": "用于心、肝、肾等疾病所致水肿，也可用于高血压、高钾/高钙血症及部分需要强效利尿的情况；原发性高血压通常不作为首选。",
+        "dosage": "成人水肿常从20～40mg每日一次开始，必要时6～8小时后按20～40mg递增，达到利尿效果后以最低维持量使用；高血压常40～80mg/日分2次。剂量差异大，须结合体重、尿量、肾功能和电解质由医生调整。",
+        "adverseReactions": "常见脱水、低血容量、低钾/低钠/低镁、低血压、乏力和肌痉挛；可见高尿酸、高血糖、肾功能恶化、皮疹和胃肠不适，少见听力损害、血细胞减少或严重皮肤反应。",
+        "precautions": "无尿及对呋塞米过敏者禁用。监测体重、血压、出入量、电解质和肾功能；避免过度利尿。与地高辛、锂盐、氨基糖苷类、NSAID及其他影响电解质药物合用须核对相互作用，出现少尿、晕厥、心悸或听力变化应就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：呋塞米片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=13570&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "呋塞米注射液",
+      "genericName": "呋塞米",
+      "specification": "2ml:20mg/支",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "上海禾丰制药有限公司",
+      "clinical": {
+        "indication": "用于需要快速利尿或不能口服时的水肿性疾病、急性左心衰竭/肺水肿、高血压危象和高钙血症等；仅限医疗机构使用。",
+        "dosage": "成人水肿紧急情况常从20～40mg缓慢静脉注射开始，必要时每2小时追加并根据反应调整；急性左心衰竭常从40mg静脉注射开始。高剂量和其他适应症方案须由专科制定，成人输注速度不得超过4mg/分钟。",
+        "adverseReactions": "可致脱水、低血容量、低钾/低钠/低镁、低血压、肾功能恶化、高尿酸和高血糖；快速或大剂量静脉给药可引起耳鸣、听力下降甚至不可逆耳聋，亦可有严重过敏和皮肤反应。",
+        "precautions": "持续监测血压、尿量、电解质、肾功能和必要时听力。无尿和对本品过敏者禁用；低蛋白血症、肾功能不全或合用氨基糖苷类等耳毒性药物时风险更高。配伍禁忌较多，须单独核对溶媒、浓度和静脉通路。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：呋塞米注射液说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000011674&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "速效救心丸",
+      "genericName": "速效救心丸",
+      "specification": "40mg×300粒/盒",
+      "dosageForm": "丸剂",
+      "category": "中成药",
+      "manufacturer": "天津中新药业集团股份有限公司第六中药厂",
+      "clinical": {
+        "indication": "行气活血、祛瘀止痛，用于气滞血瘀型冠心病、心绞痛。不能代替急性心肌梗死的紧急救治。",
+        "dosage": "舌下含服，常规一次4～6粒、一日3次；心绞痛急性发作时一次10～15粒。应坐位或半卧位使用；若胸痛数分钟内不缓解、反复或伴大汗呼吸困难，应立即呼叫急救，不要持续自行加量。",
+        "adverseReactions": "监测数据显示可见恶心、呕吐、口干、头痛、头晕、皮疹、瘙痒、潮红、乏力、过敏及过敏样反应。",
+        "precautions": "孕妇及对本品成分过敏者禁用。低血压患者慎用，含服后头晕或近乎晕厥应平卧并就医；不得把本品当保健品长期滥用，也不得因含服后暂时缓解而延误急性冠脉综合征评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家药监局：速效救心丸说明书修订公告（2021年第12号）",
+        "url": "https://www.nmpa.gov.cn/directory/web/nmpa/xxgk/ggtg/ypggtg/ypshmshxdgg/20210119110604144.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "羧甲司坦口服溶液",
+      "genericName": "羧甲司坦",
+      "specification": "10ml:0.5g×10支/盒",
+      "dosageForm": "口服溶液剂",
+      "category": "西药",
+      "manufacturer": "北京康祯生物科技有限公司",
+      "clinical": {
+        "indication": "用于慢性支气管炎、支气管哮喘等疾病所致痰液黏稠、咳痰困难。",
+        "dosage": "成人口服一次10ml（0.5g），一日3次；使用7日症状仍未缓解应就医。儿童剂量须按对应产品说明书或医嘱。",
+        "adverseReactions": "可见恶心、胃部不适、腹泻、轻度头痛和皮疹；偶有胃肠道出血。",
+        "precautions": "活动性消化性溃疡患者禁用，有溃疡史者慎用。避免与中枢性镇咳药自行同用，以免痰液稀化后排出受阻；出现黑便、呕血、呼吸困难或严重皮疹应停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医药百科：羧甲司坦口服溶液说明书",
+        "url": "https://drugs.meditool.cn/Drugtype/druginfo?datatype=0&druginfoid=144755&msgtype=1",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "碳酸钙D3片",
+      "genericName": "碳酸钙/维生素D3",
+      "specification": "0.6g×60片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "海南金赛药业有限公司",
+      "clinical": {
+        "indication": "作为妊娠和哺乳期妇女、更年期妇女、老年人等人群的钙补充剂，并辅助防治骨质疏松；是否需要补充应结合饮食、血钙和维生素D状态。",
+        "dosage": "口服，一次1片，一日1～2次；同时使用其他钙剂或维生素D制剂时应合并计算总量，避免重复补充。",
+        "adverseReactions": "可见嗳气和便秘；过量或长期不当使用可致高钙血症、碱中毒、肾功能损害或尿路结石。",
+        "precautions": "高钙血症、高钙尿症或对成分过敏者禁用；肾功能不全、肾结石史、结节病或甲状旁腺功能异常者先咨询医生。与左甲状腺素、双膦酸盐、四环素/喹诺酮类、铁剂等需错开服用，具体间隔按相互作用资料。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "111医药馆：碳酸钙D3片说明书资料",
+        "url": "https://m.111.com.cn/item/52058155.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",
