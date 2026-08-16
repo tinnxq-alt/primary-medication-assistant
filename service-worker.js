@@ -1,5 +1,5 @@
-const CACHE_NAME = "primary-medication-pro-v22";
-const APP_SHELL = ["./", "./index.html", "./style.css", "./drugs.js", "./chinese-drug-labels.json?v=8", "./app.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const CACHE_NAME = "primary-medication-pro-v23";
+const APP_SHELL = ["./", "./index.html", "./style.css", "./drugs.js", "./chinese-drug-labels.json?v=9", "./app.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));
