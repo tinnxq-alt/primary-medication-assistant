@@ -114,7 +114,7 @@
     .map(applyLocalOverrides);
 
   async function hydrateVerifiedCatalog() {
-    const response = await fetch("./chinese-drug-labels.json?v=2", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=3", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
@@ -628,12 +628,12 @@
     return window.DRUG_CATALOG.filter(drug => isVerifiedSource(drug.source?.status) && drug.clinical && drug.source?.url && normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q)).slice(0, 8).map(drug => ({
       drugName: drug.genericName || drug.drugName, genericName: drug.genericName || drug.drugName, tradeName: drug.tradeName || "", specification: drug.specification,
       category: normalizeDrugCategory(drug.category, drug.drugName),
-      clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验范本）` }
+      clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验资料）` }
     })).filter(isChineseCandidate);
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=2", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=3", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
