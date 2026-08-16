@@ -1,4 +1,4 @@
-name: Deploy smart search Worker
+name: Deploy free Chinese verification Worker
 
 on:
   workflow_dispatch:
@@ -38,7 +38,3 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
           command: deploy
-          secrets: |
-            OPENAI_API_KEY
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
