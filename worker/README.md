@@ -6,7 +6,9 @@
 
 - 从项目维护的 `chinese-drug-labels.json` 中查找带明确中文来源的已核验资料；
 - 没有核验资料时，使用 `@cf/meta/llama-3.1-8b-instruct-fast` 生成中文“未核验草稿”；
-- 自动填入目录字段、适应症、用法用量、不良反应和注意事项，全部字段均可编辑并可直接保存；
+- AI 固定返回 8 个字段：`drugName`、`tradeName`、`category`、`indications`、`specification`、`dosage`、`adverseReactions`、`precautions`；
+- `category` 只能使用项目定义的分类 ID；适应症和用法用量为保存时必填字段；
+- 自动填入后所有字段均可编辑并可直接保存；
 - 返回国家药监局查询、国家药监局站内搜索和全网中文搜索入口；
 - 仅允许网站域名和本地开发地址跨域调用；
 - 将 AI 生成内容始终标记为“未核验草稿”。
