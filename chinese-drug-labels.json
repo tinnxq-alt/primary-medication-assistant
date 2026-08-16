@@ -2363,6 +2363,406 @@
       }
     },
     {
+      "drugName": "替米沙坦片",
+      "genericName": "替米沙坦",
+      "specification": "40mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海信谊天平药业有限公司",
+      "clinical": {
+        "indication": "用于治疗成人原发性高血压；部分具体产品还可能获批用于降低特定高危患者心血管风险，须核对对应说明书。",
+        "dosage": "成人通常40mg每日一次，可与或不与食物同服；按血压反应在20～80mg每日一次范围内调整，最大80mg/日。建议每日同一时间服用。",
+        "adverseReactions": "可见头晕、低血压、背痛、腹泻和感染样症状；可能出现高钾血症、肾功能恶化、肝功能异常，少见血管性水肿或严重过敏。",
+        "precautions": "妊娠期禁用，发现妊娠立即停药。监测血压、血钾和肾功能；容量不足、肾动脉狭窄、肾/肝功能损害者慎用。不得与其他ARB重复，糖尿病患者避免与阿利吉仑合用，ACEI联合也须医生评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：替米沙坦片说明书",
+        "url": "https://drugs.dxy.cn/business/drug/54331.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "天麻素注射液",
+      "genericName": "天麻素",
+      "specification": "2ml:0.2g/支",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "昆药集团股份有限公司",
+      "clinical": {
+        "indication": "用于神经衰弱及血管神经性头痛等，也可用于脑外伤性综合征和部分眩晕症；具体诊断和适用性由医生判断。",
+        "dosage": "仅限有抢救条件的医疗机构使用。肌内注射一次0.2g、一日1～2次；静脉滴注一次0.6g、一日1次，以5%葡萄糖或0.9%氯化钠注射液250～500ml稀释。不得把单支规格直接等同于所有给药方案。",
+        "adverseReactions": "可见口鼻干燥、头昏和胃部不适；上市后已报告皮疹、呼吸困难、过敏样反应及过敏性休克等严重反应。",
+        "precautions": "对本品成分过敏者禁用。给药前询问过敏史，过敏体质者慎用；用药中密切观察，出现胸闷、喘鸣、面唇肿胀、血压下降等立即停药并抢救。核对溶媒和配伍，不在无监护条件下输注。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：天麻素注射液说明书及注射剂安全提示",
+        "url": "https://www.yaopinnet.com/sms_pdf/H20059809.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "通天口服液",
+      "genericName": "通天口服液",
+      "specification": "10ml×10支/盒",
+      "dosageForm": "口服液",
+      "category": "中成药",
+      "manufacturer": "太极集团涪陵制药厂",
+      "clinical": {
+        "indication": "活血化瘀、祛风止痛，用于瘀血阻滞、风邪上扰所致偏头痛，症见头部胀痛或刺痛、痛有定处、反复发作并可伴头晕、恶心呕吐或恶风。",
+        "dosage": "第1日即刻、1小时后、2小时后、4小时后各服10ml，以后每6小时10ml；第2～3日一次10ml、一日3次，3天为一个疗程。不得自行超疗程使用。",
+        "adverseReactions": "少数患者可出现胃痛、皮疹、肝酶升高或凝血功能异常。",
+        "precautions": "出血性脑血管病、阴虚阳亢者和孕妇禁用；高血压患者慎用。用药期间监测血压，必要时检查肝功能和凝血功能；与抗凝/抗血小板药合用前咨询医生。头痛突然剧烈、伴神经功能缺损或3天无改善应就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：通天口服液现行说明书资料",
+        "url": "https://m.yaopinnet.com/shuomingshu1/zy42639.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "头孢克洛缓释胶囊",
+      "genericName": "头孢克洛",
+      "specification": "0.1875g×12粒/盒",
+      "dosageForm": "缓释胶囊剂",
+      "category": "西药",
+      "manufacturer": "上海现代制药股份有限公司",
+      "clinical": {
+        "indication": "用于敏感菌所致的轻中度呼吸道、耳鼻喉、泌尿生殖道、皮肤软组织及部分牙源性感染；仅用于明确或高度怀疑的细菌感染。",
+        "dosage": "成人及体重20kg以上儿童常用每次0.375～0.75g（本规格2～4粒）、每日2次，于早晚餐后服；不同感染部位的剂量和疗程不同，须按处方完成。20kg以下儿童使用合适儿童剂型并遵医嘱。",
+        "adverseReactions": "常见腹泻、恶心、腹痛和皮疹；可发生荨麻疹、血清病样反应、严重过敏/过敏性休克、艰难梭菌相关性腹泻、肝肾功能异常和血细胞减少。",
+        "precautions": "头孢菌素严重过敏者禁用，青霉素严重过敏史者使用前须评估交叉过敏。缓释胶囊不得打开或咀嚼；肾功能损害者可能需调整。出现呼吸困难、全身皮疹或持续水样/血性腹泻应停药就医，不自行用止泻药。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国控恒兴：头孢克洛缓释胶囊说明书",
+        "url": "https://www.511yaohx.com/goodsList-api/goodsList/detailGoods?goodscode=0142900",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "外用应急软膏",
+      "genericName": "外用应急软膏",
+      "specification": "15g/支",
+      "dosageForm": "软膏剂",
+      "category": "中成药",
+      "manufacturer": "威海华洋药业有限公司",
+      "clinical": {
+        "indication": "消肿、止痛、抗感染并促进伤口愈合，用于冻疮、Ⅰ～Ⅱ度小面积烫伤、手足皲裂及小面积轻度擦挫伤。",
+        "dosage": "外用，取适量涂于患处周围，一日1次；清洁创面及具体覆盖方式按说明书和医护指导。",
+        "adverseReactions": "公开说明书记载尚不明确；使用后可出现粟粒样疹、小水疱、局部疼痛或过敏反应，明显或持续时应停药就医。",
+        "precautions": "对本品过敏者禁用，涂药后不可用塑料薄膜密闭覆盖。仅用于小面积轻伤；深度烧伤、大面积创面、化学/电烧伤、明显感染或伤及眼面会阴者应立即就医，不以本品替代清创和破伤风评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "河南省医药服务平台：外用应急软膏说明书",
+        "url": "https://www.hnysfww.com/mobile/goods.php?id=7581",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "万应胶囊",
+      "genericName": "万应胶囊",
+      "specification": "0.15g×12粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "成都杨天万应制药有限公司",
+      "clinical": {
+        "indication": "清热、解毒、镇惊，用于邪毒内蕴所致口舌生疮、牙龈或咽喉肿痛，以及小儿高热、烦躁易惊。",
+        "dosage": "口服，本0.15g规格一次2～4粒，一日2次；3岁以内儿童须由儿科医生按年龄体重酌减，不得由家长自行估算。",
+        "adverseReactions": "现行公开说明书中不良反应尚不明确；出现恶心、皮疹、嗜睡或其他异常应停药并咨询医生。",
+        "precautions": "孕妇及运动员慎用。儿童高热伴抽搐、精神差、呼吸困难或脱水属于急症，应立即就医，不能只依赖本品；咽喉肿痛伴吞咽/呼吸困难也应急诊。含人工麝香、熊胆粉等成分，须按处方使用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：万应胶囊说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy81159vur.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "维生素B6片",
+      "genericName": "维生素B6",
+      "specification": "10mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "杭州民生药业有限公司",
+      "clinical": {
+        "indication": "用于预防和治疗维生素B6缺乏症，如脂溢性皮炎、唇干裂等，也可用于减轻妊娠呕吐；其他用途须有明确指征。",
+        "dosage": "成人通常每日10～20mg（1～2片），儿童每日5～10mg，连续使用一般不超过3周；异烟肼相关预防或治疗等方案须由医生另行制定。",
+        "adverseReactions": "推荐短期剂量通常耐受良好；长期大剂量可引起严重感觉性周围神经病，表现为手足麻木、感觉异常、步态不稳和精细动作困难，停药后恢复可能不完全。",
+        "precautions": "不得将维生素当作无风险保健品长期大量使用。出现麻木、烧灼感或步态异常应立即停药就医；与单独左旋多巴合用会降低其疗效（与卡比多巴/苄丝肼复方时不同），合用前核对。孕期大剂量可使新生儿产生依赖。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：维生素B6片说明书",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=32253",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "维生素B6注射液",
+      "genericName": "维生素B6",
+      "specification": "2ml:0.1g/支",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "山东方明药业集团股份有限公司",
+      "clinical": {
+        "indication": "用于维生素B6缺乏的防治、全胃肠外营养补充及部分药物中毒解救等；能口服者通常不应无指征选择注射。",
+        "dosage": "皮下、肌内或静脉注射，一次50～100mg、一日1次。异烟肼或环丝氨酸中毒的解毒剂量明显不同，只能由医生按中毒量和抢救方案给药。",
+        "adverseReactions": "可见皮疹、瘙痒、恶心、头晕等；注射剂已报告严重过敏反应和过敏性休克。长期或大剂量使用同样可致感觉性周围神经病。",
+        "precautions": "仅限具备抢救条件的医疗机构使用，给药前询问过敏史并观察。对本品成分过敏者禁用；出现胸闷、呼吸困难、面唇肿胀或血压下降立即停药抢救。不得把一支100mg当作日常补充剂自行注射。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家药监局：维生素B6注射剂说明书修订公告（2021年第97号）",
+        "url": "https://www.nmpa.gov.cn/directory/web/nmpa/xxgk/ggtg/ypggtg/ypshmshxdgg/20210727155255110.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "维生素C注射液",
+      "genericName": "维生素C",
+      "specification": "5ml:1g/支",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "上海信谊金朱药业有限公司",
+      "clinical": {
+        "indication": "用于防治坏血病及在特定疾病、创伤或长期发热等情况下补充维生素C；无明确缺乏或临床指征时不推荐常规静脉注射。",
+        "dosage": "仅限医疗机构肌内或静脉给药。成人常用一次100～250mg、一日1～3次；大剂量方案仅用于特定适应症并由医生决定。当前每支1g不等于常规单次剂量。",
+        "adverseReactions": "快速静脉注射可引起头晕或晕厥；长期大剂量可致草酸盐、尿酸盐或半胱氨酸盐结石，停药后可出现反跳性坏血病，并可有溶血等严重风险。",
+        "precautions": "肾功能不全、草酸盐结石史、铁负荷过高和葡萄糖-6-磷酸脱氢酶缺乏者慎用；大剂量可干扰尿糖、便潜血和多项生化检测。核对配伍并缓慢给药，避免把本品用于未经证实的感冒、肿瘤等用途。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：维生素C注射液说明书",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=37135",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "维生素D2软胶囊",
+      "genericName": "维生素D2",
+      "specification": "0.125mg×20粒/盒",
+      "dosageForm": "软胶囊剂",
+      "category": "西药",
+      "manufacturer": "南京海鲸药业有限公司",
+      "clinical": {
+        "indication": "用于维生素D缺乏症的预防和治疗，以及部分低钙/低磷血症、佝偻病、骨软化症和甲状旁腺功能低下等；病因不同，剂量差异很大。",
+        "dosage": "每粒0.125mg相当于5000单位，属于较高含量规格。说明书示例成人预防量为400～800单位/日、一般缺乏治疗量为1000～2000单位/日；本规格具体服用间隔须由医生依据25-羟维生素D、血钙磷和病因换算，不能自行每日服1粒。",
+        "adverseReactions": "过量可致高钙血症，表现为恶心、呕吐、便秘或腹泻、持续头痛、口渴、多尿、乏力、心律失常和肾功能损害；长期过量可造成软组织钙化和肾结石。",
+        "precautions": "高钙血症、高维生素D血症者禁用。治疗期间监测血钙、血磷、尿钙和肾功能；与其他维生素D、钙剂或噻嗪类利尿剂合用可增加高钙风险。颗粒数无法精确匹配小剂量时应改用合适规格。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：南京海鲸维生素D2软胶囊说明书",
+        "url": "https://drugs.dxy.cn/pc/drug/I4j9gKnJNANdHaLc0ihbWA%3D%3D",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "乌灵胶囊",
+      "genericName": "乌灵胶囊",
+      "specification": "0.33g×54粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "浙江佐力药业股份有限公司",
+      "clinical": {
+        "indication": "补肾健脑、养心安神，用于心肾不交所致失眠、健忘、心悸、心烦、神疲乏力、腰膝酸软、头晕耳鸣，也用于上述证候的神经衰弱。",
+        "dosage": "口服，一次3粒，一日3次，或遵医嘱；连续使用7天症状无改善应复诊，不自行长期加量。",
+        "adverseReactions": "可见恶心、腹泻、呕吐、腹部不适、口干、腹胀、皮疹、瘙痒、嗜睡、乏力和头晕等。",
+        "precautions": "对本品成分过敏者禁用。孕妇、哺乳期妇女、儿童及严重慢性病患者应在医生指导下使用；服后明显嗜睡或头晕时避免驾驶和操作机器。失眠伴躁狂、自伤风险或进行性神经症状者应及时就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：乌灵胶囊说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy1165v.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "西帕依固龈液",
+      "genericName": "西帕依固龈液",
+      "specification": "30ml/瓶",
+      "dosageForm": "合剂",
+      "category": "中成药",
+      "manufacturer": "新奇康药业股份有限公司",
+      "clinical": {
+        "indication": "健齿固龈、清血止痛，用于牙周疾病引起的牙龈出血、牙齿酸软、口臭以及咽喉肿痛。",
+        "dosage": "漱口，一次约3ml，一日3～5次；在口腔内含漱后吐出。具体含漱时间及疗程以本品盒内现行说明书为准。",
+        "adverseReactions": "国家药监局公开范本记载尚不明确；如出现口腔刺激、灼痛、黏膜肿胀、皮疹或其他过敏表现应停用并就医。",
+        "precautions": "本品仅供含漱，不得吞服，儿童须在成人监护下使用。牙龈反复或大量出血不能只靠含漱液，应排查牙周病、药物影响及血液系统疾病，并配合刷牙、牙线和必要的牙周治疗。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：西帕依固龈液非处方药说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/otc2zy/1244.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "吲哚美辛栓",
+      "genericName": "吲哚美辛",
+      "specification": "100mg×12粒/盒",
+      "dosageForm": "栓剂",
+      "category": "西药",
+      "manufacturer": "江苏恒瑞医药股份有限公司",
+      "clinical": {
+        "indication": "用于风湿性或类风湿关节炎、强直性脊柱炎、骨关节炎及急性痛风发作等引起的疼痛和炎症；不用于普通发热或无诊断的长期止痛。",
+        "dosage": "直肠给药，成人一次50～100mg、一日1次。当前每粒100mg；只有产品结构及盒内说明书明确允许时才可分为半粒，不能自行切分。使用最低有效剂量和最短疗程。",
+        "adverseReactions": "可致恶心、腹痛、消化性溃疡或胃肠出血，头痛、眩晕，水肿、血压升高、肾功能损害、肝酶异常、血细胞减少、皮疹和严重过敏；也可引起直肠刺激或出血，并增加心血管血栓风险。",
+        "precautions": "活动性消化性溃疡/出血、阿司匹林或其他NSAID诱发哮喘/过敏、冠脉搭桥围术期、严重心肝肾功能不全及妊娠晚期禁用。避免与其他NSAID同用；抗凝药、抗血小板药、激素或SSRI合用会增出血风险。直肠炎、肛门出血者不用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：吲哚美辛栓",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=5424&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "硝苯地平控释片",
+      "genericName": "硝苯地平",
+      "specification": "30mg×14片/盒",
+      "dosageForm": "控释片",
+      "category": "西药",
+      "manufacturer": "合肥立方制药股份有限公司",
+      "clinical": {
+        "indication": "用于高血压和冠心病慢性稳定型心绞痛；不能用于正在发生的心绞痛或需要快速处理的高血压急症。",
+        "dosage": "成人通常起始30mg每日一次，按血压和耐受性由医生调整。药片须整片吞服，不得掰开、咀嚼或碾碎；建议每日固定时间服用。",
+        "adverseReactions": "常见踝部水肿、头痛、面部潮红、心悸、头晕和便秘；可发生低血压、心动过速、牙龈增生，少见过敏或肝功能异常。",
+        "precautions": "低血压、重度主动脉瓣狭窄及肝功能损害者慎用。避免葡萄柚/西柚及其汁液，合用CYP3A4强抑制剂或诱导剂须核对相互作用。完整空药片外壳可能随大便排出属控释结构现象；若胸痛加重、晕厥或严重低血压立即就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国控恒兴：硝苯地平控释片说明书",
+        "url": "https://www.511yaohx.com/goodsList-api/goodsList/detailGoods?goodscode=0307000",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "硝苯地平片",
+      "genericName": "硝苯地平",
+      "specification": "10mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海信谊天平药业有限公司",
+      "clinical": {
+        "indication": "短效制剂，可用于高血压及心绞痛，但慢性高血压通常优先选择长效制剂；是否使用和具体方案由医生评估。",
+        "dosage": "口服常见起始一次10mg、一日3次，须按血压和处方调整。严禁舌下含服、嚼碎后含服或为追求快速降压而重复加量；高血压急症应急诊处理。",
+        "adverseReactions": "常见面部潮红、头痛、头晕、心悸、反射性心动过速、踝部水肿和低血压；血压骤降或心率增快可能诱发或加重心肌缺血。",
+        "precautions": "短效片与控释片不可按毫克数自行替换。出现血压显著升高并伴胸痛、气促、意识或神经功能异常时立即急诊，不自行含服本药。低血压、严重主动脉瓣狭窄、肝功能损害者慎用，并核对葡萄柚及CYP3A4相关相互作用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "硝苯地平片说明书及《国家基层高血压防治管理指南2025》",
+        "url": "https://medi-guide.meditool.cn/ymtpdf/2FECC3DB-2E21-8365-A41A-F937D9952DCB.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "缬沙坦胶囊",
+      "genericName": "缬沙坦",
+      "specification": "80mg×12粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "华润赛科药业有限责任公司",
+      "clinical": {
+        "indication": "用于治疗轻至中度原发性高血压；其他心力衰竭或心肌梗死后用途须以对应产品获批说明书和专科处方为准。",
+        "dosage": "成人通常80mg或160mg每日一次，建议固定时间服用；疗效不足时可由医生增至160mg或加用利尿剂。不得自行叠加其他ARB。",
+        "adverseReactions": "可见头痛、头晕、乏力和胃肠不适；可能出现低血压、高钾血症、肌酐升高、肾功能恶化或肝功能异常，少见血管性水肿。",
+        "precautions": "妊娠期禁用，发现妊娠立即停药。开始及调量后监测血压、血钾和肾功能；容量不足、肾动脉狭窄、肾/肝功能损害者慎用。避免与ACEI或其他ARB重复，糖尿病患者避免与阿利吉仑合用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：缬沙坦胶囊",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000012880&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "心速宁胶囊",
+      "genericName": "心速宁胶囊",
+      "specification": "0.48g×12粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "陕西摩美得气血和制药有限公司",
+      "clinical": {
+        "indication": "清热化痰、宁心定悸，用于痰热扰心所致心悸，以及冠心病、病毒性心肌炎所致轻中度室性期前收缩符合该证候者。",
+        "dosage": "口服，一次4粒，一日3次；胃部不适者可在饭后服。疗程和是否继续须根据心电图及病因复评。",
+        "adverseReactions": "少数患者可有轻度恶心或胃部不适；处方含常山，剂量过大或个体敏感时可能诱发明显恶心、呕吐。",
+        "precautions": "孕妇禁用，胃病患者慎用。不能替代对持续性心律失常、心肌炎或冠心病的病因治疗和监测；出现晕厥、持续胸痛、呼吸困难、心率持续过快/过慢或心悸明显加重应立即就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：心速宁胶囊说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy81845ss1.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "宣肺止嗽合剂",
+      "genericName": "宣肺止嗽合剂",
+      "specification": "120ml/瓶",
+      "dosageForm": "合剂",
+      "category": "中成药",
+      "manufacturer": "甘肃普安制药股份有限公司",
+      "clinical": {
+        "indication": "疏风宣肺、止咳化痰，用于风邪犯肺所致咳嗽，症见咳嗽、咽痒、鼻塞流涕、恶寒发热、咯痰等。",
+        "dosage": "口服，一次20ml，一日3次。按说明书短期使用；服药3天症状无缓解应就医，不自行长期连续服用。",
+        "adverseReactions": "公开说明书中不良反应尚不明确；用药后如出现胃肠不适、皮疹、瘙痒、喘憋或其他异常应停药并就医。",
+        "precautions": "对本品过敏者禁用。高热超过38.5℃、呼吸困难、胸痛、咯血、精神差或痰量/脓性痰明显增加者及时就医；慢性肺病患者、儿童、孕妇及哺乳期妇女使用前咨询医生。糖尿病患者注意制剂辅料。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "39药品通：宣肺止嗽合剂说明书",
+        "url": "https://ypk.39.net/589660/manual/",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "玄七健骨片",
+      "genericName": "玄七健骨片",
+      "specification": "0.45g×24片/盒",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "湖南方盛制药股份有限公司",
+      "clinical": {
+        "indication": "活血理气、祛风除湿、滋补肝肾，用于经络瘀阻证的轻中度膝骨关节炎，症见膝痛、肿胀、活动不利等。",
+        "dosage": "口服，一次4片，一日3次，疗程4周；是否重复疗程须复诊评估，不自行长期服用。",
+        "adverseReactions": "临床资料报告可见肝功能生化指标升高、血肌酐升高、尿蛋白或尿红细胞异常，也可能出现胃肠不适、皮疹等。",
+        "precautions": "孕妇、哺乳期妇女、对本品过敏者及严重肝肾功能不全者禁用。用药前后建议检查肝肾功能和尿常规；心力衰竭患者慎用。处方含全蝎等成分，不与同类药自行叠加；关节红肿发热、不能负重或外伤后剧痛须及时就医。"
+      },
+      "source": {
+        "status": "verified-regulator",
+        "label": "国家医保局药品说明书：玄七健骨片",
+        "url": "https://www.nhsa.gov.cn/attach/Ypsn2026/YPSN202600273/YPSN202600273.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "血塞通胶囊",
+      "genericName": "血塞通胶囊",
+      "specification": "100mg×30粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "云南维和药业股份有限公司",
+      "clinical": {
+        "indication": "活血祛瘀、通脉活络，用于瘀血闭脉络证的中风偏瘫、口眼歪斜、语言不利，以及胸痹心痛、胸闷等。",
+        "dosage": "口服，一次100mg（本规格1粒），一日3次；疗程由医生按疾病、出血风险和合并用药决定。",
+        "adverseReactions": "可见恶心、腹痛、腹泻等胃肠不适，头晕、头痛、皮疹、瘙痒及肝功能异常；上市后有鼻出血、牙龈出血、皮下出血等出血事件报告，少见严重过敏。",
+        "precautions": "对人参、三七及本品成分过敏者、急性出血性疾病患者禁用。与阿司匹林、氯吡格雷、华法林及其他抗凝/抗血小板药合用须由医生评估并观察出血；孕妇、月经过多者及拟手术者先咨询医生。疑似卒中或急性胸痛立即急诊，不以本品替代急救。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：血塞通胶囊说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy77036.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",
