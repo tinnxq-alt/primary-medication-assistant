@@ -127,6 +127,19 @@ try {
   });
   assert.equal(additionalManufacturerSource.sourceQuality, "manufacturer");
 
+  const rocheLabelSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://assets.roche.com/example.pdf" }
+  });
+  assert.equal(rocheLabelSource.sourceQuality, "manufacturer");
+  assert.equal(rocheLabelSource.confidence, "high");
+
+  const buchangLabelSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.buchang.com/example/" }
+  });
+  assert.equal(buchangLabelSource.sourceQuality, "manufacturer");
+
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
