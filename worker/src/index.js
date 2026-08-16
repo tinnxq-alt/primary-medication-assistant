@@ -10,7 +10,7 @@ const CATEGORY_IDS = [
 ];
 const DRAFT_FIELDS = ["drugName", "tradeName", "category", "specification"];
 const CLINICAL_FIELDS = ["indications", "dosage", "adverseReactions", "precautions"];
-const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph"]);
+const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph", "verified-regulator"]);
 const DRAFT_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -101,8 +101,8 @@ function cleanCatalogCandidate(candidate) {
   if (![indications, dosage, adverseReactions, precautions].every(Boolean)) return null;
   const hostname = new URL(sourceUrl).hostname.toLowerCase();
   const regulator = hostname === "nmpa.gov.cn" || hostname.endsWith(".nmpa.gov.cn") || hostname === "nhsa.gov.cn" || hostname.endsWith(".nhsa.gov.cn") || hostname === "nhc.gov.cn" || hostname.endsWith(".nhc.gov.cn");
-  const manufacturerDomains = ["labeling.pfizer.com", "assets.roche.com", "santao.com.cn", "lingrui.com", "jf-pharma.com", "e-cspc.com", "grandpharm.com", "diao.com", "sinepromod.com", "tianhengyaoye.com", "topfond.com", "huasungrp.com", "medco.com.cn", "dinglu.com", "youcareyk.com", "cnkh.com", "yiling.cn", "betterpharma.com", "cy-pharm.com", "foyou.com.cn", "buchang.com", "njcttq.com", "lys.cn"];
-  const medicalDatabaseDomains = ["drugs.dxy.cn", "zy91.com", "yaopinnet.com", "hnysfww.com", "meditool.cn", "315jiage.cn", "511yaohx.com", "yzsbh.com", "39.net", "298.cn", "yilianmeiti.com", "iophthal.com", "lehuopharm.com", "ncmi.cn", "111.com.cn"];
+  const manufacturerDomains = ["labeling.pfizer.com", "assets.roche.com", "santao.com.cn", "lingrui.com", "jf-pharma.com", "e-cspc.com", "grandpharm.com", "diao.com", "sinepromod.com", "tianhengyaoye.com", "topfond.com", "huasungrp.com", "medco.com.cn", "dinglu.com", "youcareyk.com", "cnkh.com", "yiling.cn", "betterpharma.com", "cy-pharm.com", "foyou.com.cn", "buchang.com", "njcttq.com", "lys.cn", "xian-janssen.com.cn", "rhykjt.com"];
+  const medicalDatabaseDomains = ["drugs.dxy.cn", "zy91.com", "yaopinnet.com", "hnysfww.com", "meditool.cn", "315jiage.cn", "511yaohx.com", "yzsbh.com", "39.net", "298.cn", "yilianmeiti.com", "iophthal.com", "lehuopharm.com", "ncmi.cn", "111.com.cn", "qgyyzs.net"];
   const hospitalDomains = ["bdfs.org.cn", "sustech-hospital.cn"];
   const domainMatches = domain => hostname === domain || hostname.endsWith(`.${domain}`);
   const manufacturer = manufacturerDomains.some(domainMatches);
