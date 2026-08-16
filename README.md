@@ -57,6 +57,21 @@ Worker 使用 Cloudflare Workers Free 计划及 Workers AI 免费额度，不调
 - 每次增加说明书内容时必须记录来源 URL、核验日期，并注明是品种范本还是具体厂家说明书。
 - 如果规格、通用名、厂家或剂型发生串行错配，使用 `qualityIssue` 锁定并等待包装/批准文号复核，不得靠常识补全。
 
+## 自动质量检查
+
+每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括 167 个目录品规与核验库的一一对应、临床四字段、来源 URL 与核验日期、重复 ID、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
+
+本地可执行：
+
+```bash
+node --check app.js
+node --check drugs.js
+node --check service-worker.js
+node --check worker/src/index.js
+node scripts/audit-catalog.mjs
+node worker/test.mjs
+```
+
 ## 本地预览
 
 在仓库目录执行：

@@ -859,7 +859,7 @@
     {
       "drugName": "复方氨酚伪麻胶囊",
       "genericName": "复方氨酚伪麻",
-      "specification": "待核验（原始：20粒/盒）",
+      "specification": "规格待核验（20粒/盒）",
       "dosageForm": "胶囊剂",
       "category": "西药",
       "manufacturer": "四川天德制药有限…",
@@ -880,7 +880,7 @@
     {
       "drugName": "复方甲氧那明胶囊",
       "genericName": "复方甲氧那明",
-      "specification": "待核验（原始：40粒/盒）",
+      "specification": "规格待核验（40粒/盒）",
       "dosageForm": "胶囊剂",
       "category": "西药",
       "manufacturer": "上海上药信谊药厂…",
@@ -920,7 +920,7 @@
     },
     {
       "drugName": "富马酸比索洛尔片",
-      "genericName": "比索洛尔",
+      "genericName": "富马酸比索洛尔",
       "specification": "5mg×18片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -941,7 +941,7 @@
     },
     {
       "drugName": "富马酸依美斯汀缓释胶囊",
-      "genericName": "依美斯汀",
+      "genericName": "富马酸依美斯汀",
       "specification": "2mg×4粒/盒",
       "dosageForm": "缓释胶囊剂",
       "category": "西药",
@@ -981,7 +981,7 @@
     },
     {
       "drugName": "枸橼酸莫沙必利片",
-      "genericName": "莫沙必利",
+      "genericName": "枸橼酸莫沙必利",
       "specification": "5mg×48片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -1141,7 +1141,7 @@
     },
     {
       "drugName": "酒石酸美托洛尔片",
-      "genericName": "美托洛尔",
+      "genericName": "酒石酸美托洛尔",
       "specification": "25mg×30片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -1161,7 +1161,7 @@
     },
     {
       "drugName": "酒石酸唑吡坦片",
-      "genericName": "唑吡坦",
+      "genericName": "酒石酸唑吡坦",
       "specification": "10mg×7片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -1382,7 +1382,7 @@
     },
     {
       "drugName": "磷酸奥司他韦胶囊",
-      "genericName": "奥司他韦",
+      "genericName": "磷酸奥司他韦",
       "specification": "75mg×10粒/盒",
       "dosageForm": "胶囊剂",
       "category": "西药",
@@ -1462,7 +1462,7 @@
     },
     {
       "drugName": "硫酸氢氯吡格雷片",
-      "genericName": "氯吡格雷",
+      "genericName": "硫酸氢氯吡格雷",
       "specification": "75mg×7片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -2084,7 +2084,7 @@
     },
     {
       "drugName": "沙库巴曲阿利沙坦钙片",
-      "genericName": "沙库巴曲/阿利沙坦钙",
+      "genericName": "沙库巴曲阿利沙坦钙",
       "specification": "240mg×7片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -2104,7 +2104,7 @@
     },
     {
       "drugName": "沙库巴曲缬沙坦钠片",
-      "genericName": "沙库巴曲/缬沙坦",
+      "genericName": "沙库巴曲缬沙坦钠",
       "specification": "200mg×28片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -2344,7 +2344,7 @@
     },
     {
       "drugName": "碳酸钙D3片",
-      "genericName": "碳酸钙/维生素D3",
+      "genericName": "碳酸钙D3",
       "specification": "0.6g×60片/盒",
       "dosageForm": "片剂",
       "category": "西药",

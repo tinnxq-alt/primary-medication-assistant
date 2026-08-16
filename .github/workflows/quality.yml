@@ -1,0 +1,44 @@
+name: Quality gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: 药品资料与代码质控
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Use Node.js 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          package-manager-cache: false
+
+      - name: JavaScript syntax
+        run: |
+          node --check app.js
+          node --check drugs.js
+          node --check service-worker.js
+          node --check worker/src/index.js
+
+      - name: Catalog audit
+        run: node scripts/audit-catalog.mjs
+
+      - name: Worker tests
+        run: node worker/test.mjs
