@@ -2763,6 +2763,408 @@
       }
     },
     {
+      "drugName": "盐酸二甲双胍片",
+      "genericName": "盐酸二甲双胍",
+      "specification": "0.25g×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京京丰制药集团有限公司",
+      "clinical": {
+        "indication": "配合饮食和运动用于2型糖尿病，尤其适用于超重或伴高胰岛素血症者；也可按医嘱与其他降糖药或胰岛素联合。",
+        "dosage": "成人通常从一次0.25g、一日2～3次开始，餐中或餐后即刻服用以减轻胃肠反应；根据血糖逐渐调整，一般1～1.5g/日，说明书最大2g/日。肾功能损害者须按eGFR调整或停用。",
+        "adverseReactions": "常见恶心、呕吐、腹泻、腹痛、腹胀、食欲下降和味觉异常；长期可降低维生素B12。乳酸性酸中毒罕见但可致命，风险在肾功能不全、缺氧、严重感染或大量饮酒时升高。",
+        "precautions": "用药前及至少每年评估肾功能；eGFR＜45ml/min/1.73㎡不应新启用，＜30禁用。含碘造影、手术、脱水、休克或严重缺氧前后按医嘱暂停。避免酗酒；出现深快呼吸、极度乏力、持续呕吐或腹痛立即就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "以岭药业：盐酸二甲双胍片说明书资料",
+        "url": "https://www.yiling.com/pro/%E7%9B%90%E9%85%B8%E4%BA%8C%E7%94%B2%E5%8F%8C%E8%83%8D%E7%89%87/",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸氟桂利嗪胶囊",
+      "genericName": "盐酸氟桂利嗪",
+      "specification": "5mg×40粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "江苏平光制药(焦作)有限公司",
+      "clinical": {
+        "indication": "用于有先兆或无先兆偏头痛的预防治疗，以及前庭功能紊乱所致眩晕的对症治疗；不能用于正在发生的偏头痛急性止痛。",
+        "dosage": "偏头痛预防起始：65岁以下每晚10mg（2粒），65岁及以上每晚5mg（1粒）；有效后的维持方案通常每周服5天、停2天。2个月无效应停；即使有效，连续6个月后也应停药观察。眩晕控制后及时停药。",
+        "adverseReactions": "最常见嗜睡、疲惫和体重增加；可有抑郁、失眠、焦虑、口干和胃部不适。长期或老年患者可能出现震颤、运动迟缓、强直、静坐不能等锥体外系反应。",
+        "precautions": "既往抑郁症、帕金森病或其他锥体外系疾病患者禁用或不宜使用；急性脑出血期不用。出现情绪低落、自伤想法、震颤或动作变慢立即停药就医。服后避免驾驶和饮酒；孕妇、哺乳期妇女原则上不用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：盐酸氟桂利嗪胶囊",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=917&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸凯普拉生片",
+      "genericName": "盐酸凯普拉生",
+      "specification": "10mg×8片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "南京柯菲平盛辉制药有限公司",
+      "clinical": {
+        "indication": "用于十二指肠溃疡和反流性食管炎的治疗。",
+        "dosage": "成人20mg（本规格2片）每日一次，最好早餐前整片吞服，不得咀嚼或压碎；十二指肠溃疡连续6周，反流性食管炎连续8周。是否提前停药或延长疗程须复诊评估。",
+        "adverseReactions": "临床研究中多为轻中度，可见腹泻、腹痛、腹胀、恶心、头痛、头晕及肝功能指标异常；严重或持续症状须停药评估。",
+        "precautions": "10mg是单片规格，不是获批成人单次治疗剂量。儿童、妊娠及哺乳期用药资料有限；严重肝肾功能损害者须医生评估。长期抑酸或症状反复者需排除消化道肿瘤并评估低镁、维生素B12缺乏和感染风险。"
+      },
+      "source": {
+        "status": "verified-regulator",
+        "label": "国家医保局：盐酸凯普拉生片申报资料与说明书摘要",
+        "url": "https://www.nhsa.gov.cn/attach/Ypsn2023/YPSW202300079/YPSW202300079-W1%28ppt%29.pptx",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸乐卡地平片",
+      "genericName": "盐酸乐卡地平",
+      "specification": "10mg×14片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "安徽宏业药业有限公司",
+      "clinical": {
+        "indication": "用于治疗轻、中度原发性高血压；不是高血压急症的快速降压药。",
+        "dosage": "推荐10mg每日一次，餐前至少15分钟服用；根据个体反应可由医生增至20mg每日一次。高脂餐会显著增加吸收，勿随高脂餐服用。",
+        "adverseReactions": "可见面部潮红、踝部水肿、心悸、心动过速、头痛和眩晕；偶见胃肠不适、皮疹、乏力、嗜睡、肌痛或低血压。",
+        "precautions": "妊娠/哺乳期、未治疗的心力衰竭、不稳定型心绞痛、左室流出道梗阻、心肌梗死后1个月内及重度肝肾功能损害者禁用或不推荐。禁与CYP3A4强抑制剂、环孢素或葡萄柚汁同用；胸痛加重或晕厥立即就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医药百科：盐酸乐卡地平片说明书",
+        "url": "https://drugs.meditool.cn/Drugtype/druginfo?datatype=0&druginfoid=1106&msgtype=0",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸吗啡注射液",
+      "genericName": "盐酸吗啡",
+      "specification": "10mg:1ml×10支/盒",
+      "dosageForm": "注射液",
+      "category": "西药",
+      "manufacturer": "东北制药集团沈阳第一制药有限公司",
+      "clinical": {
+        "indication": "强阿片类镇痛药，用于其他镇痛药无效的严重急性疼痛、晚期癌痛及特定围术期/急救情形；属于麻醉药品和高警示药品。",
+        "dosage": "仅限具备呼吸监护和纳洛酮抢救条件的医疗机构。成人皮下注射常用一次5～15mg、一日15～40mg，极量一次20mg、一日60mg；静脉镇痛常用5～10mg，须缓慢、个体化滴定。老年、虚弱或肝肾功能损害者从更低剂量开始。",
+        "adverseReactions": "常见恶心、呕吐、便秘、嗜睡、眩晕、瘙痒、尿潴留和低血压；可发生危及生命的呼吸抑制、昏迷、休克，反复使用可致耐受、身体依赖和成瘾。",
+        "precautions": "严禁自行注射。给药前后连续监测呼吸、意识、血压和血氧；与酒精、苯二氮䓬类、镇静催眠药或其他阿片合用可致致命呼吸抑制。颅内压升高、严重呼吸抑制、急性哮喘及麻痹性肠梗阻等禁忌/高风险情形须排除；出现呼吸变慢或叫不醒立即抢救。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：盐酸吗啡注射液",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=1443&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸坦索罗辛缓释胶囊",
+      "genericName": "盐酸坦索罗辛",
+      "specification": "0.2mg×20粒/盒",
+      "dosageForm": "缓释胶囊剂",
+      "category": "西药",
+      "manufacturer": "浙江海力生制药有限公司",
+      "clinical": {
+        "indication": "用于前列腺增生症引起的排尿障碍；只能改善症状，不能缩小前列腺或替代对前列腺癌、尿潴留的评估。",
+        "dosage": "成人一次0.2mg（1粒）、每日一次，饭后口服；胶囊及缓释颗粒应完整吞服，不得咀嚼、压碎或打开。剂量调整须遵医嘱。",
+        "adverseReactions": "可见头晕、头痛、乏力、鼻塞、胃肠不适、射精障碍；可发生体位性低血压、晕厥、心悸、皮疹/血管性水肿，罕见阴茎异常勃起。白内障手术时可能出现术中虹膜松弛综合征。",
+        "precautions": "首次服用或加量时缓慢起立，头晕即坐下/躺下，避免驾驶。用药前排除前列腺癌；计划白内障或青光眼手术须提前告知眼科医生正在或曾经服用本药，不自行临时停药。与PDE5抑制剂或其他降压药合用注意低血压。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：盐酸坦索罗辛缓释胶囊",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000012889&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸特比萘芬乳膏",
+      "genericName": "盐酸特比萘芬",
+      "specification": "25g×2支/盒",
+      "dosageForm": "乳膏剂",
+      "category": "西药",
+      "manufacturer": "武汉诺安药业有限公司",
+      "clinical": {
+        "indication": "用于手癣、足癣、体癣、股癣、花斑癣及皮肤念珠菌病等浅表真菌感染；不能治疗头癣或甲真菌病。",
+        "dosage": "外用，清洁并干燥患处后薄涂患处及周围皮肤，一日1次，轻揉片刻，通常连续1～2周；具体频次以当前产品盒内说明书为准。",
+        "adverseReactions": "可见皮肤脱屑、瘙痒、烧灼感、刺痛、发红或局部刺激；少见接触性皮炎、皮疹、荨麻疹等过敏反应。",
+        "precautions": "仅供皮肤外用，避免眼、口、鼻等黏膜和破溃皮肤，不必密闭包扎。出现明显红肿、水疱或全身过敏立即停用并洗净。疗程结束无改善应复诊确认是否真菌感染，不自行与激素复方长期混用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：盐酸特比萘芬乳膏",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000011378&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸西替利嗪片",
+      "genericName": "盐酸西替利嗪",
+      "specification": "10mg×20片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "成都利尔药业有限公司",
+      "clinical": {
+        "indication": "用于季节性或常年性过敏性鼻炎，以及过敏原所致荨麻疹和皮肤瘙痒。",
+        "dosage": "成人和12岁以上儿童一次10mg、每日一次；对不良反应敏感者可早晚各5mg。6～11岁儿童每日5～10mg，低龄儿童应选合适剂型并按说明书。肾功能损害者须减少剂量或延长间隔。",
+        "adverseReactions": "多为轻微和一过性，可见困倦、嗜睡、疲劳、头痛、眩晕、口干、激动和胃肠不适；偶见肝酶升高，少见尿潴留或严重过敏。",
+        "precautions": "即使属于第二代抗组胺药也可能嗜睡，首次服用后确认反应再驾驶；避免饮酒和其他中枢抑制剂。严重肾功能不全者、老年人及有尿潴留/前列腺增生风险者先咨询医生。荨麻疹伴喉头水肿或呼吸困难立即急救。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：盐酸西替利嗪片",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=39236",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸小檗碱片",
+      "genericName": "盐酸小檗碱",
+      "specification": "0.1g×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "开封制药(集团)有限公司",
+      "clinical": {
+        "indication": "用于肠道感染，如细菌性胃肠炎；不能替代对严重、血性或持续腹泻病因的评估和补液。",
+        "dosage": "成人一次0.1～0.3g（1～3片）、一日3次。儿童须按说明书年龄/体重表计算并由成人监护；同时补充口服补液盐，避免脱水。",
+        "adverseReactions": "口服不良反应较少，偶有恶心、呕吐、皮疹和药热，停药后多可消失；葡萄糖-6-磷酸脱氢酶缺乏者有溶血风险。",
+        "precautions": "溶血性贫血及G6PD缺乏患者禁用，妊娠前3个月慎用。含鞣质中药可能形成沉淀并降低疗效。高热、血便、剧烈腹痛、明显口渴尿少或腹泻超过48小时应就医；婴幼儿、老年人和免疫低下者更早评估。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：盐酸小檗碱片说明书",
+        "url": "https://www.yaopinnet.com/huayao/hy6984g.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸溴己新口服溶液",
+      "genericName": "盐酸溴己新",
+      "specification": "100ml:0.2g/瓶",
+      "dosageForm": "口服溶液剂",
+      "category": "西药",
+      "manufacturer": "河北仁合益康药业有限公司",
+      "qualityIssue": "原始目录仅记录100ml装量，未记录药物含量；已依据生产企业资料补正为100ml:0.2g。",
+      "clinical": {
+        "indication": "用于成人、青少年和6岁及以上儿童的急慢性支气管炎、慢阻肺等伴黏液分泌或清除障碍的呼吸系统疾病，对黏稠痰作对症治疗。",
+        "dosage": "本品浓度2mg/ml。成人和青少年常用一次4ml（8mg）、一日最多3次；儿童剂量按年龄和说明书，使用量具准确量取。大量痰液被稀释后须配合有效咳痰和充分饮水。",
+        "adverseReactions": "常见腹痛、恶心、呕吐和腹泻；可见头痛、眩晕、皮疹、荨麻疹及肝酶升高，罕见严重过敏和严重皮肤反应。",
+        "precautions": "对溴己新过敏者禁用；消化性溃疡、严重肝肾功能损害及咳痰能力弱者慎用。出现进行性皮疹、水疱或黏膜损害立即停药就医。避免与强力镇咳药自行合用，以免痰液潴留；呼吸困难、咯血或高热应就医。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "仁合益康：盐酸溴己新口服溶液产品说明书资料",
+        "url": "https://www.rhykjt.com/content/details19_550.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "左氧氟沙星片",
+      "genericName": "盐酸左氧氟沙星",
+      "specification": "0.25g×30片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "浙江普利药业有限公司",
+      "clinical": {
+        "indication": "用于敏感细菌所致的部分呼吸道、泌尿道、皮肤软组织及前列腺等感染；应在明确或高度怀疑细菌感染且更安全抗菌药不适用时使用。",
+        "dosage": "成人肾功能正常时常用250mg、500mg或750mg每24小时一次，具体剂量和疗程随感染部位、严重度和病原体而异；本规格每片250mg。肌酐清除率＜50ml/min须调整。与含铝镁抗酸剂、铁/锌、硫糖铝等前后至少间隔2小时。",
+        "adverseReactions": "可见恶心、腹泻、头痛、眩晕和失眠；严重风险包括肌腱炎/肌腱断裂、不可逆周围神经病变、中枢神经反应、精神异常、QT延长、血糖紊乱、肝损伤、艰难梭菌相关腹泻和严重过敏。",
+        "precautions": "出现肌腱疼痛肿胀、麻木灼痛、幻觉/惊厥、严重皮疹或低/高血糖立即停药就医。重症肌无力患者避免；癫痫、主动脉瘤高风险、QT延长、糖尿病、老年及合用激素者慎用。妊娠、哺乳及18岁以下通常不推荐。补充水分并避免强日晒。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：左氧氟沙星片说明书",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=26110",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "左氧氟沙星氯化钠注射液",
+      "genericName": "盐酸左氧氟沙星",
+      "specification": "100ml:0.5g/袋",
+      "dosageForm": "注射剂",
+      "category": "西药",
+      "manufacturer": "湖南科伦制药有限公司",
+      "clinical": {
+        "indication": "用于敏感菌所致的中重度呼吸道、泌尿道、皮肤软组织等感染，仅在不能口服或临床确需静脉治疗时使用，并尽早评估序贯口服。",
+        "dosage": "仅供静脉滴注，不得静脉推注或用于肌内、鞘内等途径。本袋含500mg，滴注时间不得少于60分钟；常用250mg或500mg每24小时一次，具体方案按感染和肾功能决定。肌酐清除率＜50ml/min须减量或延长间隔。",
+        "adverseReactions": "除胃肠道和神经系统反应外，可发生输注部位反应、低血压和严重过敏/过敏性休克；亦有肌腱断裂、周围神经病变、中枢神经/精神反应、QT延长、血糖异常、肝损伤及严重腹泻等氟喹诺酮类风险。",
+        "precautions": "医疗机构给药并观察过敏反应；不可快速滴注，不得向预混袋加入其他药物或与不相容药同路混输。用药前评估既往喹诺酮严重反应、肾功能、QT风险、肌腱病、重症肌无力和血糖。出现肌腱痛、麻木、意识改变或呼吸困难立即停药处置。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医药数据：左氧氟沙星氯化钠注射液现行说明书资料",
+        "url": "https://shuju.qgyyzs.net/yppwcx/details23140g0XpO1Idse31504.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "养心氏片",
+      "genericName": "养心氏片",
+      "specification": "0.6g×36片/盒",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "上海医药集团青岛国风药业股份有限公司",
+      "clinical": {
+        "indication": "益气活血、化瘀止痛，用于气虚血瘀所致胸痹，症见心悸气短、胸闷、心前区刺痛；冠心病心绞痛见上述证候者。",
+        "dosage": "口服，本0.6g规格一次2～3片、一日3次，或遵医嘱；疗程由医生结合心绞痛控制和合并用药决定。",
+        "adverseReactions": "极个别患者出现胃部不适；上市后如发生皮疹、出血倾向、心悸加重或其他异常应停药并复诊。",
+        "precautions": "孕妇慎用。处方含丹参、当归、山楂等，与抗凝/抗血小板药合用前评估出血风险；不要用本品替代他汀、抗血小板药等循证治疗。胸痛持续超过数分钟、伴出汗气促或放射痛应立即急救，不等待中成药起效。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：养心氏片说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy43506.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "叶酸片",
+      "genericName": "叶酸",
+      "specification": "0.4mg×31片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "江苏联环药业股份有限公司",
+      "clinical": {
+        "indication": "本0.4mg规格用于预防胎儿先天性神经管畸形，以及妊娠期、哺乳期妇女的叶酸预防性补充；治疗叶酸缺乏性贫血通常需要不同剂量并明确病因。",
+        "dosage": "计划怀孕者从备孕开始至妊娠满3个月一次0.4mg、每日一次；妊娠及哺乳期预防通常0.4mg每日一次。既往神经管缺陷妊娠、抗癫痫药使用等高危人群剂量须由医生制定。",
+        "adverseReactions": "不良反应较少，罕见过敏；长期使用可有畏食、恶心、腹胀等，大量服用可使尿液呈黄色。",
+        "precautions": "维生素B12缺乏导致的巨幼细胞贫血不能单用叶酸，否则可能掩盖贫血而神经损害继续进展。核对复合维生素和保健品中的叶酸，避免重复超量；正在使用甲氨蝶呤或抗癫痫药者必须先咨询医生。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：叶酸片说明书",
+        "url": "https://www.yaopinnet.com/huayao/hy3597l.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "依折麦布片",
+      "genericName": "依折麦布",
+      "specification": "10mg×20片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "重庆圣华曦药业股份有限公司",
+      "clinical": {
+        "indication": "配合低脂饮食，用于原发性高胆固醇血症，可单用或与他汀类联合；也用于纯合子家族性高胆固醇血症及纯合子谷甾醇血症等获批情形。",
+        "dosage": "成人通常10mg每日一次，可空腹或随餐、每日任一固定时间服用。与胆酸螯合剂合用时，应在其前至少2小时或后至少4小时服用。",
+        "adverseReactions": "可见腹痛、腹泻、腹胀、疲劳和头痛；可能出现肝酶升高、肌痛、肌病/横纹肌溶解、过敏及胰腺炎，联合他汀时相关风险增加。",
+        "precautions": "与他汀联用前后按他汀要求监测肝功能；不明原因肌痛、乏力或深色尿立即就医。中重度肝功能损害者不推荐。妊娠/哺乳期若与他汀联用须遵循他汀禁忌；不要把单方依折麦布与含依折麦布复方重复使用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品说明书查询：依折麦布片",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000010647&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "乙酰半胱氨酸胶囊",
+      "genericName": "乙酰半胱氨酸",
+      "specification": "0.2g×24粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "广东人人康药业有限公司",
+      "clinical": {
+        "indication": "黏液溶解剂，用于急性支气管炎、慢性支气管炎急性发作和支气管扩张等痰液浓稠、黏液过多且不易咳出的疾病。",
+        "dosage": "成人口服一次0.2g（1粒）、一日2～3次；适量饮水有助排痰。儿童使用须遵医嘱并选择适宜剂型。",
+        "adverseReactions": "偶有恶心、呕吐；极少出现皮疹、荨麻疹、支气管痉挛等过敏反应，也可能有腹痛、腹泻和头痛。",
+        "precautions": "支气管哮喘患者严密观察，出现支气管痉挛立即停药。避免与强力镇咳药自行合用，以免痰液潴留；与部分口服抗菌药宜间隔至少2小时。消化性溃疡、咳痰能力弱者慎用；呼吸困难、咯血或高热及时就医。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：乙酰半胱氨酸胶囊说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hy6/30.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "盐酸洛哌丁胺胶囊",
+      "genericName": "盐酸洛哌丁胺",
+      "specification": "2mg×6粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "西安杨森制药有限公司",
+      "qualityIssue": "原始目录剂型误填为片剂；已依据药品名称和生产企业说明书修正为胶囊剂。",
+      "clinical": {
+        "indication": "用于控制急、慢性腹泻症状，也可减少回肠造瘘术患者排便量和次数；仅属对症治疗，补液和病因处理同样重要。",
+        "dosage": "成人急性腹泻起始4mg（2粒），以后每次不成形便后2mg（1粒）；慢性腹泻起始4mg后调整至每日1～2次正常便。成人每日最多16mg（8粒）。6～17岁按说明书和体重，6岁以下禁用或不适用。",
+        "adverseReactions": "可见便秘、腹胀、恶心、腹痛、口干、头晕和嗜睡；严重可发生肠梗阻、巨结肠、尿潴留、严重皮肤反应。过量或滥用可致QT/QRS延长、尖端扭转型室速、心脏骤停和死亡。",
+        "precautions": "血便伴高热、急性溃疡性结肠炎发作、细菌性肠炎、抗菌药相关假膜性结肠炎或需抑制肠蠕动时禁用。急性腹泻48小时无改善即停药就医；出现腹胀或便秘立即停。不得超剂量，并补充液体、电解质。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "西安杨森：易蒙停（盐酸洛哌丁胺胶囊）说明书",
+        "url": "https://www.xian-janssen.com.cn/sites/default/files/PDF/yi_meng_ting_yan_suan_luo_pai_ding_e_xiao_nang_shuo_ming_shu_20201012.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "银杏叶片",
+      "genericName": "银杏叶片",
+      "specification": "19.2mg×36片/盒",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "江苏扬子江药业集团有限公司",
+      "clinical": {
+        "indication": "活血化瘀通络，用于瘀血阻络所致胸痹心痛、中风、半身不遂、舌强语謇，以及冠心病稳定型心绞痛、脑梗死见上述证候者。",
+        "dosage": "本品每片含总黄酮醇苷19.2mg、萜类内酯4.8mg；口服一次2片、一日3次，或遵医嘱。疗程须定期复评，不自行长期叠加同类制剂。",
+        "adverseReactions": "可见恶心、呕吐、口干、腹胀腹痛、头晕头痛、皮疹瘙痒、胸闷心悸及血压波动；已有消化道出血、牙龈出血、鼻出血和过敏样反应报告。",
+        "precautions": "有出血倾向或使用抗凝/抗血小板药者须医生评估，围手术期提前告知医生。心力衰竭、孕妇及过敏体质者慎用。疑似卒中或急性胸痛立即急诊，不能用本品替代溶栓、抗血小板或其他标准治疗。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "298医药：扬子江银杏叶片现行说明书资料",
+        "url": "https://www.298.cn/show-193522.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "枣仁安神液",
+      "genericName": "枣仁安神液",
+      "specification": "10ml×7支/盒",
+      "dosageForm": "口服液",
+      "category": "中成药",
+      "manufacturer": "辽宁仙草药业有限公司",
+      "clinical": {
+        "indication": "补心安神，用于失眠、头晕、健忘。",
+        "dosage": "口服，晚临睡前一次10～20ml（1～2支）、一日1次；如有沉淀可摇匀后服。服用2周症状未缓解应就医。",
+        "adverseReactions": "公开说明书记载尚不明确；如出现胃肠不适、皮疹、瘙痒、头晕或其他异常应停药并咨询医生。",
+        "precautions": "孕妇慎用，消化不良导致的睡眠差者忌用；糖尿病患者和儿童在医生指导下使用，注意辅料蜂蜜。避免与酒精及其他镇静催眠药自行同用；服后困倦者不驾驶。失眠伴躁狂、自伤想法或持续功能受损应尽快就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：辽宁仙草枣仁安神液说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy4000i.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "drugName": "珍菊降压片",
+      "genericName": "珍菊降压片",
+      "specification": "60片/瓶",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "上海雷允上药业有限公司",
+      "clinical": {
+        "indication": "中西药复方降压药，用于高血压；含盐酸可乐定、氢氯噻嗪、芦丁等，不宜作为高血压治疗首选药物。",
+        "dosage": "口服一次1片、一日3次，或遵医嘱。不能因血压高自行加量；如需停药，须在医生指导下于2～4天内逐渐减量，严禁突然停用。",
+        "adverseReactions": "可见口干、嗜睡、头晕、乏力、低血压、心动过缓、胃肠不适和皮疹；氢氯噻嗪可致低钠低钾、高尿酸和血糖异常，可乐定骤停可引起血压反跳甚至高血压危象。还报告肝损伤和严重皮肤反应。",
+        "precautions": "定期监测血压、心率、电解质、肾功能、血糖和尿酸。避免与含可乐定或氢氯噻嗪药物重复；与其他降压药、镇静药和酒精合用注意低血压/嗜睡。痛风、糖尿病、肝肾功能异常及老年患者慎用；驾驶和高空作业前确认无嗜睡。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "河南省医药服务平台：珍菊降压片现行说明书",
+        "url": "https://www.hnysfww.com/mobile/goods.php?id=7168",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",
