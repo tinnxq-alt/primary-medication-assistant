@@ -15,7 +15,8 @@
 - 缓存管理支持预加载、逐项编辑本机目录字段、恢复原始字段、批量移出、批量修改分类、重复检测和 JSON 导出。
 - 自定义药品支持从详情页编辑或删除；修改不会自动获得说明书“已核验”状态。
 - 添加自定义药品时，可通过独立 Cloudflare Worker 优先查询项目中文核验库；没有核验资料时，使用 Workers AI 免费额度生成中文“未核验草稿”。
-- 添加药物提供两种方式：输入药名后点击“智能识别”自动填充，或直接手动填写表单。
+- 添加药物提供两种方式：输入已收录的中文商品名或通用名后点击“智能识别”（也可按回车）自动填充，或直接手动填写表单。
+- 商品名通过带来源的别名表映射到通用名；命中商品名时不会套用其他厂家包装规格，规格留空并提示按药盒或现行说明书核对。
 - 智能识别固定返回 `drugName`、`tradeName`、`category`、`indications`、`specification`、`dosage`、`adverseReactions`、`precautions`；所有字段都可编辑，未核验草稿无需人工放行即可保存。
 - 手动录入必填药品名称、药品分类、适应症和用法用量；商品名、规格、不良反应、注意事项和备注为选填。备注同步写入本地笔记本。
 - 自定义药品保存到浏览器本地存储，并自动显示在“全部药物”和所选分类中。
@@ -59,7 +60,7 @@ Worker 使用 Cloudflare Workers Free 计划及 Workers AI 免费额度，不调
 
 ## 自动质量检查
 
-每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括 167 个目录品规与核验库的一一对应、临床四字段、来源 URL 与核验日期、重复 ID、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
+每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括 167 个目录品规与核验库的一一对应、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、重复 ID、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
 
 本地可执行：
 
@@ -69,6 +70,7 @@ node --check drugs.js
 node --check service-worker.js
 node --check worker/src/index.js
 node scripts/audit-catalog.mjs
+node scripts/test-drug-lookup.mjs
 node worker/test.mjs
 ```
 

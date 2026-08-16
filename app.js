@@ -48,6 +48,9 @@
   const BACKUP_OBJECT_KEYS = ["favoriteMap", "categoryOverrides", "drugOverrides"];
   const BACKUP_KEYS = [...BACKUP_ARRAY_KEYS, ...BACKUP_OBJECT_KEYS];
   let deferredInstallPrompt = null;
+  let tradeNameAliases = [];
+  const { directlyMatchesDrug, normalize, normalizeTradeNameAliases, tradeNameAliasForDrug: findTradeNameAliasForDrug } = window.DRUG_LOOKUP;
+  const tradeNameAliasForDrug = (query, drug, aliases = tradeNameAliases) => findTradeNameAliasForDrug(query, drug, aliases);
 
   const routes = {
     home: "基层用药助手 Pro",
@@ -83,7 +86,6 @@
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 
-  const normalize = value => String(value ?? "").toLowerCase().replace(/[\s()（）·:：,，/\-]/g, "");
   const safeExternalUrl = value => {
     try { const url = new URL(String(value || ""), location.href); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; }
     catch { return ""; }
@@ -114,10 +116,11 @@
     .map(applyLocalOverrides);
 
   async function hydrateVerifiedCatalog() {
-    const response = await fetch("./chinese-drug-labels.json?v=11", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=12", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
+    tradeNameAliases = normalizeTradeNameAliases(payload.tradeNameAliases);
     for (const entry of payload.drugs) {
       if (!entry?.drugName || !entry.clinical || !entry.source?.status) continue;
       const target = window.DRUG_CATALOG.find(drug => drug.drugName === entry.drugName && (!entry.specification || drug.specification === entry.specification))
@@ -469,9 +472,9 @@
       <section class="panel section">
         <h2>添加药物</h2>
         <h3 style="margin-top:14px">1. 智能识别（AI 自动填充）</h3>
-        <p class="notice">输入药品名称并点击“智能识别”。AI 会返回固定 JSON 字段并填入下方表单；未核验内容可直接修改后保存。</p>
+        <p class="notice">输入已收录的中文商品名或通用名，点击“智能识别”或按回车即可自动填充。商品名只用于识别通用成分，规格仍须按药盒核对。</p>
         <form id="drugForm" style="margin-top:16px">
-          <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required maxlength="60" placeholder="输入药品通用名"><button class="btn secondary" id="lookupDrugBtn" type="button">智能识别</button></div></div>
+          <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required maxlength="60" autocomplete="off" placeholder="输入商品名或通用名"><button class="btn secondary" id="lookupDrugBtn" type="button">智能识别</button></div></div>
           <div id="lookupStatus" class="muted" role="status" aria-live="polite"></div>
           <div id="lookupResults" class="card-list lookup-results"></div>
           <div id="lookupLinks" class="toolbar"></div>
@@ -512,10 +515,11 @@
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
       results.innerHTML = candidates.length ? candidates.map(candidate => {
         const sourceUrl = safeExternalUrl(candidate.source?.url);
+        const tradeNameSourceUrl = safeExternalUrl(candidate.lookupMeta?.tradeNameSource?.url);
         const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
         const confidence = { high: "高", medium: "中", low: "低" }[candidate.smartMeta?.confidence] || "";
         const meta = [confidence && `可信度：${confidence}`, candidate.smartMeta?.approvalNumber && `批准文号：${candidate.smartMeta.approvalNumber}`].filter(Boolean).join(" · ");
-        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeDrugCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge ${isDraft ? "warn" : "ok"}">${isDraft ? "未核验草稿" : "核验资料"}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
+        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeDrugCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge ${isDraft ? "warn" : "ok"}">${isDraft ? "未核验草稿" : "核验资料"}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}${candidate.lookupMeta?.matchedByTradeName ? " · 商品名已识别" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${tradeNameSourceUrl ? `<a class="btn ghost small link-btn" href="${esc(tradeNameSourceUrl)}" target="_blank" rel="noopener">查看商品名来源</a>` : ""}${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
       }).join("") : empty("暂未生成可自动填充的中文资料。可稍后重试，或使用下方中文搜索入口手动补充。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
     const renderVerificationLinks = links => {
@@ -554,6 +558,11 @@
         renderLookupResults([]); status.textContent = `智能识别失败：${error.message || "网络不可用"}`;
         toast("智能识别失败，请检查网络"); revealLookupFeedback();
       } finally { button.disabled = false; button.textContent = "智能识别"; }
+    });
+    document.getElementById("drugNameInput").addEventListener("keydown", event => {
+      if (event.key !== "Enter" || event.isComposing) return;
+      event.preventDefault();
+      document.getElementById("lookupDrugBtn").click();
     });
     form.addEventListener("submit", event => {
       event.preventDefault();
@@ -635,41 +644,50 @@
   }
 
   function localLookupCandidates(query) {
-    const q = normalize(query);
-    return window.DRUG_CATALOG.filter(drug => isVerifiedSource(drug.source?.status) && drug.clinical && drug.source?.url && normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q)).slice(0, 8).map(drug => ({
-      drugName: drug.genericName || drug.drugName, genericName: drug.genericName || drug.drugName, tradeName: drug.tradeName || "", specification: drug.specification,
+    return window.DRUG_CATALOG.filter(drug => {
+      const alias = tradeNameAliasForDrug(query, drug);
+      return isVerifiedSource(drug.source?.status) && drug.clinical && drug.source?.url && (directlyMatchesDrug(query, drug) || alias);
+    }).slice(0, 8).map(drug => {
+      const alias = tradeNameAliasForDrug(query, drug);
+      return ({
+      drugName: drug.genericName || drug.drugName, genericName: drug.genericName || drug.drugName, tradeName: alias?.tradeName || drug.tradeName || "", specification: alias ? "" : drug.specification,
       category: normalizeDrugCategory(drug.category, drug.drugName),
-      clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验资料）` }
-    })).filter(isChineseCandidate);
+      clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验资料）` },
+      lookupMeta: { matchedByTradeName: Boolean(alias), tradeNameSource: alias?.source || null }
+    }); }).filter(isChineseCandidate);
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=11", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=12", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
-    const q = normalize(query);
+    const aliases = normalizeTradeNameAliases(payload.tradeNameAliases);
     return payload.drugs
       .filter(candidate => isVerifiedSource(candidate.source?.status))
-      .filter(candidate => normalize(`${candidate.drugName}${candidate.genericName}`).includes(q))
-      .map(candidate => ({
+      .filter(candidate => directlyMatchesDrug(query, candidate) || tradeNameAliasForDrug(query, candidate, aliases))
+      .map(candidate => {
+        const alias = tradeNameAliasForDrug(query, candidate, aliases);
+        return ({
         drugName: candidate.genericName || candidate.drugName, genericName: candidate.genericName || candidate.drugName,
-        tradeName: candidate.tradeName || "", specification: candidate.specification || "",
+        tradeName: alias?.tradeName || candidate.tradeName || "", specification: alias ? "" : candidate.specification || "",
         category: normalizeDrugCategory(candidate.category, candidate.drugName),
         clinical: candidate.clinical ? { ...candidate.clinical } : null,
-        source: { ...candidate.source, label: `${candidate.source.label}（联网中文库）` }
-      }))
+        source: { ...candidate.source, label: `${candidate.source.label}（联网中文库）` },
+        lookupMeta: { matchedByTradeName: Boolean(alias), tradeNameSource: alias?.source || null }
+      }); })
       .filter(isChineseCandidate).slice(0, 8);
   }
 
   function directoryHintFor(query) {
     const q = normalize(query);
-    const matches = window.DRUG_CATALOG.filter(drug => normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q));
+    const matches = window.DRUG_CATALOG.filter(drug => directlyMatchesDrug(query, drug) || tradeNameAliasForDrug(query, drug));
     const drug = matches.find(item => [item.drugName, item.genericName, item.tradeName].some(value => normalize(value) === q)) || matches[0];
     if (!drug) return {};
+    const alias = tradeNameAliasForDrug(query, drug);
     return {
-      drugName: drug.genericName || drug.drugName || "", tradeName: drug.tradeName || "",
-      specification: drug.specification || "", category: normalizeDrugCategory(drug.category, drug.drugName)
+      drugName: drug.genericName || drug.drugName || "", tradeName: alias?.tradeName || drug.tradeName || "",
+      specification: alias ? "" : drug.specification || "", category: normalizeDrugCategory(drug.category, drug.drugName)
     };
   }
 
@@ -704,7 +722,11 @@
           label: draft ? `未核验 AI 草稿：${candidate.sourceTitle || "中文资料草稿"}` : `免费联网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
           url: candidate.sourceUrl || "", checkedAt: candidate.sourceCheckedAt || new Date().toISOString().slice(0, 10)
         },
-        smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "", draft, verified: candidate.verified === true, editable: candidate.editable !== false }
+        smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "", draft, verified: candidate.verified === true, editable: candidate.editable !== false },
+        lookupMeta: {
+          matchedByTradeName: candidate.matchType === "trade-name",
+          tradeNameSource: candidate.tradeNameSourceUrl ? { label: candidate.tradeNameSourceTitle || "商品名核验来源", url: candidate.tradeNameSourceUrl } : null
+        }
       }); }).filter(isChineseCandidate).slice(0, 6);
       const verificationLinks = Array.isArray(payload.verificationLinks)
         ? payload.verificationLinks.map(link => ({ label: String(link.label || ""), url: safeExternalUrl(link.url) })).filter(link => link.label && link.url).slice(0, 6)
@@ -730,6 +752,9 @@
       const key = normalize(`${candidate.drugName}|${candidate.tradeName}|${candidate.specification}`);
       if (seen.has(key)) return false; seen.add(key); return true;
     }).slice(0, 8);
+    if (candidates.some(candidate => candidate.lookupMeta?.matchedByTradeName)) {
+      warnings = [...new Set([...warnings, "已按商品名识别通用名；不同厂家和包装的规格可能不同，请按药盒或现行说明书核对规格。"])];
+    }
     return { candidates, networkError, smartError, warnings, verificationLinks, smartConfigured };
   }
 

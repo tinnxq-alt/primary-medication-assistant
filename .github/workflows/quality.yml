@@ -33,12 +33,16 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
+          node --check drug-lookup.js
           node --check drugs.js
           node --check service-worker.js
           node --check worker/src/index.js
 
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
+
+      - name: Drug name lookup tests
+        run: node scripts/test-drug-lookup.mjs
 
       - name: Worker tests
         run: node worker/test.mjs
