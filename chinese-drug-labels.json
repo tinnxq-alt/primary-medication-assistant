@@ -797,6 +797,409 @@
       }
     },
     {
+      "drugName": "双氯芬酸二乙胺乳胶剂",
+      "genericName": "双氯芬酸二乙胺",
+      "specification": "20g:0.2g/支",
+      "dosageForm": "乳胶剂",
+      "category": "西药",
+      "manufacturer": "中美天津史克制药…",
+      "clinical": {
+        "indication": "用于缓解肌肉、软组织和关节的轻至中度疼痛，如扭伤、拉伤、挫伤、劳损及关节疼痛；也可用于骨关节炎的对症治疗。",
+        "dosage": "外用，按疼痛部位面积取适量轻揉使其渗透皮肤，一日3～4次；连续使用时间及儿童用量按说明书或医嘱。",
+        "adverseReactions": "可见局部丘疹、发红、刺痛、水肿、瘙痒、水疱或鳞屑；罕见哮喘发作、血管性水肿、荨麻疹或光敏反应。",
+        "precautions": "仅用于完整皮肤，避免接触眼睛、口腔和破损皮肤；不得长期、大面积或密闭包扎使用。对双氯芬酸、阿司匹林或其他非甾体抗炎药过敏者禁用；出现全身过敏反应应立即停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：双氯芬酸二乙胺乳胶剂说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=1755&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "氟伐他汀钠胶囊",
+      "genericName": "氟伐他汀钠",
+      "specification": "20mg×20粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "瀚晖制药有限公司",
+      "clinical": {
+        "indication": "在饮食治疗不能充分控制时，用于原发性高胆固醇血症和混合型血脂异常；具体心血管风险适用范围按现行说明书判断。",
+        "dosage": "治疗前及期间配合降脂饮食。常用起始20mg或40mg每日一次，通常晚间服；需要较强降脂时可由医生调整至40mg每日2次，最大80mg/日。",
+        "adverseReactions": "可见消化不良、恶心、腹痛、头痛及肝酶升高；少见肌病、横纹肌溶解和严重肝损伤。",
+        "precautions": "活动性肝病或原因不明的持续转氨酶升高者禁用；治疗前及期间按风险监测肝功能。出现不明原因肌痛、肌无力、深色尿或黄疸应立即就医，并核对合并用药的肌病风险。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：氟伐他汀钠胶囊",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=8403",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "氟哌噻吨美利曲辛片",
+      "genericName": "氟哌噻吨/美利曲辛",
+      "specification": "0.5mg:10mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "四川海思科制药有…",
+      "clinical": {
+        "indication": "用于轻、中度抑郁和焦虑，以及伴焦虑或抑郁的部分心身疾病；必须由医生评估诊断。",
+        "dosage": "成人通常早、午各1片；严重病例可早晨2片、午间1片，最大每日4片。老年人通常早晨1片；维持量常为早晨1片，具体须遵医嘱。",
+        "adverseReactions": "可见失眠、坐立不安、口干、便秘、头晕、震颤、心悸和视物模糊；还可能出现锥体外系反应、情绪转躁、QT间期延长、依赖或停药反应。",
+        "precautions": "应监测自杀风险和躁狂转变，不得突然停药。避免饮酒及自行合用其他中枢作用药；青光眼、排尿困难、癫痫、心脏传导异常者须谨慎。与单胺氧化酶抑制剂等合用前必须核对禁忌和洗脱期。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：氟哌噻吨美利曲辛片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=4654&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "复方氨酚伪麻胶囊",
+      "genericName": "复方氨酚伪麻",
+      "specification": "待核验（原始：20粒/盒）",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "四川天德制药有限…",
+      "qualityIssue": "院内清单仅记录包装数量，未记录每粒成分及含量；不同复方感冒制剂不得仅凭简称互换。",
+      "clinical": {
+        "indication": "用于缓解普通感冒或流行性感冒引起的发热、头痛、四肢酸痛、鼻塞、流涕和喷嚏等症状。",
+        "dosage": "公开同名品种资料常见成人一次1～2粒、一日3次，但当前条目的每粒成分含量尚未核定，禁止直接据此给药；必须先核对盒内说明书或批准文号。",
+        "adverseReactions": "可见头晕、乏力、恶心、上腹不适、口干、食欲减退和皮疹；含对乙酰氨基酚的制剂过量可致严重肝损伤。",
+        "precautions": "不得与含相同成分的其他感冒药重复使用，服药期间避免饮酒。高血压、心脏病、甲状腺疾病、糖尿病、青光眼、前列腺肥大及肝肾功能不全者使用前咨询医生；当前规格未核实前不得用于剂量计算。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "39药品通：复方氨酚伪麻胶囊通用品种资料",
+        "url": "https://wapypk.39.net/498550/",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "复方甲氧那明胶囊",
+      "genericName": "复方甲氧那明",
+      "specification": "待核验（原始：40粒/盒）",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "上海上药信谊药厂…",
+      "qualityIssue": "院内清单仅记录40粒/盒，未记录每粒复方成分含量；使用前须核对盒内说明书。",
+      "clinical": {
+        "indication": "用于支气管哮喘和喘息性支气管炎，以及其他呼吸系统疾病引起的咳嗽、咳痰、喘息等症状。",
+        "dosage": "通常15岁以上一次2粒，一日3次，饭后服；8岁至未满15岁一次1粒、一日3次。当前复方含量须先核对，8岁以下不应自行使用。",
+        "adverseReactions": "可见皮疹、瘙痒、恶心、呕吐、食欲减退、头晕、心悸、排尿困难、嗜睡、口干或震颤。",
+        "precautions": "哺乳期、哮喘急性发作、严重心血管疾病患者及8岁以下儿童按说明书禁忌或不适用。避免与含茶碱、其他抗组胺或拟交感成分的药物重复使用；服药后嗜睡者不得驾驶，避免饮酒。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：复方甲氧那明胶囊说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000011241&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "复合维生素B片",
+      "genericName": "复合维生素B",
+      "specification": "100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海新黄河制药有…",
+      "clinical": {
+        "indication": "用于预防和治疗B族维生素缺乏所致的营养不良、厌食、脚气病和糙皮病等。",
+        "dosage": "口服，成人一次1～3片，儿童一次1～2片，一日3次；用于日常补充和预防时宜用最低量，治疗性使用应咨询医生。",
+        "adverseReactions": "大剂量服用可出现烦躁、疲倦和食欲减退；偶见皮肤潮红、瘙痒，尿液可呈黄色。",
+        "precautions": "不可把维生素补充替代病因治疗，也不宜长期超量服用。对本品过敏者禁用；儿童须在成人监护下使用，与其他维生素或药品合用前核对重复成分。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：复合维生素B片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=737&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "富马酸比索洛尔片",
+      "genericName": "比索洛尔",
+      "specification": "5mg×18片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "成都苑东生物制药…",
+      "qualityIssue": "原始目录剂型误填为胶囊剂，已按药品名称纠正为片剂；厂家现行说明书仍须复核。",
+      "clinical": {
+        "indication": "用于高血压、冠心病心绞痛；稳定性慢性心力衰竭的适应症及剂量递增方案须按具体说明书和专科医嘱。",
+        "dosage": "高血压或心绞痛常用5mg每日一次、早晨服，轻症可从2.5mg开始，必要时由医生增至10mg。心力衰竭须从1.25mg起逐级滴定，不能自行按5mg起始。",
+        "adverseReactions": "可见疲乏、头晕、头痛、心动过缓、低血压、肢端发冷及恶心、腹泻或便秘；易感患者可发生支气管痉挛或心衰加重。",
+        "precautions": "监测心率和血压，不得突然停药。急性失代偿性心衰、心源性休克、高度房室传导阻滞、明显心动过缓或低血压者禁用；哮喘、外周循环障碍和糖尿病患者须谨慎，药物可掩盖低血糖表现。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：富马酸比索洛尔片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=12761&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "富马酸依美斯汀缓释胶囊",
+      "genericName": "依美斯汀",
+      "specification": "2mg×4粒/盒",
+      "dosageForm": "缓释胶囊剂",
+      "category": "西药",
+      "manufacturer": "四川德峰药业有限…",
+      "clinical": {
+        "indication": "用于过敏性鼻炎和荨麻疹的对症治疗。",
+        "dosage": "成人通常每次1～2mg、每日2次，早饭后及睡前服；本目录为2mg缓释胶囊，通常一次1粒，具体疗程和剂量必须按盒内说明书或医嘱。",
+        "adverseReactions": "可见嗜睡、疲倦、口渴、腹痛、头晕和胃肠不适；少数可出现皮疹或肝功能指标异常。",
+        "precautions": "可能引起嗜睡，服药期间避免驾驶和操作危险机械。长期使用糖皮质激素者不得因启用本品而突然停用激素；儿童用药安全性资料有限，肝肾功能异常者应先咨询医生。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：富马酸依美斯汀缓释胶囊",
+        "url": "https://drugs.dxy.cn/drug/m1OuYSt5rLSvBMPsSzd40w%3D%3D",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "格列美脲片",
+      "genericName": "格列美脲",
+      "specification": "2mg×60片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "重庆康刻尔制药有…",
+      "clinical": {
+        "indication": "用于饮食控制、运动和减重不能充分控制血糖的2型糖尿病；不用于1型糖尿病或糖尿病酮症酸中毒。",
+        "dosage": "通常从1～2mg每日一次开始，在早餐或第一顿主餐前即刻或随餐服；按血糖每1～2周逐步调整，常用维持量1～4mg，最大8mg/日。",
+        "adverseReactions": "最重要的不良反应为低血糖；还可见恶心、腹痛、腹泻、体重增加和皮疹，少见血液系统或肝胆异常。",
+        "precautions": "规律进餐并监测血糖，漏餐、运动增加、饮酒、肝肾功能异常或与其他降糖药合用会增加低血糖风险。出现意识改变或严重低血糖须立即处理；妊娠、哺乳期及严重肝肾功能不全者按说明书禁忌或改用其他方案。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：格列美脲片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=10977&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "枸橼酸莫沙必利片",
+      "genericName": "莫沙必利",
+      "specification": "5mg×48片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "成都康弘药业集团…",
+      "clinical": {
+        "indication": "用于胃肠动力减弱所致的消化道症状，如烧心、嗳气、恶心、呕吐、早饱、上腹胀等。",
+        "dosage": "成人一次5mg，一日3次，饭前或饭后服用；连续用药约2周症状无改善时应停药并重新评估。",
+        "adverseReactions": "可见腹泻、稀便、口干、腹痛、恶心、乏力、头晕及皮疹；可出现嗜酸性粒细胞、甘油三酯或肝酶升高，罕见严重肝炎、肝功能障碍或黄疸。",
+        "precautions": "仅作对症治疗，不宜无评估长期使用。出现明显乏力、食欲减退、黄疸或尿色加深应立即停药就医；老年人、肝肾功能异常者及合并可能影响胃肠动力药物者须谨慎。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "成都康弘药业：枸橼酸莫沙必利片产品说明",
+        "url": "https://www.cnkh.com/productnew/17639.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "谷维素片",
+      "genericName": "谷维素",
+      "specification": "10mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海普康药业有限…",
+      "clinical": {
+        "indication": "用于神经官能症、经前期紧张综合征和更年期综合征的镇静助眠。",
+        "dosage": "口服，一次1～3片（10～30mg），一日3次；使用7日症状未缓解应咨询医生或药师。",
+        "adverseReactions": "偶见胃部不适、恶心、呕吐、口干、疲乏、皮疹、乳房胀大、油脂分泌增多、脱发和体重增加，通常停药后可消失。",
+        "precautions": "胃及十二指肠溃疡患者慎用；不得超量或以本品替代对失眠、焦虑等病因的评估。对本品过敏者禁用，儿童须在成人监护下使用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：谷维素片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000011199&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "猴头健胃灵片",
+      "genericName": "猴头健胃灵片",
+      "specification": "0.38g×24片/盒",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "湖南新汇制药股份…",
+      "clinical": {
+        "indication": "舒肝和胃、理气止痛，用于肝胃不和所致的胃脘胁肋胀痛、呕吐吞酸；慢性胃炎、胃及十二指肠溃疡见上述证候者可按医嘱使用。",
+        "dosage": "口服，一次4片，一日3次；疗程及联合用药应遵医嘱。",
+        "adverseReactions": "现有公开说明书资料标示尚不明确；出现皮疹、胃肠不适或其他异常应停药并咨询医生。",
+        "precautions": "中成药也可能发生过敏和相互作用。孕妇、哺乳期妇女、儿童以及有消化道出血、持续呕吐、体重下降等报警症状者须先就医；不得用本品延误溃疡或肿瘤等疾病诊断。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "39药品通：猴头健胃灵片说明书资料",
+        "url": "https://wapypk.39.net/compare/825267",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "黄葵胶囊",
+      "genericName": "黄葵胶囊",
+      "specification": "0.5g×30粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "江苏苏中药业集团…",
+      "clinical": {
+        "indication": "清利湿热、解毒消肿，用于慢性肾炎湿热证，症见浮肿、腰痛、蛋白尿、血尿、舌苔黄腻等。",
+        "dosage": "口服，一次5粒，一日3次，饭后服；8周为一疗程，疗程和肾病基础治疗须由医生决定。",
+        "adverseReactions": "可见上腹部胀满不适；监测资料还报告恶心、腹泻、皮疹、瘙痒等，发生明显异常应停药就医。",
+        "precautions": "孕妇忌服，过敏体质者慎用。本品不能替代肾病病因治疗；用药期间应按医嘱监测尿蛋白、肾功能和病情变化，水肿加重、尿量减少或血尿加重时及时就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：黄葵胶囊说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy12346.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "甲磺酸二氢麦角碱分散片",
+      "genericName": "甲磺酸二氢麦角碱",
+      "specification": "1mg×6片/盒",
+      "dosageForm": "分散片",
+      "category": "西药",
+      "manufacturer": "海南金瑞宝医药科…",
+      "clinical": {
+        "indication": "用于改善与老年相关的精神退化症状，以及急、慢性脑血管病后遗的功能或智力减退和轻、中度血管性痴呆。",
+        "dosage": "口服，一次1～2mg，一日总量3～6mg，饭前服；疗程必须遵医嘱。分散片可按具体说明书直接吞服或分散后服用。",
+        "adverseReactions": "可见恶心、胃部不适、面部潮红、鼻塞；还可能发生心动过缓、血管收缩、视物模糊、皮疹或体位性低血压。",
+        "precautions": "严重心脏病特别是伴心动过缓者、对本品过敏者禁用；低血压、心肌梗死、肾功能减退者慎用，孕妇不宜使用。与多巴胺类、降压药或其他麦角衍生物合用前必须核对相互作用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "298医药网：甲磺酸二氢麦角碱分散片说明书",
+        "url": "https://www.298.cn/show-166610.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "降脂通脉胶囊",
+      "genericName": "降脂通脉胶囊",
+      "specification": "0.5g×36粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "云南优克制药公司",
+      "clinical": {
+        "indication": "化痰祛湿、活血通脉，用于痰瘀阻滞所致的高脂血症。",
+        "dosage": "口服，一次2～4粒，一日3次；长期使用的安全性资料有限，疗程由医生结合血脂复查决定。",
+        "adverseReactions": "监测资料可见胃部不适、恶心、呕吐、腹胀、腹泻、腹痛、肝功能异常、皮疹、瘙痒、头痛和头晕等。",
+        "precautions": "孕妇及对本品成分过敏者禁用；腹泻、低血压者慎用。老年或体弱者应在医生监督下使用并监测不良反应；不得替代饮食、运动及有明确获益的规范调脂治疗。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：降脂通脉胶囊说明书",
+        "url": "https://www.yaopinnet.com/zhongyao/zy83259hen.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "金银花口服液",
+      "genericName": "金银花口服液",
+      "specification": "20ml×10支/盒",
+      "dosageForm": "口服液",
+      "category": "中成药",
+      "manufacturer": "真奥金银花药业有…",
+      "clinical": {
+        "indication": "清热解毒、疏散风热，用于暑热内犯所致的中暑、痱疹、疖肿，以及风热感冒所见发热口渴、咽喉肿痛等。",
+        "dosage": "口服。成人一次20～60ml、一日3次；3岁以下一次10ml、一日2次，3～7岁一次10ml、一日3次，7岁以上一次20ml、一日3次；婴幼儿须在医生指导下使用。",
+        "adverseReactions": "监测资料可见腹泻、腹痛、腹部不适、恶心、呕吐、皮疹、瘙痒、头晕及过敏反应等。",
+        "precautions": "对本品成分过敏者禁用，脾虚便溏及过敏体质者慎用。服药期间饮食宜清淡，不宜同时服用滋补性中药；服药3天无缓解或出现严重症状应停药就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "河南省医药服务平台：金银花口服液说明书资料",
+        "url": "https://www.hnysfww.com/mobile/goods.php?id=9187",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "精蛋白人胰岛素混合注射液30R",
+      "genericName": "精蛋白人胰岛素混合注射液(30R)",
+      "specification": "3ml:300IU/支",
+      "dosageForm": "注射剂",
+      "category": "西药",
+      "manufacturer": "甘李药业股份有限…",
+      "clinical": {
+        "indication": "用于需要胰岛素治疗的糖尿病。30R通常含30%可溶性人胰岛素和70%精蛋白人胰岛素，具体以本品标签为准。",
+        "dosage": "仅供皮下注射，剂量须按血糖、饮食、运动和个体需求由医生设定，常每日1～2次并在含碳水化合物餐前约30分钟注射。使用前按说明书轻柔混匀至均匀白色混悬液，不得静脉注射。",
+        "adverseReactions": "低血糖最常见，可伴出汗、心悸、震颤、饥饿、意识改变甚至惊厥；还可见注射部位反应、脂肪营养不良、体重增加、水肿及过敏反应。",
+        "precautions": "必须掌握低血糖识别和处理并监测血糖；漏餐、运动、饮酒、疾病和肝肾功能变化均可能改变需求。不同品牌、浓度、装置或胰岛素类型不得自行互换；轮换注射部位，混悬液异常、发生低血糖或未正确混匀时不得注射。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：精蛋白人胰岛素混合注射液30R",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=40110",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "酒石酸美托洛尔片",
+      "genericName": "美托洛尔",
+      "specification": "25mg×30片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "石家庄以岭药业…",
+      "clinical": {
+        "indication": "用于高血压、心绞痛、心肌梗死、部分心律失常、肥厚型心肌病和甲状腺功能亢进相关症状；心力衰竭用药须由有经验医生指导。",
+        "dosage": "口服剂量必须个体化并避免心动过缓。高血压常用每日100～200mg、分1～2次；心绞痛或心律失常等常用一次25～50mg、一日2～3次。当前25mg规格不代表所有适应症的起始量。",
+        "adverseReactions": "可见疲劳、头痛、头晕、心动过缓、心悸、肢端发冷、恶心、腹痛、腹泻或便秘；可发生低血压、房室传导阻滞、心衰加重或支气管痉挛。",
+        "precautions": "监测心率和血压，不得突然停药。病态窦房结、二至三度房室传导阻滞、心源性休克、失代偿性心衰、明显心动过缓或低血压者禁用；哮喘、外周血管病和糖尿病患者须谨慎，可能掩盖低血糖症状。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "石家庄以岭药业：酒石酸美托洛尔片说明书",
+        "url": "https://www.yiling.cn/pro/metoprolol-tartrate-tablets/",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "酒石酸唑吡坦片",
+      "genericName": "唑吡坦",
+      "specification": "10mg×7片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "赛诺菲(杭州)制药…",
+      "clinical": {
+        "indication": "用于偶发性或暂时性严重失眠的短期治疗。",
+        "dosage": "临睡前一次服用。成人常用10mg，每日最大10mg；老年人或肝功能不全者通常5mg。疗程应尽可能短，一般不超过4周并包含逐渐减量期；18岁以下不使用。",
+        "adverseReactions": "可见嗜睡、头晕、头痛、乏力、噩梦、幻觉、顺行性遗忘和胃肠不适；可发生跌倒、复杂睡眠行为、依赖、耐受及停药反应。与阿片类或其他中枢抑制药合用可致严重镇静和呼吸抑制。",
+        "precautions": "仅在能保证完整夜间睡眠时服用，服后不得再次补服。避免饮酒及自行合用阿片类、苯二氮卓类等中枢抑制药；次日仍受影响时不得驾驶。严重肝功能不全、睡眠呼吸暂停、重症肌无力或严重呼吸功能不全者按说明书禁用。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "南方科技大学医院：酒石酸唑吡坦片说明书",
+        "url": "https://www.sustech-hospital.cn/UploadFiles/jyzn/2025/3/%E9%85%92%E7%9F%B3%E9%85%B8%E5%94%91%E5%90%A1%E5%9D%A6%E7%89%87%E8%AF%B4%E6%98%8E%E4%B9%A6.pdf",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "开塞露",
+      "genericName": "开塞露",
+      "specification": "20ml×2支/盒",
+      "dosageForm": "溶液剂",
+      "category": "西药",
+      "manufacturer": "锦州本天药业有限…",
+      "clinical": {
+        "indication": "用于便秘的临时缓解。",
+        "dosage": "直肠给药。取下或剪开顶端并确认开口光滑，涂少许油脂润滑，缓慢插入肛门后将药液挤入；成人20ml一次，儿童通常10ml一次，儿童须在成人监护下使用。",
+        "adverseReactions": "公开说明书多标示尚不明确；不当插入可造成肛门或直肠黏膜损伤，频繁使用可能引起局部刺激或形成依赖性使用。",
+        "precautions": "仅供直肠外用，导管开口必须光滑，插入时不得用力。腹痛原因不明、疑似肠梗阻、便血或持续便秘者不应自行使用；不宜长期反复依赖，使用后仍无排便或出现疼痛、出血应就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：开塞露（含甘油）说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000011407&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",

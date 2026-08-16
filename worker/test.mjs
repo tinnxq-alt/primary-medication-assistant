@@ -94,6 +94,26 @@ try {
   assert.equal(databaseSource.sourceQuality, "medical-database", "医药数据库不得误标为生产企业来源");
   assert.equal(databaseSource.confidence, "medium");
 
+  const additionalDatabaseSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://wapypk.39.net/example/" }
+  });
+  assert.equal(additionalDatabaseSource.sourceQuality, "medical-database");
+
+  const manufacturerSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.yiling.cn/example/" }
+  });
+  assert.equal(manufacturerSource.sourceQuality, "manufacturer");
+  assert.equal(manufacturerSource.confidence, "high");
+
+  const hospitalSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.sustech-hospital.cn/example.pdf" }
+  });
+  assert.equal(hospitalSource.sourceQuality, "hospital");
+  assert.equal(hospitalSource.confidence, "high");
+
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
