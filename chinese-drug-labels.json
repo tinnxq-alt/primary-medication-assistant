@@ -396,6 +396,407 @@
       }
     },
     {
+      "drugName": "苯溴马隆胶囊",
+      "genericName": "苯溴马隆",
+      "specification": "50mg×12粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "西药",
+      "manufacturer": "成都华神科技集团…",
+      "clinical": {
+        "indication": "用于原发性高尿酸血症以及痛风性关节炎间歇期；不用于痛风急性发作期的自行处理。",
+        "dosage": "成人通常一次50mg（一粒）、每日一次，早餐时服用；治疗初期及调整剂量须监测血尿酸并遵医嘱。",
+        "adverseReactions": "可见腹泻、胃部不适、恶心等胃肠道反应及皮疹、瘙痒等过敏反应；可出现肝功能指标异常，少数可发生严重肝损伤。",
+        "precautions": "用药前及治疗期间应评估肝肾功能并保证适当饮水；出现乏力、食欲减退、黄疸或尿色加深等肝损伤征象应立即停药就医。中重度肾功能损害、肾结石及妊娠哺乳期患者禁用或按现行说明书处理。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "成都华神集团：苯溴马隆胶囊产品说明书",
+        "url": "https://www.huasungrp.com/prod_view.aspx?id=179&nid=3&typeid=68",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "冰黄肤乐软膏",
+      "genericName": "冰黄肤乐软膏",
+      "specification": "30g/支",
+      "dosageForm": "软膏剂",
+      "category": "中成药",
+      "manufacturer": "西藏海容唐果药业…",
+      "clinical": {
+        "indication": "清热燥湿、活血祛风、止痒消炎；用于湿热蕴结或血热风燥所致皮肤瘙痒，以及神经性皮炎、湿疹、足癣和银屑病瘙痒见上述证候者。",
+        "dosage": "外用，取适量涂搽患处，每日3次；疗程及大面积使用应咨询医生。",
+        "adverseReactions": "上市后监测可见用药部位瘙痒、红斑、皮疹、肿胀、刺激、疼痛、发热或烧灼感等过敏反应。",
+        "precautions": "患处破溃或有明显渗出者禁用；避免接触眼睛和黏膜。治疗期间忌酒及辛辣发物，出现明显刺激或过敏应停药并清洗患处。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：冰黄肤乐软膏说明书资料",
+        "url": "https://www.yaopinnet.com/zhongyao/zy1115x.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "丙戊酸钠片",
+      "genericName": "丙戊酸钠",
+      "specification": "200mg×100片/瓶",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "湖南省湘中制药有…",
+      "clinical": {
+        "indication": "主要用于单纯或复杂失神发作、肌阵挛发作、强直-阵挛发作等癫痫的单药或联合治疗；具体适用发作类型须由专科医生判断。",
+        "dosage": "成人通常从每日5～10mg/kg开始，按疗效逐步调整；常用维持量约每日15mg/kg或600～1200mg，分2～3次服用。剂量须个体化并结合血药浓度及临床反应调整。",
+        "adverseReactions": "可见恶心、呕吐、腹泻、嗜睡、震颤、体重增加、脱发和血小板减少；少数可发生严重肝损伤、胰腺炎、高氨血症或严重皮肤反应。",
+        "precautions": "治疗前及治疗期间监测肝功能、血常规和必要时的血氨/血药浓度；不得突然停药。妊娠期有显著致畸和神经发育风险，育龄女性须由专科医生严格评估并采取有效避孕；肝病、尿素循环障碍或线粒体病患者须按说明书禁忌处理。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：丙戊酸钠片",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=16714",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "布洛芬缓释胶囊",
+      "genericName": "布洛芬",
+      "specification": "300mg×24粒/盒",
+      "dosageForm": "缓释胶囊剂",
+      "category": "西药",
+      "manufacturer": "上海信谊天平药业…",
+      "clinical": {
+        "indication": "用于缓解轻至中度疼痛，如关节痛、神经痛、肌肉痛、偏头痛、头痛、痛经和牙痛，也可缓解普通感冒或流行性感冒引起的发热。",
+        "dosage": "成人口服一次300mg、一日2次，间隔约12小时；胶囊应整粒吞服，不得自行加量。",
+        "adverseReactions": "可见恶心、呕吐、胃灼热、消化不良、胃痛、腹泻、头晕、耳鸣和皮疹；少数可出现消化道出血、肾损伤、严重过敏或严重皮肤反应。",
+        "precautions": "止痛连续使用一般不超过5天、解热不超过3天。不得与其他含布洛芬或同类非甾体抗炎药重复使用；活动性消化性溃疡、严重心肾功能不全、NSAID过敏及妊娠晚期等情况按现行说明书禁用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家药监局：布洛芬缓释口服制剂说明书资料",
+        "url": "https://www.nmpa.gov.cn/wwwroot/otc3p1/h27.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "阿司匹林肠溶片",
+      "genericName": "阿司匹林",
+      "specification": "100mg×30片/盒",
+      "dosageForm": "肠溶片",
+      "category": "西药",
+      "manufacturer": "南京道群医药研发…",
+      "clinical": {
+        "indication": "小剂量用于抑制血小板聚集，降低部分心肌梗死、缺血性卒中、短暂性脑缺血发作及动脉介入术后血栓事件风险；具体适应症须由医生评估。",
+        "dosage": "不同适应症剂量不同；长期抗血小板治疗常见剂量为每日75～100mg、每日一次。肠溶片通常应整片吞服，不得掰开、压碎或咀嚼；急性事件首剂方案必须遵医嘱。",
+        "adverseReactions": "可见消化不良、腹痛、恶心及皮肤过敏；可增加鼻出血、牙龈出血、消化道出血和其他出血风险，少数出现支气管痉挛、严重过敏或肾功能损害。",
+        "precautions": "使用前评估出血、溃疡及阿司匹林哮喘风险；与抗凝药、其他抗血小板药或NSAID合用须由医生决定。手术或拔牙前不得自行停药，应告知医生；活动性出血、严重过敏及其他禁忌按具体说明书处理。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：阿司匹林肠溶片说明书样稿",
+        "url": "https://www.nmpa.gov.cn/wwwroot/yjz02159/07.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "格列齐特片(II)",
+      "genericName": "格列齐特",
+      "specification": "80mg×60片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "天津华津制药有限…",
+      "clinical": {
+        "indication": "用于经饮食控制和运动仍不能满意控制血糖的成人2型糖尿病。",
+        "dosage": "口服，常从一次40～80mg、一日1～2次开始，根据血糖调整至每日80～240mg，分2～3次服用；老年人及高风险患者须减量并遵医嘱。",
+        "adverseReactions": "最重要的不良反应为低血糖；还可见恶心、呕吐、上腹不适、腹泻或便秘、皮疹，少数出现血细胞减少或肝功能异常。",
+        "precautions": "规律进餐并监测血糖；饮食不足、饮酒、剧烈运动、肝肾功能不全或与其他降糖药合用可增加低血糖风险。1型糖尿病、糖尿病酮症酸中毒及妊娠哺乳期等按现行说明书禁忌处理。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：格列齐特片说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/hysms3/028.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "丹参酮IIA磺酸钠注射液",
+      "genericName": "丹参酮IIA磺酸钠",
+      "specification": "2ml:10mg/支",
+      "dosageForm": "注射剂",
+      "category": "西药",
+      "manufacturer": "上海第一生化药业…",
+      "clinical": {
+        "indication": "用于冠心病、心绞痛等缺血性心脏病的辅助治疗；具体适应范围以对应批准说明书为准。",
+        "dosage": "仅限医疗机构使用。常见说明书方案为一次40～80mg、一日一次，静脉注射或静脉滴注前按说明书使用规定溶媒稀释；实际剂量、溶媒和滴速必须由医务人员核对具体产品决定。",
+        "adverseReactions": "可见注射部位疼痛、皮疹、瘙痒等；注射剂存在过敏样反应甚至严重过敏反应风险，发生胸闷、呼吸困难、血压下降等应立即停药抢救。",
+        "precautions": "给药前核对过敏史、溶媒、配伍禁忌和药液性状，输注期间严密观察。与抗凝或抗血小板药合用时注意出血风险；不得在家庭环境自行注射。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家医保局公示：丹参酮IIA磺酸钠注射液法定说明书资料",
+        "url": "https://www.nhsa.gov.cn/attach/Ypsn2026/YPSN202600227/YPSN202600227.pdf",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "丹龙口服液",
+      "genericName": "丹龙口服液",
+      "specification": "10ml×6支/盒",
+      "dosageForm": "口服液",
+      "category": "中成药",
+      "manufacturer": "浙江康恩贝集团…",
+      "clinical": {
+        "indication": "清热平喘、豁痰散瘀；用于中医热哮证，症见喘息、咳嗽、咯痰黏白或黄稠、口渴喜饮、舌红苔黄腻等。",
+        "dosage": "口服，一次10ml、一日3次，常见疗程7天；应按处方和现行说明书使用。",
+        "adverseReactions": "少数病例可见恶心、皮疹、腹泻、头晕或头痛。",
+        "precautions": "本品不推荐用于哮喘急性发作的替代救治；运动员、肝肾功能不全及过敏体质者慎用。已使用吸入或口服糖皮质激素、长效支气管扩张剂等控制药者不得自行停换药；妊娠哺乳期缺乏研究资料。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "湖南药事服务平台：丹龙口服液说明书资料",
+        "url": "https://www.hnysfww.com/goods.php?id=12658",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "丹七片",
+      "genericName": "丹七片",
+      "specification": "0.31g×48片/瓶",
+      "dosageForm": "片剂",
+      "category": "中成药",
+      "manufacturer": "天津同仁堂集团…",
+      "clinical": {
+        "indication": "活血化瘀；用于血瘀气滞所致心胸痹痛、眩晕头痛和经期腹痛等。",
+        "dosage": "口服，一次3～5片，一日3次；按医嘱和具体厂家说明书使用。",
+        "adverseReactions": "现有说明书资料记载尚不明确；用药后如出现胃肠不适、皮疹或异常出血应停药并就医。",
+        "precautions": "孕妇慎用；有出血倾向或正在使用抗凝、抗血小板药者应先咨询医生。不能以本品替代急性胸痛的紧急评估和标准治疗。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "医库：天津同仁堂丹七片说明书资料",
+        "url": "https://drugs.meditool.cn/Drugtype/druginfo?datatype=1&druginfoid=29472&msgtype=1",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "丹栀逍遥丸",
+      "genericName": "丹栀逍遥丸",
+      "specification": "6g×6袋/盒",
+      "dosageForm": "丸剂",
+      "category": "中成药",
+      "manufacturer": "吉林省天泰药业…",
+      "clinical": {
+        "indication": "舒肝解郁、清热调经；用于肝郁化火所致胸胁胀痛、烦闷急躁、颊赤口干、食欲不振或潮热，以及妇女月经先期、经行不畅、乳房与少腹胀痛。",
+        "dosage": "口服，一次6～9g，一日2次；不同丸剂规格应按包装折算。",
+        "adverseReactions": "说明书资料记载尚不明确；出现皮疹、胃肠不适或其他异常反应应停药咨询。",
+        "precautions": "孕妇慎用；服药期间少食生冷油腻，保持情绪平稳。服药一周症状未缓解或加重应就医；过敏体质及正在使用其他药物者先咨询医生或药师。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "厦门中药厂：丹栀逍遥丸说明书资料",
+        "url": "https://www.dinglu.com/produce-detail/19",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "单硝酸异山梨酯缓释胶囊",
+      "genericName": "单硝酸异山梨酯",
+      "specification": "50mg×30粒/盒",
+      "dosageForm": "缓释胶囊剂",
+      "category": "西药",
+      "manufacturer": "珠海润都制药股份…",
+      "clinical": {
+        "indication": "用于冠心病的长期治疗、心绞痛预防、心肌梗死后持续心绞痛；也可与洋地黄和/或利尿剂联合用于慢性充血性心力衰竭。",
+        "dosage": "50mg缓释胶囊通常每日早饭后服1次，整粒吞服；不得嚼碎或自行加量。",
+        "adverseReactions": "用药初期常见硝酸酯性头痛，还可见面部潮红、眩晕、直立性低血压和反射性心动过速；偶见明显低血压、心动过缓、心绞痛加重或晕厥。",
+        "precautions": "不能用于缓解急性心绞痛发作；严禁与磷酸二酯酶5抑制剂（如西地那非等）或利奥西呱合用，以免严重低血压。低血压、主动脉/二尖瓣狭窄等患者慎用；起立时动作缓慢，头晕时避免驾驶。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药品网：单硝酸异山梨酯缓释胶囊说明书",
+        "url": "https://www.yaopinnet.com/huayao/hy31168.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "当飞利肝宁胶囊",
+      "genericName": "当飞利肝宁胶囊",
+      "specification": "0.25g×36粒/盒",
+      "dosageForm": "胶囊剂",
+      "category": "中成药",
+      "manufacturer": "四川美大康药业…",
+      "clinical": {
+        "indication": "清利湿热、益肝退黄；用于湿热郁蒸所致黄疸、急性黄疸型肝炎、传染性或慢性肝炎见湿热证候者，也用于非酒精性单纯性脂肪肝湿热内蕴证。",
+        "dosage": "口服，常见说明书剂量为一次4粒、一日3次；不同适应症和疗程须按具体说明书及医嘱执行。",
+        "adverseReactions": "现有公开说明书资料记载尚不明确；如出现恶心、腹泻、皮疹或肝功能异常加重应停药并就医。",
+        "precautions": "处方药，应在医生指导下使用并监测肝功能；不能替代病毒性肝炎的规范抗病毒治疗或非酒精性脂肪肝的生活方式干预。妊娠哺乳期、儿童及合并严重肝病者使用前须咨询医生。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "四川美大康药业：当飞利肝宁胶囊产品说明书",
+        "url": "https://www.medco.com.cn/product_detail/id/5.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "地塞米松磷酸钠注射液",
+      "genericName": "地塞米松磷酸钠",
+      "specification": "1ml:5mg/支",
+      "dosageForm": "注射剂",
+      "category": "西药",
+      "manufacturer": "西南药业股份有限…",
+      "clinical": {
+        "indication": "用于过敏性与自身免疫性炎症性疾病等需要全身糖皮质激素治疗的情况，也可按不同给药途径用于部分急症；具体适应症须由医生判断。",
+        "dosage": "仅限医务人员根据病情选择静脉、肌内、关节腔或其他批准途径给药；剂量差异很大，必须核对具体厂家说明书和处方，不提供患者自行注射剂量。",
+        "adverseReactions": "短期可见血糖升高、消化道不适、情绪或睡眠改变、血压升高和感染风险增加；较大剂量或长期使用可导致库欣样改变、骨质疏松、肌病、消化性溃疡、肾上腺抑制和眼压升高等。",
+        "precautions": "用药前评估感染、消化道溃疡、糖尿病、高血压和骨质疏松风险；长期或大剂量使用后不得突然停药。活疫苗、严重感染及与其他药物配伍须由医生核对；注射后出现严重过敏应立即抢救。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国控恒兴：地塞米松磷酸钠注射液说明书资料",
+        "url": "https://www.511yaohx.com/goodsList-api/goodsList/detailGoods?goodscode=0067600",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "地衣芽孢杆菌活菌颗粒",
+      "genericName": "地衣芽孢杆菌活菌",
+      "specification": "0.5g×24袋/盒",
+      "dosageForm": "颗粒剂",
+      "category": "西药",
+      "manufacturer": "东北制药集团沈阳…",
+      "clinical": {
+        "indication": "用于细菌或真菌引起的急、慢性肠炎和腹泻，也可用于其他原因引起的肠道菌群失调防治。",
+        "dosage": "口服，成人一次1袋、儿童一次半袋，一日3次，首次可加倍；将颗粒溶于不超过40℃的水或牛奶中混匀后服用。儿童剂量应核对具体包装。",
+        "adverseReactions": "个别患者可见便秘。",
+        "precautions": "本品为活菌制剂，避免高温；不得与抗菌药同时服用，必要时通常需间隔约3小时。铋剂、鞣酸、药用炭及酊剂等可抑制或吸附活菌，合用前咨询医生或药师。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "整肠生地衣芽孢杆菌活菌颗粒说明书资料",
+        "url": "https://www.315jiage.cn/n84172",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "丁酸氢化可的松乳膏",
+      "genericName": "丁酸氢化可的松",
+      "specification": "20g/支",
+      "dosageForm": "乳膏剂",
+      "category": "西药",
+      "manufacturer": "湖南迪诺制药有限…",
+      "clinical": {
+        "indication": "用于过敏性皮炎、脂溢性皮炎、过敏性湿疹及苔藓样瘙痒症等。",
+        "dosage": "局部外用，取适量涂于患处，一日2次；不宜自行大面积或长期使用。",
+        "adverseReactions": "长期使用可引起局部皮肤萎缩、毛细血管扩张、色素沉着及继发感染，偶见过敏反应。",
+        "precautions": "感染性皮肤病禁用；不得用于破溃处，避免接触眼睛和黏膜。儿童、孕妇和哺乳期妇女应在医师指导下使用；用药部位出现烧灼、红肿或一周后未缓解应停药咨询。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国控恒兴：丁酸氢化可的松乳膏说明书",
+        "url": "https://511yaohx.com/goodsList-api/goodsList/detailGoods?goodscode=2567400",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "甲磺酸多沙唑嗪缓释片",
+      "genericName": "多沙唑嗪",
+      "specification": "4mg×10片/盒",
+      "dosageForm": "缓释片",
+      "category": "西药",
+      "manufacturer": "辉瑞制药有限公司",
+      "clinical": {
+        "indication": "用于良性前列腺增生的对症治疗，也用于高血压。",
+        "dosage": "最常用剂量为4mg、每日一次，用足量水完整吞服；不得咀嚼、掰开或碾碎，不受进食影响。剂量调整须遵医嘱。",
+        "adverseReactions": "可见头晕、头痛、乏力、嗜睡、恶心、腹痛、心悸、水肿和鼻炎等；体位性低血压较重要，少数可发生晕厥。",
+        "precautions": "开始治疗或加量时注意首剂低血压，起立动作应缓慢，出现头晕时避免驾驶。肝功能不全、与其他降压药或磷酸二酯酶5抑制剂合用者慎用；缓释片外壳随粪便排出可属正常现象。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天际健康：甲磺酸多沙唑嗪缓释片说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=7695&show_navbar=true",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "甲磺酸多沙唑嗪片",
+      "genericName": "多沙唑嗪",
+      "specification": "2mg×14片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "杭州康恩贝制药有…",
+      "clinical": {
+        "indication": "用于原发性轻、中度高血压，也用于良性前列腺增生的对症治疗。",
+        "dosage": "普通片通常从每日1mg开始，根据血压或症状逐渐调整；2mg规格不能直接作为首剂依据。具体剂量、给药时间和最大剂量须遵医嘱。",
+        "adverseReactions": "常见头晕、头痛、乏力、嗜睡、恶心和水肿；可发生体位性低血压、心悸，少数出现晕厥。",
+        "precautions": "普通片与缓释片不能按相同剂量直接替换。开始治疗、加量或停药后重新开始时防范首剂低血压；与其他降压药或治疗勃起功能障碍药合用可能加重低血压。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "悦康药业：甲磺酸多沙唑嗪片产品说明",
+        "url": "https://youcareyk.com/content/details19_1065.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "二甲双胍格列吡嗪片",
+      "genericName": "二甲双胍/格列吡嗪",
+      "specification": "250mg:2.5mg×24片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京四环科宝制药…",
+      "qualityIssue": "原始规格“252.5mg”缺少成分分隔，暂规范为250mg:2.5mg，仍须按包装和批准文号复核。",
+      "clinical": {
+        "indication": "用于成人2型糖尿病，可作为饮食和运动不能充分控制血糖时的初始治疗，或用于单用格列吡嗪/二甲双胍控制不佳者；具体适用人群按说明书判断。",
+        "dosage": "应随餐服用并从低剂量开始，根据血糖和耐受性逐步调整；不同既往治疗方案的起始剂量不同，必须由医生个体化决定，不得超过说明书规定的最大日剂量。",
+        "adverseReactions": "常见腹泻、恶心、呕吐、腹痛等胃肠道反应及低血糖；还可见头晕、皮疹和维生素B12下降，罕见但严重的不良反应为二甲双胍相关乳酸性酸中毒。",
+        "precautions": "治疗前及期间监测肾功能和血糖；严重肾功能不全、代谢性酸中毒等禁用。使用含碘造影剂、手术、严重感染、缺氧或脱水时需由医生评估暂停；规律进餐并避免大量饮酒。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园：二甲双胍格列吡嗪片说明书资料",
+        "url": "https://drugs.dxy.cn/drug/5Yzik39z2M1oIwCOsnTXxA%3D%3D",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "非布司他片",
+      "genericName": "非布司他",
+      "specification": "40mg×10片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "江苏恒瑞医药股份…",
+      "clinical": {
+        "indication": "用于痛风患者高尿酸血症的长期治疗；不推荐用于无临床症状的高尿酸血症。",
+        "dosage": "常用起始剂量为40mg、每日一次；根据血尿酸和具体说明书可由医生调整。与食物同服或空腹均可，治疗初期常需按医嘱预防痛风发作。",
+        "adverseReactions": "可见肝功能异常、恶心、腹泻、头痛、皮疹、关节痛及治疗初期痛风发作；少数可发生严重皮肤反应、严重过敏或心血管事件。",
+        "precautions": "用药前和治疗期间监测肝功能及血尿酸；治疗初期痛风发作通常不应自行停用降尿酸药。正在使用硫唑嘌呤或巯嘌呤者禁用；既往重大心血管病、重度肝肾功能不全者须由医生权衡。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "北京大学人民医院风湿免疫研究所：非布司他用药资料",
+        "url": "https://bdfs.org.cn/4/2570/18552",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "非那雄胺片",
+      "genericName": "非那雄胺",
+      "specification": "5mg×30片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "杭州康恩贝制药有…",
+      "clinical": {
+        "indication": "5mg规格用于治疗和控制良性前列腺增生，改善尿流和相关症状，并降低急性尿潴留及需要前列腺手术的风险；不能与1mg男性脱发适应症混淆。",
+        "dosage": "成人推荐一次5mg、每日一次，可与或不与食物同服；通常需持续治疗数月后评估疗效，不得自行加量。",
+        "adverseReactions": "可见性欲减退、勃起功能障碍、射精异常和精液量减少；还可出现乳房胀痛/增大、皮疹或情绪异常，少数反应停药后仍可能持续。",
+        "precautions": "妇女及儿童不适用；孕妇或可能妊娠者不得接触破碎片剂。用药可使前列腺特异抗原（PSA）下降，筛查前列腺癌时必须告知医生；出现乳房肿块、乳头溢液或明显情绪变化应就医。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "药智医院说明书库：非那雄胺片5mg",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=1179",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",

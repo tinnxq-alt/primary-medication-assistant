@@ -101,15 +101,20 @@ function cleanCatalogCandidate(candidate) {
   if (![indications, dosage, adverseReactions, precautions].every(Boolean)) return null;
   const hostname = new URL(sourceUrl).hostname.toLowerCase();
   const regulator = hostname === "nmpa.gov.cn" || hostname.endsWith(".nmpa.gov.cn") || hostname === "nhsa.gov.cn" || hostname.endsWith(".nhsa.gov.cn");
-  const medicalDatabase = hostname === "drugs.dxy.cn" || hostname.endsWith(".zy91.com");
-  const sourceQuality = regulator ? "regulator" : medicalDatabase ? "medical-database" : "manufacturer";
+  const manufacturerDomains = ["labeling.pfizer.com", "santao.com.cn", "lingrui.com", "jf-pharma.com", "e-cspc.com", "grandpharm.com", "diao.com", "sinepromod.com", "tianhengyaoye.com", "topfond.com", "huasungrp.com", "medco.com.cn", "dinglu.com", "youcareyk.com"];
+  const medicalDatabaseDomains = ["drugs.dxy.cn", "zy91.com", "yaopinnet.com", "hnysfww.com", "meditool.cn", "315jiage.cn", "511yaohx.com", "yzsbh.com"];
+  const domainMatches = domain => hostname === domain || hostname.endsWith(`.${domain}`);
+  const manufacturer = manufacturerDomains.some(domainMatches);
+  const medicalDatabase = medicalDatabaseDomains.some(domainMatches);
+  const hospital = domainMatches("bdfs.org.cn");
+  const sourceQuality = regulator ? "regulator" : manufacturer ? "manufacturer" : hospital ? "hospital" : medicalDatabase ? "medical-database" : "other";
   const drugName = chineseField(candidate.genericName || candidate.drugName, 80);
   return {
     drugName, tradeName: chineseField(candidate.tradeName, 80),
     category: categoryIdFor(candidate.category, `${candidate.drugName || ""}${drugName}`),
     indications, specification: plainField(candidate.specification), dosage,
     adverseReactions, precautions, approvalNumber: "",
-    confidence: medicalDatabase ? "medium" : "high", sourceQuality,
+    confidence: ["regulator", "manufacturer", "hospital"].includes(sourceQuality) ? "high" : "medium", sourceQuality,
     sourceTitle: chineseField(candidate.source?.label, 120) || "中文核验资料", sourceUrl,
     sourceCheckedAt: /^\d{4}-\d{2}-\d{2}$/.test(candidate.source?.checkedAt || "")
       ? candidate.source.checkedAt : new Date().toISOString().slice(0, 10),
