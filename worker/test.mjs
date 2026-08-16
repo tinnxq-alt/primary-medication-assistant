@@ -140,6 +140,18 @@ try {
   });
   assert.equal(buchangLabelSource.sourceQuality, "manufacturer");
 
+  const traditionalManufacturerSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.lys.cn/example/" }
+  });
+  assert.equal(traditionalManufacturerSource.sourceQuality, "manufacturer");
+
+  const nationalMedicalDataSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://pharm.ncmi.cn/example/" }
+  });
+  assert.equal(nationalMedicalDataSource.sourceQuality, "medical-database");
+
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
