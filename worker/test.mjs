@@ -9,11 +9,15 @@ const AI = {
     aiCalls += 1;
     assert.equal(model, "@cf/meta/llama-3.1-8b-instruct-fast");
     assert.equal(input.response_format.type, "json_schema");
+    assert.deepEqual(
+      [...input.response_format.json_schema.required].sort(),
+      ["drugName", "tradeName", "category", "indications", "specification", "dosage", "adverseReactions", "precautions"].sort()
+    );
+    assert.ok(input.response_format.json_schema.properties.category.enum.includes("降压药"));
     assert.match(input.messages[0].content, /核验|草稿/);
     return { response: {
-      drugName: "测试胶囊", genericName: "测试成分", tradeName: "", specification: "10mg",
-      dosageForm: "胶囊剂", category: "西药", manufacturer: "测试制药企业",
-      indication: "用于说明书所列适应症的资料录入草稿。",
+      drugName: "测试成分胶囊", tradeName: "", category: "神经精神",
+      indications: "用于说明书所列适应症的资料录入草稿。", specification: "10mg*20粒",
       dosage: "具体用法用量应以对应品种现行说明书为准。",
       adverseReactions: "可能出现胃肠道不适等不良反应。",
       precautions: "使用前应阅读对应品种现行说明书并注意禁忌事项。"
@@ -62,7 +66,10 @@ try {
   let payload = await response.json();
   assert.equal(payload.mode, "free-verified");
   assert.equal(payload.candidates.length, 1);
-  assert.equal(payload.candidates[0].clinical.precautions, "");
+  assert.equal(payload.candidates[0].precautions, "");
+  assert.equal(payload.candidates[0].drugName, "阿司匹林");
+  assert.equal(payload.candidates[0].category, "抗凝抗血小板");
+  assert.match(payload.candidates[0].indications, /抗血小板/);
   assert.equal(payload.candidates[0].sourceQuality, "regulator");
   assert.equal(payload.candidates[0].verified, true);
   assert.equal(payload.candidates[0].editable, true);
@@ -71,7 +78,7 @@ try {
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
-    body: JSON.stringify({ query: "测试胶囊", directoryHint: { drugName: "测试胶囊", specification: "20mg", manufacturer: "目录厂家", ignored: "不要传入" } })
+    body: JSON.stringify({ query: "测试胶囊", directoryHint: { drugName: "测试成分胶囊", specification: "20mg*10粒", category: "神经精神", ignored: "不要传入" } })
   }), baseEnv);
   assert.equal(response.status, 200);
   payload = await response.json();
@@ -80,9 +87,13 @@ try {
   assert.equal(payload.candidates[0].draft, true);
   assert.equal(payload.candidates[0].verified, false);
   assert.equal(payload.candidates[0].editable, true);
-  assert.equal(payload.candidates[0].specification, "20mg", "目录字段应覆盖模型猜测");
-  assert.equal(payload.candidates[0].manufacturer, "目录厂家");
-  assert.match(payload.candidates[0].clinical.indication, /用于/);
+  assert.equal(payload.candidates[0].specification, "20mg*10粒", "目录字段应覆盖模型猜测");
+  assert.equal(payload.candidates[0].category, "神经精神");
+  assert.match(payload.candidates[0].indications, /用于/);
+  assert.deepEqual(
+    Object.keys(payload.candidates[0]).filter(key => ["drugName", "tradeName", "category", "indications", "specification", "dosage", "adverseReactions", "precautions"].includes(key)).sort(),
+    ["adverseReactions", "category", "dosage", "drugName", "indications", "precautions", "specification", "tradeName"].sort()
+  );
   assert.equal(payload.candidates[0].sourceUrl, "");
   assert.equal(aiCalls, 1);
   assert.equal(payload.verificationLinks.length, 3);
