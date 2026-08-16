@@ -56,6 +56,346 @@
       }
     },
     {
+      "drugName": "阿普唑仑片",
+      "genericName": "阿普唑仑",
+      "specification": "0.4mg×14片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海上药信谊药厂…",
+      "clinical": {
+        "indication": "主要用于焦虑、紧张和激动，也可用于催眠、抗惊恐及缓解急性酒精戒断症状；抑郁患者使用须由医生评估。",
+        "dosage": "成人抗焦虑通常从一次0.4mg、一日3次开始，按反应调整，一日最大4mg；镇静催眠一次0.4～0.8mg睡前服；抗惊恐剂量须个体化，须遵医嘱。",
+        "adverseReactions": "常见嗜睡、头昏、乏力；大剂量可见共济失调、震颤，少见皮疹、光敏和白细胞减少；长期使用可产生依赖，停药可出现戒断反应。",
+        "precautions": "按最低有效剂量短期使用，长期或较大剂量用药不得突然停药。避免饮酒及与其他中枢抑制药自行合用；服药后不得驾驶或从事危险作业。呼吸功能不全、重症肌无力、青光眼及肝肾功能损害患者慎用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "天方药业：阿普唑仑片说明书资料",
+        "url": "https://www.topfond.com/product/46.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "阿奇霉素片",
+      "genericName": "阿奇霉素",
+      "specification": "0.25g×6片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "浙江华润三九众益…",
+      "clinical": {
+        "indication": "用于敏感菌所致的呼吸道、耳鼻喉、皮肤软组织感染，以及沙眼衣原体等所致的部分泌尿生殖道感染；仅用于明确或高度怀疑的细菌感染。",
+        "dosage": "口服方案随感染类型而异。成人常见方案为总剂量1.5g，可每日0.5g连用3日，或首日0.5g、随后每日0.25g至第5日；部分泌尿生殖道感染可单次1g。具体疗程须按现行说明书和医嘱。",
+        "adverseReactions": "常见腹泻、恶心、腹痛和呕吐；可见头痛及肝酶升高。少见但严重者包括过敏反应、严重皮肤反应、肝损伤、QT间期延长和艰难梭菌相关性腹泻。",
+        "precautions": "应按感染部位、病原体和当地耐药情况选择方案并完成疗程。既往大环内酯类过敏、QT延长或心律失常风险、重度肝功能损害患者须谨慎；不得与含铝镁抗酸剂同时服用。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "辉瑞：阿奇霉素片中文说明书（2026版）",
+        "url": "https://labeling.pfizer.com/ShowLabeling.aspx?id=14475",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "阿托伐他汀钙片",
+      "genericName": "阿托伐他汀钙",
+      "specification": "20mg×14片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "齐鲁制药(海南)…",
+      "clinical": {
+        "indication": "用于原发性高胆固醇血症、家族性高胆固醇血症或混合型血脂异常；也用于合适患者降低动脉粥样硬化性心血管事件风险。",
+        "dosage": "治疗前及治疗期间配合低胆固醇饮食。常用起始剂量10mg每日一次，按低密度脂蛋白目标及疗效个体化调整，调整间隔通常不少于4周，最大80mg每日一次，可在一天内任意时间服用。",
+        "adverseReactions": "可见肌痛、关节痛、胃肠道不适及肝酶升高；少见肌病、横纹肌溶解和严重肝损伤。",
+        "precautions": "活动性肝病、原因不明的持续转氨酶升高及妊娠期禁用。出现不明原因的肌痛、肌无力、深色尿或肝损伤症状应及时就医；与强CYP3A4抑制剂等合用需核对相互作用。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "恒瑞制药：阿托伐他汀钙片说明书",
+        "url": "https://www.santao.com.cn/index.php?a=show&c=index&catid=20&id=95&m=content",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "阿昔洛韦乳膏",
+      "genericName": "阿昔洛韦",
+      "specification": "15g/支",
+      "dosageForm": "乳膏剂",
+      "category": "西药",
+      "manufacturer": "福元药业股份有限…",
+      "clinical": {
+        "indication": "用于单纯疱疹或带状疱疹感染的局部治疗。",
+        "dosage": "局部外用，取适量涂于患处；成人和儿童通常白天每2小时1次，一日4～6次，共7日。",
+        "adverseReactions": "可见局部轻度疼痛、灼痛、刺痛、瘙痒及皮疹。",
+        "precautions": "仅用于皮肤黏膜，不用于眼部；涂药时宜戴指套或手套。使用7日症状未缓解应就医；出现明显烧灼、红肿或过敏反应时停药并洗净。孕妇及哺乳期妇女慎用。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "河南羚锐：阿昔洛韦乳膏现行说明书",
+        "url": "https://www.lingrui.com/productview.aspx?id=153",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "艾地骨化醇软胶囊",
+      "genericName": "艾地骨化醇",
+      "specification": "0.75μg×30粒/盒",
+      "dosageForm": "软胶囊剂",
+      "category": "西药",
+      "manufacturer": "大连美创药业有限…",
+      "clinical": {
+        "indication": "用于治疗绝经后女性骨质疏松症。",
+        "dosage": "成人通常口服0.75μg，每日一次；可根据症状减量至0.5μg，每日一次。",
+        "adverseReactions": "主要风险为血钙升高和尿钙升高；可出现肾功能异常、尿路结石及胃肠道不适。",
+        "precautions": "治疗期间应定期监测血钙、尿钙及肾功能，出现高钙血症应停药并处理。与维生素D及其衍生物、钙剂合用时须防止高钙血症；妊娠或可能妊娠者应核对现行说明书。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "珠海健福制药：艾地骨化醇软胶囊产品说明书资料",
+        "url": "https://www.jf-pharma.com/product_center/%E8%89%BE%E5%9C%B0%E9%AA%A8%E5%8C%96%E9%86%87%E8%BD%AF%E8%83%B6%E5%9B%8A/",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "艾司奥美拉唑镁肠溶干混悬剂",
+      "genericName": "艾司奥美拉唑镁",
+      "specification": "20mg×14袋/盒",
+      "dosageForm": "干混悬剂",
+      "category": "西药",
+      "manufacturer": "北京福元医药股份…",
+      "clinical": {
+        "indication": "用于胃食管反流病；与适当抗菌药联合根除幽门螺杆菌并治疗、预防相关消化性溃疡；也用于需要持续NSAID治疗患者的相关胃溃疡。",
+        "dosage": "反流性食管炎通常40mg每日一次4周，必要时再治疗4周；维持或无食管炎的症状控制通常20mg每日一次。根除幽门螺杆菌时按联合方案使用；NSAID相关胃溃疡通常20mg每日一次4～8周。每袋加入约15ml水，搅拌后等待2～3分钟变稠并在30分钟内服用。",
+        "adverseReactions": "常见头痛、腹痛、腹泻、便秘、腹胀、恶心或呕吐；长期用药可发生低镁血症、维生素B12缺乏、骨折风险增加及感染风险变化。",
+        "precautions": "存在报警症状或疑似恶性病变时应先评估。长期治疗需定期复核必要性，并关注低镁、肾损伤、艰难梭菌感染及与氯吡格雷等药物的相互作用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家医保局公示：艾司奥美拉唑镁肠溶干混悬剂说明书信息",
+        "url": "https://www.nhsa.gov.cn/attach/Ypsn2023/YPSW202300080/YPSW202300080-W1.pdf",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "艾司唑仑片",
+      "genericName": "艾司唑仑",
+      "specification": "1mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海上药信谊药厂…",
+      "clinical": {
+        "indication": "主要用于抗焦虑、失眠，也用于紧张、恐惧以及抗癫痫、抗惊厥。",
+        "dosage": "成人催眠通常1～2mg睡前服；镇静一次1～2mg、一日3次；抗癫痫或抗惊厥一次2～4mg、一日3次。应从最低有效剂量开始并遵医嘱。",
+        "adverseReactions": "可见嗜睡、头晕、乏力、口干、共济失调和记忆受损；长期使用可产生耐受、依赖及停药反应，过量或与其他中枢抑制药同用可致呼吸抑制。",
+        "precautions": "属于第二类精神药品，应严格按处方短期使用，不得突然停药。避免饮酒及与阿片类等中枢抑制药自行合用；服药后不得驾驶或操作机械。呼吸功能不全、重症肌无力和肝肾功能损害者慎用。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "石药集团：艾司唑仑片产品资料（国药准字H13020974）",
+        "url": "https://www.e-cspc.com/details/details_189_2574.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "舒乐安定",
+      "genericName": "艾司唑仑",
+      "specification": "1mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "上海上药信谊药厂…",
+      "clinical": {
+        "indication": "“舒乐安定”为艾司唑仑片的旧称，主要用于抗焦虑、失眠，也用于紧张、恐惧以及抗癫痫、抗惊厥。",
+        "dosage": "成人催眠通常1～2mg睡前服；镇静一次1～2mg、一日3次；抗癫痫或抗惊厥一次2～4mg、一日3次。应从最低有效剂量开始并遵医嘱。",
+        "adverseReactions": "可见嗜睡、头晕、乏力、口干、共济失调和记忆受损；长期使用可产生耐受、依赖及停药反应，过量或与其他中枢抑制药同用可致呼吸抑制。",
+        "precautions": "属于第二类精神药品，应严格按处方短期使用，不得突然停药。避免饮酒及与阿片类等中枢抑制药自行合用；服药后不得驾驶或操作机械。详情以艾司唑仑片现行说明书为准。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "石药集团：艾司唑仑片产品资料（旧称映射核验）",
+        "url": "https://www.e-cspc.com/details/details_189_2574.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "爱维心口服液",
+      "genericName": "爱维心口服液",
+      "specification": "10ml×4支/盒",
+      "dosageForm": "口服液",
+      "category": "中成药",
+      "manufacturer": "哈尔滨美君制药…",
+      "clinical": {
+        "indication": "通络行血、强心醒脑，用于心胸疼痛、心悸心慌、失眠健忘、心律不齐及神经衰弱等。",
+        "dosage": "口服，一次10ml，一日2次；具体疗程遵医嘱。",
+        "adverseReactions": "现有公开说明书标示尚不明确。",
+        "precautions": "孕妇及运动员慎用；用前摇匀。出现不适应停药并咨询医生；与其他药物合用前应核对具体厂家现行说明书。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "丁香园用药助手：哈尔滨美君爱维心口服液说明书",
+        "url": "https://drugs.dxy.cn/drug/G65IA0z0Tbt8RRGSHHH3PQ%3D%3D",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "桉柠蒎肠溶胶囊",
+      "genericName": "桉柠蒎",
+      "specification": "0.3g×36粒/盒",
+      "dosageForm": "软胶囊剂",
+      "category": "西药",
+      "manufacturer": "北京九和药业有限…",
+      "clinical": {
+        "indication": "用于急、慢性鼻窦炎，以及急慢性支气管炎、肺炎、支气管扩张、慢阻肺等伴黏稠分泌物的呼吸道疾病；也可用于支气管造影术后促进造影剂排出。",
+        "dosage": "口服。成人急性患者一次0.3g、一日3～4次；慢性患者一次0.3g、一日2次。宜餐前半小时用凉开水整粒送服，不得用热开水，不可打开或嚼破。",
+        "adverseReactions": "可见胃肠道不适、恶心、腹泻及味觉异常；少数患者可出现过敏反应。",
+        "precautions": "肠溶胶囊须整粒吞服。对成分过敏者禁用；孕妇、哺乳期妇女及儿童须按具体规格说明书使用。出现呼吸困难、皮疹等过敏表现应停药就医。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "远大医药：桉柠蒎肠溶胶囊（切诺）说明书",
+        "url": "https://www.grandpharm.com/product/%E6%A1%89%E6%9F%A0%E8%92%8E%E8%82%A0%E6%BA%B6%E8%83%B6%E5%9B%8A%E5%88%87%E8%AF%BA/",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "氨氯地平贝那普利片(II)",
+      "genericName": "氨氯地平/贝那普利",
+      "specification": "5mg:10mg（包装待核验）",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "成都地奥制药集团…",
+      "clinical": {
+        "indication": "用于单用氨氯地平或贝那普利不能充分控制的高血压患者，不作为未经评估的初始治疗。",
+        "dosage": "通常一次1片、每日一次；应根据既往单药剂量、血压反应及耐受性个体化调整。",
+        "adverseReactions": "较常见头痛、外周水肿、疲劳、头晕和咳嗽；可发生低血压、肾功能恶化及高钾血症，少见但严重者包括血管性水肿。",
+        "precautions": "妊娠期禁用。开始或调整治疗后监测血压、血钾及肾功能；既往ACE抑制剂相关血管性水肿、双侧肾动脉狭窄或明显容量不足者须特别评估。出现面唇舌咽肿胀应立即停药急诊处理。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "成都地奥：氨氯地平贝那普利片(II)说明书",
+        "url": "https://www.diao.com/productinfo.aspx?NId=62&NodeID=285",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "奥美沙坦酯片",
+      "genericName": "奥美沙坦酯",
+      "specification": "20mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "北京福元医药股份…",
+      "clinical": {
+        "indication": "用于高血压治疗，可单独使用或与其他降压药联合使用。",
+        "dosage": "剂量个体化。血容量正常的成人通常起始20mg每日一次；治疗约2周仍需进一步降压时可增至40mg每日一次。",
+        "adverseReactions": "可见头晕、头痛、乏力及胃肠道不适；可发生高钾血症、肾功能恶化，少见严重慢性腹泻和体重下降的类乳糜泻性肠病。",
+        "precautions": "妊娠期禁用。容量或钠不足患者可能发生症状性低血压；开始或加量后监测血压、肾功能和血钾。肾动脉狭窄、严重肾功能或肝功能损害者慎用。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "上海现代制药：奥美沙坦酯片说明书",
+        "url": "https://www.sinepromod.com/page1000012?brd=1&product_id=67",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "克罗米通乳膏",
+      "genericName": "克罗米通",
+      "specification": "10g/支",
+      "dosageForm": "乳膏剂",
+      "category": "西药",
+      "manufacturer": "待核验",
+      "clinical": {
+        "indication": "用于治疗疥疮及皮肤瘙痒。",
+        "dosage": "疥疮：洗澡擦干后从颈以下涂搽全身，重点涂皱褶、指趾间、腋下和腹股沟，24小时后再涂1次，之后按说明书洗去并更换衣物和床单，必要时1周后重复。止痒：局部涂患处，每日3次。",
+        "adverseReactions": "可引起接触性皮炎，偶见过敏反应。",
+        "precautions": "急性渗出性皮肤病禁用；婴幼儿慎用。避免接触眼睛和口鼻等黏膜；出现烧灼、红肿或过敏反应应停药、洗净并咨询医生。共同生活的疥疮患者通常需同时治疗并处理衣物寝具。"
+      },
+      "source": {
+        "status": "verified-template",
+        "label": "国家药监局：克罗米通乳膏说明书范本",
+        "url": "https://www.nmpa.gov.cn/wwwroot/otc2h/x136.htm",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "胞磷胆碱钠片",
+      "genericName": "胞磷胆碱钠",
+      "specification": "100mg×24片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "华润双鹤利民药业…",
+      "clinical": {
+        "indication": "用于治疗颅脑损伤或脑血管意外所致神经系统后遗症。",
+        "dosage": "口服，一次0.2g，一日3次，温开水送服。",
+        "adverseReactions": "偶见轻微、短暂的胃肠道反应。",
+        "precautions": "对本品任何成分过敏者禁用；不可与含氯酯醒的药物合用。孕妇、哺乳期妇女及儿童的使用资料有限，应遵医嘱。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "浙江大学医学院附属邵逸夫医院说明书库：胞磷胆碱钠片",
+        "url": "https://swin.zy91.com/pages/m-instruction/m.instruction.html?hospitalCode=1&webHisId=39362",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "苯磺酸氨氯地平片",
+      "genericName": "苯磺酸氨氯地平",
+      "specification": "5mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "浙江京新药业股份…",
+      "clinical": {
+        "indication": "用于高血压，可单独或与其他降压药合用；用于慢性稳定性心绞痛和血管痉挛性心绞痛的对症治疗。",
+        "dosage": "成人治疗高血压通常起始5mg每日一次，最大10mg每日一次；体弱、老年或肝功能不全患者可从2.5mg每日一次开始。心绞痛常用5～10mg每日一次。",
+        "adverseReactions": "最常见头痛和外周水肿；可见头晕、潮红、心悸、疲劳、恶心、腹痛和嗜睡。",
+        "precautions": "严重主动脉狭窄者注意症状性低血压；严重冠状动脉阻塞患者开始或加量时极少出现心绞痛加重或心肌梗死。肝功能损害患者应从较低剂量开始并缓慢调整。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "恒瑞制药：苯磺酸氨氯地平片说明书",
+        "url": "https://www.santao.com.cn/index.php?a=show&c=index&catid=13&id=79&m=content",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "苯磺酸左氨氯地平片",
+      "genericName": "苯磺酸左氨氯地平",
+      "specification": "2.5mg×28片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "南昌弘益药业有限…",
+      "clinical": {
+        "indication": "用于高血压，可单独或与其他降压药合用；用于慢性稳定性心绞痛和血管痉挛性心绞痛的对症治疗。",
+        "dosage": "成人治疗高血压通常起始2.5mg每日一次，最大5mg每日一次；体弱、老年或肝功能不全患者可从1.25mg每日一次开始。心绞痛常用2.5～5mg每日一次。",
+        "adverseReactions": "常见或剂量相关反应包括外周水肿、头晕、潮红和心悸；还可见疲劳、恶心、腹痛、头痛及嗜睡。",
+        "precautions": "严重主动脉狭窄者注意症状性低血压；严重冠状动脉阻塞患者开始或加量时极少出现心绞痛加重或心肌梗死。肝功能损害患者应从低剂量开始并缓慢调整。"
+      },
+      "source": {
+        "status": "verified-label",
+        "label": "吉林天衡药业：苯磺酸左氨氯地平片说明书",
+        "url": "https://www.tianhengyaoye.com/products_detail/16.html",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
+      "drugName": "苯甲酸福格列汀片",
+      "genericName": "苯甲酸福格列汀",
+      "specification": "12mg×14片/盒",
+      "dosageForm": "片剂",
+      "category": "西药",
+      "manufacturer": "深圳信立泰药业…",
+      "clinical": {
+        "indication": "配合饮食和运动，用于改善成人2型糖尿病患者的血糖控制；可单药治疗，或在二甲双胍单药控制不佳时与二甲双胍联合。不得用于1型糖尿病或糖尿病酮症酸中毒。",
+        "dosage": "单药或与二甲双胍联合的推荐剂量为12mg每日一次，可与食物同服或分开服用。轻度肾功能不全通常无需调整，中度肾功能不全需按现行说明书减量。",
+        "adverseReactions": "临床试验中发生率不低于1%且高于安慰剂的反应包括脂肪酶升高、尿潜血阳性和尿红细胞阳性；单药及联合二甲双胍治疗时均可发生低血糖，但试验中发生率较低。",
+        "precautions": "使用前及治疗期间评估肾功能并按肾功能调整剂量。联合其他可致低血糖的药物时加强监测；出现持续剧烈腹痛、严重过敏反应或其他异常应停药就医，并核对现行说明书。"
+      },
+      "source": {
+        "status": "verified-monograph",
+        "label": "国家医保局公示：苯甲酸福格列汀片说明书及安全性资料",
+        "url": "https://www.nhsa.gov.cn/attach/Ypsn2024/YPSW202400275/YPSW202400275%28PPT%29.pdf",
+        "checkedAt": "2026-08-16"
+      }
+    },
+    {
       "drugName": "莫匹罗星软膏",
       "genericName": "莫匹罗星",
       "specification": "10g/支",
@@ -135,4 +475,3 @@
     }
   ]
 }
-

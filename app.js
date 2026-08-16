@@ -3,6 +3,7 @@
 
   const STORAGE_PREFIX = "primary-medication-pro:v1:";
   const DEFAULT_SMART_SEARCH_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
+  const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph"]);
   const app = document.getElementById("app");
   const pageTitle = document.getElementById("pageTitle");
   const backBtn = document.getElementById("backBtn");
@@ -111,6 +112,22 @@
   const allDrugs = () => catalogDrugs()
     .filter(drug => !state.hidden.includes(drug.id))
     .map(applyLocalOverrides);
+
+  async function hydrateVerifiedCatalog() {
+    const response = await fetch("./chinese-drug-labels.json?v=2", { cache: "no-store", headers: { Accept: "application/json" } });
+    if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
+    const payload = await response.json();
+    if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
+    for (const entry of payload.drugs) {
+      if (!entry?.drugName || !entry.clinical || !entry.source?.status) continue;
+      const target = window.DRUG_CATALOG.find(drug => drug.drugName === entry.drugName && (!entry.specification || drug.specification === entry.specification))
+        || window.DRUG_CATALOG.find(drug => drug.drugName === entry.drugName);
+      if (!target) continue;
+      target.clinical = { ...entry.clinical, source: { ...entry.source } };
+      target.source = { ...entry.source };
+      if (entry.qualityIssue) target.qualityIssue = entry.qualityIssue;
+    }
+  }
   const drugById = id => {
     const drug = catalogDrugs().find(item => item.id === id);
     return drug ? applyLocalOverrides(drug) : drug;
@@ -129,6 +146,8 @@
 
   function statusBadge(drug) {
     const status = drug.source?.status;
+    if (status === "verified-label") return '<span class="badge ok">✓ 说明书已核验</span>';
+    if (status === "verified-monograph") return '<span class="badge ok">✓ 通用资料已核验</span>';
     if (status === "verified-template") return '<span class="badge ok">✓ 范本已核验</span>';
     if (status === "blocked") return '<span class="badge blocked">⛔ 数据锁定</span>';
     if (status === "unverified-draft") return '<span class="badge warn">△ 未核验草稿</span>';
@@ -136,6 +155,8 @@
     if (drug.isCustom) return '<span class="badge info">自定义</span>';
     return '<span class="badge info">仅目录</span>';
   }
+
+  function isVerifiedSource(status) { return VERIFIED_SOURCE_STATUSES.has(status); }
 
   function drugCard(drug, options = {}) {
     const selectable = Boolean(options.selectable);
@@ -199,7 +220,7 @@
 
   function renderHome() {
     const drugs = allDrugs();
-    const verified = drugs.filter(d => d.source?.status === "verified-template").length;
+    const verified = drugs.filter(d => isVerifiedSource(d.source?.status)).length;
     const needsReview = drugs.filter(d => ["needs-review", "blocked"].includes(d.source?.status)).length;
     const recent = drugs.slice(0, 5);
     app.innerHTML = `
@@ -212,7 +233,7 @@
         </label>
         <div class="stat-grid">
           <div class="stat"><strong>${drugs.length}</strong><span>内置/自定义</span></div>
-          <div class="stat"><strong>${verified}</strong><span>范本已核验</span></div>
+          <div class="stat"><strong>${verified}</strong><span>资料已核验</span></div>
           <div class="stat"><strong>${needsReview}</strong><span>需优先复核</span></div>
         </div>
       </section>
@@ -283,7 +304,7 @@
     sessionStorage.removeItem("drug-search-query");
     app.innerHTML = `
       <section class="section">
-        <div class="toolbar"><input id="searchInput" value="${esc(initialQuery)}" placeholder="输入药品名、通用名、规格或厂家"><select id="statusFilter"><option value="">全部数据状态</option><option value="verified-template">范本已核验</option><option value="needs-review">待复核</option><option value="blocked">数据锁定</option><option value="inventory-only">仅目录</option></select></div>
+        <div class="toolbar"><input id="searchInput" value="${esc(initialQuery)}" placeholder="输入药品名、通用名、规格或厂家"><select id="statusFilter"><option value="">全部数据状态</option><option value="verified">全部已核验</option><option value="verified-label">说明书已核验</option><option value="verified-monograph">通用资料已核验</option><option value="verified-template">范本已核验</option><option value="needs-review">待复核</option><option value="blocked">数据锁定</option><option value="inventory-only">仅目录</option></select></div>
         <p id="resultCount" class="muted"></p>
         <div id="searchResults" class="card-list"></div>
       </section>`;
@@ -294,7 +315,8 @@
       const status = filter.value;
       const results = allDrugs().filter(drug => {
         const haystack = normalize([drug.drugName, drug.rawName, drug.genericName, drug.tradeName, drug.specification, drug.manufacturer].join(" "));
-        return (!q || haystack.includes(q)) && (!status || drug.source?.status === status);
+        const statusMatch = !status || (status === "verified" ? isVerifiedSource(drug.source?.status) : drug.source?.status === status);
+        return (!q || haystack.includes(q)) && statusMatch;
       });
       document.getElementById("resultCount").textContent = `找到 ${results.length} 个品规`;
       document.getElementById("searchResults").innerHTML = results.length ? results.map(drugCard).join("") : empty("没有匹配结果，请检查名称或添加自定义药品。", '<button class="btn primary" data-route-link="add">添加药品</button>');
@@ -345,7 +367,7 @@
         <div class="source-box">
           <strong>来源：</strong>${esc(drug.source?.label || "未记录")}<br>
           ${sourceUrl ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener">打开来源页面</a><br>` : ""}
-          核验日期：${esc(drug.source?.checkedAt || "未核验")}。品种说明书范本不能替代具体厂家、批准文号对应的现行说明书。
+          核验日期：${esc(drug.source?.checkedAt || "未核验")}。通用资料不能替代具体厂家、批准文号对应的现行说明书。
         </div>
         <div class="toolbar" style="margin-top:16px">
           <button class="btn ${isCached(id) ? "ghost" : "secondary"}" data-cache="${esc(id)}">${isCached(id) ? "移出缓存" : "缓存此药"}</button>
@@ -603,7 +625,7 @@
 
   function localLookupCandidates(query) {
     const q = normalize(query);
-    return window.DRUG_CATALOG.filter(drug => drug.clinical && drug.source?.url && normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q)).slice(0, 8).map(drug => ({
+    return window.DRUG_CATALOG.filter(drug => isVerifiedSource(drug.source?.status) && drug.clinical && drug.source?.url && normalize(`${drug.drugName}${drug.genericName}${drug.tradeName}`).includes(q)).slice(0, 8).map(drug => ({
       drugName: drug.genericName || drug.drugName, genericName: drug.genericName || drug.drugName, tradeName: drug.tradeName || "", specification: drug.specification,
       category: normalizeDrugCategory(drug.category, drug.drugName),
       clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验范本）` }
@@ -611,12 +633,14 @@
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=1", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=2", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
     const q = normalize(query);
-    return payload.drugs.filter(candidate => normalize(`${candidate.drugName}${candidate.genericName}`).includes(q))
+    return payload.drugs
+      .filter(candidate => isVerifiedSource(candidate.source?.status))
+      .filter(candidate => normalize(`${candidate.drugName}${candidate.genericName}`).includes(q))
       .map(candidate => ({
         drugName: candidate.genericName || candidate.drugName, genericName: candidate.genericName || candidate.drugName,
         tradeName: candidate.tradeName || "", specification: candidate.specification || "",
@@ -735,7 +759,7 @@
   }
 
   function renderFlashcards() {
-    const candidates = allDrugs().filter(d => d.clinical && d.source?.status === "verified-template");
+    const candidates = allDrugs().filter(d => d.clinical && isVerifiedSource(d.source?.status));
     if (!candidates.length) {
       app.innerHTML = empty("暂无已核验临床字段可用于闪卡。完成说明书核验后会自动加入。", '<button class="btn primary" data-route-link="all">查看目录</button>');
       return;
@@ -852,7 +876,7 @@
       document.getElementById("cacheList").innerHTML = cached.length ? cached.map(cacheCard).join("") : empty("尚未缓存药品。");
     };
     document.getElementById("cacheVerified").onclick = () => {
-      state.cached = [...new Set([...state.cached, ...allDrugs().filter(d => d.source?.status === "verified-template").map(d => d.id)])];
+      state.cached = [...new Set([...state.cached, ...allDrugs().filter(d => isVerifiedSource(d.source?.status)).map(d => d.id)])];
       saveState("cached"); toast("已缓存核验条目"); renderCache();
     };
     document.getElementById("cacheBatchMode").onclick = () => {
@@ -1392,6 +1416,10 @@
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));
   }
-  if (!location.hash) navigate("home", "", true);
-  render();
+  hydrateVerifiedCatalog()
+    .catch(error => console.error("中文核验库加载失败", error))
+    .finally(() => {
+      if (!location.hash) navigate("home", "", true);
+      render();
+    });
 })();
