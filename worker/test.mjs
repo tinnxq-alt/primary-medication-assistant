@@ -146,6 +146,18 @@ try {
   });
   assert.equal(traditionalManufacturerSource.sourceQuality, "manufacturer");
 
+  const exactLabelManufacturerSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.xian-janssen.com.cn/example.pdf" }
+  });
+  assert.equal(exactLabelManufacturerSource.sourceQuality, "manufacturer");
+
+  const regulatorStatusSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, status: "verified-regulator", url: "https://www.nhsa.gov.cn/example.pdf" }
+  });
+  assert.equal(regulatorStatusSource.sourceQuality, "regulator");
+
   const nationalMedicalDataSource = cleanCatalogCandidate({
     ...catalog.drugs[0],
     source: { ...catalog.drugs[0].source, url: "https://pharm.ncmi.cn/example/" }
