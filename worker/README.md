@@ -1,47 +1,41 @@
-# 智能全网检索 Worker
+# 免费中文核验 Worker
 
-此 Cloudflare Worker 在服务器端调用 OpenAI Responses API 的 `web_search`，避免把 API 密钥暴露在 GitHub Pages 前端。它只向指定网页来源开放，限制每个 IP 每分钟 5 次请求，并过滤没有本次检索来源或不含中文临床内容的候选。
+此 Cloudflare Worker 运行在 Workers Free 计划，不调用 OpenAI 或其他收费 API，也不需要 API 密钥。
 
-## 首次部署
+输入中文药名后，服务会：
 
-需要先安装 Node.js 20 或更高版本，然后在本目录执行：
+- 从项目维护的 `chinese-drug-labels.json` 中查找带明确中文来源的已核验资料；
+- 返回国家药监局查询、国家药监局站内搜索和全网中文搜索入口；
+- 仅允许网站域名和本地开发地址跨域调用；
+- 把所有导入内容继续标记为“待复核”。
 
-```bash
-npm install
-npx wrangler login
-npx wrangler secret put OPENAI_API_KEY
-npm run deploy
-```
+免费模式不会抓取、拼接或猜测任意网页中的适应症、剂量、不良反应和注意事项。项目核验库没有记录时，用户必须打开来源链接并人工录入。这样可避免收费，也避免把搜索摘要误当成现行说明书。
 
-输入密钥时只在 Wrangler 的安全提示中粘贴，不要把密钥写进聊天、网页、代码、`.env` 或 GitHub 仓库。
+## GitHub Actions 自动部署
 
-部署成功后复制终端显示的 `https://…workers.dev` 地址。在网站打开“缓存管理” → “智能检索服务”，粘贴地址，依次点击“保存地址”和“测试连接”。连接成功后，在“添加药物”页输入中文药名并点击“智能检索”。
+仓库只需要两个 GitHub Actions secrets：
 
-## 手机端通过 Cloudflare 控制台部署
+- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_ACCOUNT_ID`
 
-没有电脑终端时，可让 Cloudflare 直接从 GitHub 自动部署：
+合并包含 `.github/workflows/deploy-worker.yml` 的 Pull Request 后，只要 `worker/` 发生修改，GitHub Actions 就会检查并部署 Worker。无需创建 `OPENAI_API_KEY`。
 
-1. 在 Cloudflare 控制台进入 **Workers & Pages**，创建一个 Hello World Worker，名称必须是 `primary-medication-smart-search`，先完成首次部署。
-2. 打开该 Worker 的 **Settings → Variables and Secrets → Add**，类型选择 **Secret**，名称填写 `OPENAI_API_KEY`，在 Cloudflare 官方输入框中填写密钥并部署。不要把密钥发送到聊天。
-3. 打开 **Settings → Builds → Connect**，连接 GitHub 仓库 `tinnxq-alt/primary-medication-assistant`。
-4. 生产分支选择 `main`，Root directory 填写 `/worker`，Build command 留空，Deploy command 使用 `npm run deploy`。
-5. 保存后触发构建。部署成功时复制该 Worker 的 `workers.dev` 地址，回到网站“缓存管理 → 智能检索服务”保存并测试。
-
-以后 `main` 分支中的 `worker/` 发生修改时，Cloudflare 会自动重新构建并部署。
+部署成功后复制 `https://primary-medication-smart-search.你的账号.workers.dev` 地址，打开网站“缓存管理” → “免费中文检索服务”，粘贴地址，依次点击“保存地址”和“测试连接”。
 
 ## 本地检查
 
 ```bash
+npm ci
 npm run check
 npm test
 npm run dev
 ```
 
-本地网站默认可从 `http://localhost:8000` 或 `http://127.0.0.1:8000` 调用 Worker。生产环境默认只允许 `https://tinnxq-alt.github.io`；如更换 Pages 域名，请同步修改 `wrangler.jsonc` 的 `ALLOWED_ORIGINS` 后重新部署。
+生产环境默认只允许 `https://tinnxq-alt.github.io`；如更换 Pages 域名，请同步修改 `wrangler.jsonc` 的 `ALLOWED_ORIGINS`。
 
-## 安全规则
+## 安全边界
 
-- 检索结果永远是“待复核”候选，必须逐项核对批准文号、规格、厂家和具体厂家现行说明书。
-- Worker 要求模型实际调用全网搜索，并优先药监部门、生产企业和医疗机构中文来源。
-- 无法与本次搜索来源对应的候选会被丢弃；英文临床字段会被清空。
-- `OPENAI_API_KEY` 是 Cloudflare 加密密钥，不属于普通环境变量，也不得提交到 Git。
+- 自动填充仅来自项目核验库，并保留直接中文来源链接。
+- 全网搜索入口只用于人工查找，不会自动导入网页摘要。
+- 必须核对批准文号、规格、厂家和对应厂家的现行说明书。
+- 本服务不用于诊断、处方推荐、相互作用判断或用药决策。
