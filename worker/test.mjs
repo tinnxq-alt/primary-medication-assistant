@@ -87,6 +87,13 @@ try {
   });
   assert.equal(incomplete, null, "临床字段不完整的条目不得作为已核验智能搜索结果");
 
+  const databaseSource = cleanCatalogCandidate({
+    ...catalog.drugs[0],
+    source: { ...catalog.drugs[0].source, url: "https://www.yaopinnet.com/example.html" }
+  });
+  assert.equal(databaseSource.sourceQuality, "medical-database", "医药数据库不得误标为生产企业来源");
+  assert.equal(databaseSource.confidence, "medium");
+
   catalog = { schemaVersion: 1, language: "zh-CN", drugs: [] };
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST", headers: { Origin: origin, "Content-Type": "application/json" },
