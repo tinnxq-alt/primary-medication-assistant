@@ -10,6 +10,7 @@ const CATEGORY_IDS = [
 ];
 const DRAFT_FIELDS = ["drugName", "tradeName", "category", "specification"];
 const CLINICAL_FIELDS = ["indications", "dosage", "adverseReactions", "precautions"];
+const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph"]);
 const DRAFT_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -89,19 +90,27 @@ function plainField(value, maxLength = 200) {
 
 function cleanCatalogCandidate(candidate) {
   if (!candidate || !HAN_RE.test(`${candidate.drugName || ""}${candidate.genericName || ""}`)) return null;
+  const sourceStatus = candidate.source?.status || candidate.clinical?.source?.status;
+  if (!VERIFIED_SOURCE_STATUSES.has(sourceStatus)) return null;
   const sourceUrl = canonicalUrl(candidate.source?.url || candidate.clinical?.source?.url);
   if (!sourceUrl) return null;
-  const blocked = candidate.source?.status === "blocked";
+  const indications = chineseField(candidate.clinical?.indication);
+  const dosage = chineseField(candidate.clinical?.dosage);
+  const adverseReactions = chineseField(candidate.clinical?.adverseReactions);
+  const precautions = chineseField(candidate.clinical?.precautions);
+  if (![indications, dosage, adverseReactions, precautions].every(Boolean)) return null;
+  const hostname = new URL(sourceUrl).hostname.toLowerCase();
+  const regulator = hostname === "nmpa.gov.cn" || hostname.endsWith(".nmpa.gov.cn") || hostname === "nhsa.gov.cn" || hostname.endsWith(".nhsa.gov.cn");
+  const medicalDatabase = hostname === "drugs.dxy.cn" || hostname.endsWith(".zy91.com");
+  const sourceQuality = regulator ? "regulator" : medicalDatabase ? "medical-database" : "manufacturer";
   const drugName = chineseField(candidate.genericName || candidate.drugName, 80);
   return {
     drugName, tradeName: chineseField(candidate.tradeName, 80),
     category: categoryIdFor(candidate.category, `${candidate.drugName || ""}${drugName}`),
-    indications: chineseField(candidate.clinical?.indication), specification: plainField(candidate.specification),
-    dosage: chineseField(candidate.clinical?.dosage),
-    adverseReactions: chineseField(candidate.clinical?.adverseReactions),
-    precautions: chineseField(candidate.clinical?.precautions), approvalNumber: "",
-    confidence: blocked ? "low" : "high", sourceQuality: "regulator",
-    sourceTitle: chineseField(candidate.source?.label, 120) || "国家药监局中文资料", sourceUrl,
+    indications, specification: plainField(candidate.specification), dosage,
+    adverseReactions, precautions, approvalNumber: "",
+    confidence: medicalDatabase ? "medium" : "high", sourceQuality,
+    sourceTitle: chineseField(candidate.source?.label, 120) || "中文核验资料", sourceUrl,
     sourceCheckedAt: /^\d{4}-\d{2}-\d{2}$/.test(candidate.source?.checkedAt || "")
       ? candidate.source.checkedAt : new Date().toISOString().slice(0, 10),
     draft: false, verified: true, editable: true
