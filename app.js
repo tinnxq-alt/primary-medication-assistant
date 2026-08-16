@@ -3,7 +3,7 @@
 
   const STORAGE_PREFIX = "primary-medication-pro:v1:";
   const DEFAULT_SMART_SEARCH_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
-  const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph"]);
+  const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph", "verified-regulator"]);
   const app = document.getElementById("app");
   const pageTitle = document.getElementById("pageTitle");
   const backBtn = document.getElementById("backBtn");
@@ -101,8 +101,8 @@
   const applyLocalOverrides = drug => {
     const override = state.drugOverrides[drug.id];
     const category = state.categoryOverrides[drug.id];
-    if (!override && !category) return drug;
     const merged = { ...drug, ...(override || {}), ...(category ? { category } : {}) };
+    if (!merged.therapeuticClass) merged.therapeuticClass = normalizeDrugCategory(merged.category, merged.drugName);
     if (override && !drug.isCustom) {
       merged.qualityIssue = [drug.qualityIssue, "本机目录字段已编辑，须按药盒、批准文号和现行说明书复核。"].filter(Boolean).join(" ");
       merged.localEdited = true;
@@ -114,7 +114,7 @@
     .map(applyLocalOverrides);
 
   async function hydrateVerifiedCatalog() {
-    const response = await fetch("./chinese-drug-labels.json?v=8", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=9", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
@@ -149,6 +149,7 @@
     if (status === "verified-label") return '<span class="badge ok">✓ 说明书已核验</span>';
     if (status === "verified-monograph") return '<span class="badge ok">✓ 通用资料已核验</span>';
     if (status === "verified-template") return '<span class="badge ok">✓ 范本已核验</span>';
+    if (status === "verified-regulator") return '<span class="badge ok">✓ 官方资料已核验</span>';
     if (status === "blocked") return '<span class="badge blocked">⛔ 数据锁定</span>';
     if (status === "unverified-draft") return '<span class="badge warn">△ 未核验草稿</span>';
     if (status === "needs-review") return '<span class="badge warn">△ 待复核</span>';
@@ -170,7 +171,7 @@
           <div class="drug-meta">
             <span>${esc(drug.specification || "规格待核验")}</span>
             <span>${esc(drug.dosageForm || "剂型待核验")}</span>
-            <span>${esc(drug.category || "未分类")}</span>
+            <span>${esc(drug.therapeuticClass || "作用待分类")}</span>
           </div>
           <p class="drug-sub">通用名：${esc(drug.genericName || "待核验")}</p>
           ${drug.qualityIssue ? `<p class="drug-sub"><span class="badge blocked">质控问题</span> ${esc(drug.qualityIssue)}</p>` : ""}
@@ -257,7 +258,12 @@
 
   function renderCategories() {
     const counts = allDrugs().reduce((map, drug) => {
-      const key = drug.category || "未分类";
+      const key = drug.therapeuticClass || "作用待分类";
+      map[key] = (map[key] || 0) + 1;
+      return map;
+    }, {});
+    const attributes = allDrugs().reduce((map, drug) => {
+      const key = drug.category || "属性待核验";
       map[key] = (map[key] || 0) + 1;
       return map;
     }, {});
@@ -272,8 +278,12 @@
     });
     app.innerHTML = `
       <section class="section">
-        <div class="section-title"><h2>按药品类别</h2><small>${Object.keys(counts).length} 类</small></div>
-        <div class="category-grid">${Object.entries(counts).map(([name, count]) => `<button class="category-card" data-category="${esc(name)}"><strong>${esc(name)}</strong><span>${count} 个品规</span></button>`).join("")}</div>
+        <div class="section-title"><h2>按药物作用分类</h2><small>${Object.keys(counts).length} 类</small></div>
+        <div class="category-grid">${Object.entries(counts).sort((a,b) => b[1]-a[1] || a[0].localeCompare(b[0], "zh-CN")).map(([name, count]) => `<button class="category-card" data-action-class="${esc(name)}"><strong>${esc(name)}</strong><span>${count} 个品规</span></button>`).join("")}</div>
+      </section>
+      <section class="section">
+        <div class="section-title"><h2>按药品属性</h2><small>${Object.keys(attributes).length} 类</small></div>
+        <div class="category-grid">${Object.entries(attributes).map(([name, count]) => `<button class="category-card" data-attribute="${esc(name)}"><strong>${esc(name)}</strong><span>${count} 个品规</span></button>`).join("")}</div>
       </section>
       <section class="section">
         <div class="section-title"><h2>按剂型浏览</h2><small>${Object.keys(forms).length} 种</small></div>
@@ -294,7 +304,7 @@
       ["pointerup", "pointercancel", "pointerleave"].forEach(type => card.addEventListener(type, () => clearTimeout(timer)));
       card.addEventListener("click", event => {
         if (longPressed) { event.preventDefault(); return; }
-        navigate("all"); setTimeout(() => renderAll(card.dataset.customCategory, ""));
+        navigate("all"); setTimeout(() => renderAll("", "", card.dataset.customCategory));
       });
     });
   }
@@ -304,7 +314,7 @@
     sessionStorage.removeItem("drug-search-query");
     app.innerHTML = `
       <section class="section">
-        <div class="toolbar"><input id="searchInput" value="${esc(initialQuery)}" placeholder="输入药品名、通用名、规格或厂家"><select id="statusFilter"><option value="">全部数据状态</option><option value="verified">全部已核验</option><option value="verified-label">说明书已核验</option><option value="verified-monograph">通用资料已核验</option><option value="verified-template">范本已核验</option><option value="needs-review">待复核</option><option value="blocked">数据锁定</option><option value="inventory-only">仅目录</option></select></div>
+        <div class="toolbar"><input id="searchInput" value="${esc(initialQuery)}" placeholder="输入药品名、作用分类、规格或厂家"><select id="statusFilter"><option value="">全部数据状态</option><option value="verified">全部已核验</option><option value="verified-regulator">官方资料已核验</option><option value="verified-label">说明书已核验</option><option value="verified-monograph">通用资料已核验</option><option value="verified-template">范本已核验</option><option value="needs-review">待复核</option><option value="blocked">数据锁定</option><option value="inventory-only">仅目录</option></select></div>
         <p id="resultCount" class="muted"></p>
         <div id="searchResults" class="card-list"></div>
       </section>`;
@@ -314,7 +324,7 @@
       const q = normalize(input.value);
       const status = filter.value;
       const results = allDrugs().filter(drug => {
-        const haystack = normalize([drug.drugName, drug.rawName, drug.genericName, drug.tradeName, drug.specification, drug.manufacturer].join(" "));
+        const haystack = normalize([drug.drugName, drug.rawName, drug.genericName, drug.tradeName, drug.specification, drug.manufacturer, drug.therapeuticClass].join(" "));
         const statusMatch = !status || (status === "verified" ? isVerifiedSource(drug.source?.status) : drug.source?.status === status);
         return (!q || haystack.includes(q)) && statusMatch;
       });
@@ -356,7 +366,8 @@
           <div class="detail-item"><dt>商品名</dt><dd>${esc(drug.tradeName || "未录入")}</dd></div>
           <div class="detail-item"><dt>规格</dt><dd>${esc(drug.specification || "待核验")}</dd></div>
           <div class="detail-item"><dt>剂型</dt><dd>${esc(drug.dosageForm || "待核验")}</dd></div>
-          <div class="detail-item"><dt>类别 / 医保标记</dt><dd>${esc(drug.category || "未分类")} · ${esc(drug.insuranceClass || "未标注")}</dd></div>
+          <div class="detail-item"><dt>药物作用分类</dt><dd>${esc(drug.therapeuticClass || "作用待分类")}</dd></div>
+          <div class="detail-item"><dt>药品属性 / 医保标记</dt><dd>${esc(drug.category || "未分类")} · ${esc(drug.insuranceClass || "未标注")}</dd></div>
           <div class="detail-item"><dt>生产企业</dt><dd>${esc(drug.manufacturer || "待核验")}</dd></div>
           ${markedField("indication", "适应症")}
           ${markedField("dosage", "用法用量")}
@@ -633,7 +644,7 @@
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=8", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=9", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
@@ -764,7 +775,7 @@
       app.innerHTML = empty("暂无已核验临床字段可用于闪卡。完成说明书核验后会自动加入。", '<button class="btn primary" data-route-link="all">查看目录</button>');
       return;
     }
-    const categories = [...new Set(candidates.map(drug => drug.category || "未分类"))];
+    const categories = [...new Set(candidates.map(drug => drug.therapeuticClass || "作用待分类"))];
     let deck = []; let index = 0; let flipped = false;
     app.innerHTML = `
       <section class="panel section">
@@ -801,7 +812,7 @@
     const buildDeck = () => {
       const category = document.getElementById("flashCategory").value;
       const onlyNew = document.getElementById("unrememberedOnly").checked;
-      deck = candidates.filter(drug => (!category || drug.category === category) && (!onlyNew || !isRemembered(drug.id)));
+      deck = candidates.filter(drug => (!category || drug.therapeuticClass === category) && (!onlyNew || !isRemembered(drug.id)));
       if (document.getElementById("flashMode").value === "random") deck = shuffled(deck);
       index = 0; flipped = false; draw();
     };
@@ -953,32 +964,34 @@
     draw();
   }
 
-  function renderAll(filterCategory = "", filterForm = "") {
-    const categories = [...new Set(allDrugs().map(d => d.category || "未分类"))];
+  function renderAll(filterAction = "", filterForm = "", filterAttribute = "") {
+    const actionClasses = [...new Set(allDrugs().map(d => d.therapeuticClass || "作用待分类"))].sort((a,b) => a.localeCompare(b, "zh-CN"));
+    const attributes = [...new Set(allDrugs().map(d => d.category || "属性待核验"))];
     const forms = [...new Set(allDrugs().map(d => d.dosageForm || "剂型待核验"))];
     let batchMode = false;
     let currentResults = [];
     const selected = new Set();
     app.innerHTML = `
       <section class="section">
-        <div class="toolbar"><input id="allQuery" placeholder="筛选药品"><select id="allCategory"><option value="">全部类别</option>${categories.map(c => `<option ${c === filterCategory ? "selected" : ""}>${esc(c)}</option>`).join("")}</select><select id="allForm"><option value="">全部剂型</option>${forms.map(f => `<option ${f === filterForm ? "selected" : ""}>${esc(f)}</option>`).join("")}</select><button class="btn secondary" id="batchModeBtn">批量操作</button></div>
+        <div class="toolbar"><input id="allQuery" placeholder="筛选药品或作用分类"><select id="allAction"><option value="">全部作用分类</option>${actionClasses.map(c => `<option ${c === filterAction ? "selected" : ""}>${esc(c)}</option>`).join("")}</select><select id="allAttribute"><option value="">全部药品属性</option>${attributes.map(c => `<option ${c === filterAttribute ? "selected" : ""}>${esc(c)}</option>`).join("")}</select><select id="allForm"><option value="">全部剂型</option>${forms.map(f => `<option ${f === filterForm ? "selected" : ""}>${esc(f)}</option>`).join("")}</select><button class="btn secondary" id="batchModeBtn">批量操作</button></div>
         <div id="batchBar" class="panel section" hidden>
           <div class="section-title"><strong id="selectedCount">已选 0 项</strong><button class="btn ghost small" id="selectAllBtn">全选当前结果</button></div>
-          <div class="toolbar"><input id="batchCategory" list="batchCategoryOptions" placeholder="输入新分类"><datalist id="batchCategoryOptions">${categories.map(c => `<option value="${esc(c)}">`).join("")}</datalist><button class="btn secondary" id="applyBatchCategory">批量修改分类</button><button class="btn danger" id="deleteBatch">批量删除/隐藏</button>${state.hidden.length ? `<button class="btn ghost" id="restoreHidden">恢复已隐藏（${state.hidden.length}）</button>` : ""}</div>
+          <div class="toolbar"><input id="batchCategory" list="batchCategoryOptions" placeholder="输入新分类"><datalist id="batchCategoryOptions">${attributes.map(c => `<option value="${esc(c)}">`).join("")}</datalist><button class="btn secondary" id="applyBatchCategory">批量修改分类</button><button class="btn danger" id="deleteBatch">批量删除/隐藏</button>${state.hidden.length ? `<button class="btn ghost" id="restoreHidden">恢复已隐藏（${state.hidden.length}）</button>` : ""}</div>
           <p class="muted">内置药品执行“删除”时仅在本机隐藏，可恢复；自定义药品会删除并需要二次确认。</p>
         </div>
         <p id="allCount" class="muted"></p><div id="allList" class="card-list"></div>
       </section>`;
     const draw = () => {
       const q = normalize(document.getElementById("allQuery").value);
-      const category = document.getElementById("allCategory").value;
+      const action = document.getElementById("allAction").value;
+      const attribute = document.getElementById("allAttribute").value;
       const form = document.getElementById("allForm").value;
-      currentResults = allDrugs().filter(d => (!q || normalize(`${d.drugName}${d.genericName}${d.specification}`).includes(q)) && (!category || d.category === category) && (!form || d.dosageForm === form));
+      currentResults = allDrugs().filter(d => (!q || normalize(`${d.drugName}${d.genericName}${d.specification}${d.therapeuticClass}`).includes(q)) && (!action || d.therapeuticClass === action) && (!attribute || d.category === attribute) && (!form || d.dosageForm === form));
       document.getElementById("allCount").textContent = `${currentResults.length} 个品规${batchMode ? " · 批量模式" : ""}`;
       document.getElementById("allList").innerHTML = currentResults.length ? currentResults.map(drug => drugCard(drug, { selectable: batchMode, selected: selected.has(drug.id) })).join("") : empty("没有匹配的药品。");
       document.getElementById("selectedCount").textContent = `已选 ${selected.size} 项`;
     };
-    ["allQuery", "allCategory", "allForm"].forEach(id => document.getElementById(id).addEventListener(id === "allQuery" ? "input" : "change", draw));
+    ["allQuery", "allAction", "allAttribute", "allForm"].forEach(id => document.getElementById(id).addEventListener(id === "allQuery" ? "input" : "change", draw));
     document.getElementById("batchModeBtn").addEventListener("click", () => {
       batchMode = !batchMode;
       if (!batchMode) selected.clear();
@@ -1366,10 +1379,12 @@
     if (swipedContent) { event.preventDefault(); swipedContent.closest(".swipe-row").classList.remove("swiped"); return; }
     const drug = event.target.closest("[data-open-drug]");
     if (drug) return navigate("detail", drug.dataset.openDrug);
-    const category = event.target.closest("[data-category]");
-    if (category) { navigate("all"); setTimeout(() => renderAll(category.dataset.category, "")); }
+    const actionClass = event.target.closest("[data-action-class]");
+    if (actionClass) { navigate("all"); setTimeout(() => renderAll(actionClass.dataset.actionClass, "", "")); }
+    const attribute = event.target.closest("[data-attribute]");
+    if (attribute) { navigate("all"); setTimeout(() => renderAll("", "", attribute.dataset.attribute)); }
     const form = event.target.closest("[data-form]");
-    if (form) { navigate("all"); setTimeout(() => renderAll("", form.dataset.form)); }
+    if (form) { navigate("all"); setTimeout(() => renderAll("", form.dataset.form, "")); }
     const note = event.target.closest("[data-delete-note]");
     if (note) confirmModal("确认删除这条笔记？", () => { state.notes = state.notes.filter(n => n.id !== note.dataset.deleteNote); saveState("notes"); render(); toast("笔记已删除"); });
     const editNote = event.target.closest("[data-edit-note]");
