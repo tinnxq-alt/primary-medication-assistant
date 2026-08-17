@@ -43,9 +43,10 @@ jobs:
         env:
           WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
         run: |
-          sleep 3
+          # 给 Workers 边缘版本传播留出时间；避免刚部署即命中旧版本。
+          sleep 10
           curl --fail --silent --show-error \
-            --max-time 40 \
+            --max-time 45 \
             -X POST "$WORKER_URL/v1/drugs/search" \
             -H 'Origin: https://tinnxq-alt.github.io' \
             -H 'Content-Type: application/json' \
@@ -54,8 +55,13 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
-          if (payload.mode !== 'web-instruction-source-extraction') {
+          if (payload.mode !== 'web-instruction-source-extraction-v2') {
+            console.error(JSON.stringify(payload, null, 2));
             throw new Error(`unexpected mode: ${payload.mode || 'missing'}`);
+          }
+          if (!(Number(payload.searchResultCount) > 0)) {
+            console.error(JSON.stringify(payload, null, 2));
+            throw new Error('live web search did not discover any external instruction-source links');
           }
           const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
           const target = candidates.find(item =>
