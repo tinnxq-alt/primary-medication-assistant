@@ -50,5 +50,8 @@ jobs:
       - name: Pharmacy scope tests
         run: node scripts/test-pharmacy-scope.mjs
 
+      - name: Text mark and notebook tests
+        run: node scripts/test-text-mark-fix.mjs
+
       - name: Worker tests
         run: node worker/test.mjs
