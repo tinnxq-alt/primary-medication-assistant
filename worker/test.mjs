@@ -1,22 +1,38 @@
 import assert from "node:assert/strict";
-import worker, { renderedHtml } from "./src/index-v7.js";
-import { search39ManualLinks } from "./src/index-v6.js";
+import worker, {
+  canonical39InstructionUrl,
+  extract39ManualLink,
+  extract39SearchLinks,
+  trustedSourceUrl
+} from "./src/index-v8.js";
 import { categoryFromDrugName, extractSection, htmlToText, parseInstructionPage } from "./src/index-v3.js";
-import { renderedHtmlFromContentResponse } from "./src/index-v5.js";
 
 const origin = "https://tinnxq-alt.github.io";
+const normalizedSearch = "https://ypk.39.net/search/%E5%8F%B8%E7%BE%8E-NULL-b0-ci0-c0-m0-bm0-otc0-fd0-p0";
 const manual1 = "https://ypk.39.net/2310025/manual/";
+const detail2 = "https://ypk.39.net/western/2310026/";
 const manual2 = "https://ypk.39.net/2310026/manual/";
-const search39 = "https://ypk.39.net/search/%E5%8F%B8%E7%BE%8E";
 const browserUrls = [];
+const fetchUrls = [];
 
 const searchHtml = `<!doctype html><html><body>
 <a href="/2310025/">司美格鲁肽注射液(诺和泰)</a>
-<a href="https://ypk.39.net/2310026/">司美格鲁肽注射液(诺和泰) 另一规格</a>
+<a href="/western/2310026/">司美格鲁肽注射液(诺和泰) 另一规格</a>
 <a href="/886077/">盐酸非索非那定片</a>
-<a href="/2310025/comment/">评论</a>
+<a href="/search/司美-NULL-b0-ci0-c0-m0-bm0-otc0-fd0-p0">司美筛选</a>
+<a href="https://www.calculator.net/">司美计算器噪声</a>
 </body></html>`;
-assert.deepEqual(search39ManualLinks(searchHtml, "司美"), [manual1, manual2]);
+
+assert.equal(canonical39InstructionUrl("https://ypk.39.net/2310025/"), manual1);
+assert.deepEqual(extract39SearchLinks(searchHtml, "司美"), [manual1, detail2]);
+assert.equal(trustedSourceUrl("https://www.calculator.net/"), null, "非医药来源必须被硬过滤");
+assert.ok(trustedSourceUrl(manual1), "39 药品通应属于可信医药来源");
+
+const detailHtml2 = `<!doctype html><html><body>
+<h1>司美格鲁肽注射液</h1>
+<a href="/2310026/manual/">详细说明书</a>
+</body></html>`;
+assert.equal(extract39ManualLink(detailHtml2, detail2), manual2);
 
 const manualHtml1 = `<!doctype html><html><head><title>司美格鲁肽注射液(诺和泰)详细说明书-39药品通</title></head><body>
 <p>〖药品名称〗</p><p>通用名称：司美格鲁肽注射液</p><p>商品名称：诺和泰</p>
@@ -44,25 +60,34 @@ assert.equal(parseInstructionPage({ url: manual1, html: manualHtml1, text }, "�
 
 const BROWSER = {
   async quickAction(action, input) {
-    assert.equal(action, "content", "39 搜索页和说明书页都必须由 Browser content 渲染");
+    assert.equal(action, "content", "可信来源页面统一通过 Browser content 读取");
     browserUrls.push(input.url);
     let html = "";
-    if (input.url === search39) html = searchHtml;
+    if (input.url === normalizedSearch) html = searchHtml;
     else if (input.url === manual1) html = manualHtml1;
+    else if (input.url === detail2) html = detailHtml2;
     else if (input.url === manual2) html = manualHtml2;
     else throw new Error(`unexpected browser url ${input.url}`);
     return Response.json({ success: true, result: html });
   }
 };
 
-const contentResponse = Response.json({ success: true, result: searchHtml });
-assert.equal(await renderedHtmlFromContentResponse(contentResponse), searchHtml, "Browser content 必须从 JSON result 中解包 HTML");
-assert.equal(await renderedHtml(BROWSER, search39), searchHtml);
-browserUrls.length = 0;
-
 const realFetch = globalThis.fetch;
 globalThis.fetch = async request => {
-  throw new Error(`Browser 直连成功时不应使用普通 fetch 读取 39 页面: ${String(request)}`);
+  const url = String(request instanceof Request ? request.url : request);
+  fetchUrls.push(url);
+  if (!url.startsWith("https://www.bing.com/search?")) throw new Error(`unexpected fetch ${url}`);
+  const decoded = decodeURIComponent(url);
+  if (decoded.includes("site:ypk.39.net")) {
+    return new Response(`<?xml version="1.0"?><rss><channel>
+      <item><title>noise</title><link>https://www.calculator.net/</link></item>
+      <item><title>司美格鲁肽说明书</title><link>${manual1}</link></item>
+    </channel></rss>`, { status: 200, headers: { "Content-Type": "application/rss+xml" } });
+  }
+  return new Response(`<?xml version="1.0"?><rss><channel><item><title>noise</title><link>https://www.calculator.net/</link></item></channel></rss>`, {
+    status: 200,
+    headers: { "Content-Type": "application/rss+xml" }
+  });
 };
 
 try {
@@ -75,8 +100,7 @@ try {
   assert.equal(response.status, 200);
   const payload = await response.json();
   assert.equal(payload.mode, "web-instruction-source-extraction-v3");
-  assert.equal(payload.discovery, "direct-39-browser-content");
-  assert.equal(payload.searchResultCount, 2);
+  assert.equal(payload.discovery, "trusted-source-discovery-v8");
   assert.equal(payload.candidates.length, 2);
   assert.equal(payload.candidates[0].drugName, "司美格鲁肽注射液");
   assert.equal(payload.candidates[0].category, "降糖药");
@@ -87,14 +111,16 @@ try {
   assert.match(payload.candidates[0].clinical.dosage, /每周一次/);
   assert.match(payload.candidates[0].clinical.adverseReactions, /胃肠/);
   assert.match(payload.candidates[0].clinical.precautions, /1型糖尿病/);
-  assert.deepEqual(browserUrls, [search39, manual1, manual2]);
+  assert.ok(payload.verificationLinks.every(item => /ypk\.39\.net|yaopinnet\.com|nmpa\.gov\.cn|cde\.org\.cn/.test(item.url)), "来源列表不得出现 calculator 等噪声站点");
+  assert.deepEqual(browserUrls, [normalizedSearch, manual1, detail2, manual2], "Browser 请求必须串行走搜索页→说明书，不并发抓多个页面");
+  assert.equal(fetchUrls.length, 2, "不足 3 个直连结果时仅做站点限定 RSS 补充发现");
 
   const health = await worker.fetch(new Request("https://worker.example/health", { headers: { Origin: origin } }), env);
   const healthPayload = await health.json();
-  assert.equal(healthPayload.discovery, "direct-medical-browser-first");
+  assert.equal(healthPayload.discovery, "trusted-source-discovery-v8");
   assert.equal(healthPayload.generatesClinicalKnowledge, false);
 } finally {
   globalThis.fetch = realFetch;
 }
 
-console.log("Worker browser-rendered direct medical-source tests passed");
+console.log("Worker trusted source discovery v8 tests passed");
