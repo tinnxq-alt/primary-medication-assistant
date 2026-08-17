@@ -3,6 +3,11 @@
   -webkit-tap-highlight-color: rgba(15, 118, 110, 0.14);
 }
 
+html.restoring-view body {
+  visibility: hidden;
+}
+
+.mark-selection-menu,
 .mark-delete-menu {
   position: fixed;
   z-index: 1200;
@@ -14,33 +19,50 @@
   box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
 }
 
+.mark-selection-menu {
+  left: 50%;
+  bottom: calc(82px + env(safe-area-inset-bottom));
+  width: min(420px, calc(100vw - 24px));
+  transform: translateX(-50%);
+}
+
+.mark-selection-menu > small,
 .mark-delete-menu > strong {
   display: block;
   margin-bottom: 8px;
 }
 
+.mark-selection-menu > div,
 .mark-delete-menu > div {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.note-group-card {
+.note-group-card,
+.mark-group-card {
   padding: 16px;
 }
 
-.note-group-list {
+.note-group-list,
+.mark-group-list {
   display: grid;
   gap: 10px;
   margin-top: 12px;
 }
 
-.note-group-entry {
+.note-group-entry,
+.mark-group-entry {
   margin: 0;
   padding: 12px;
   background: var(--surface-soft, #f7faf9);
 }
 
-.note-group-entry .detail-head {
+.note-group-entry .detail-head,
+.mark-group-entry .detail-head {
   align-items: flex-start;
+}
+
+.mark-group-entry .mark-quote {
+  margin-top: 8px;
 }

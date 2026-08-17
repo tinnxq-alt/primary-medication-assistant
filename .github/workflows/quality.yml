@@ -33,9 +33,8 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
-          node --check text-mark-fix.js
-          node --check notebook-delete-fix.js
           node --check notebook-scroll-fix.js
+          node --check mark-notebook-ui.js
           node --check header-brand.js
           node --check catalog-retirements.js
           node --check drug-lookup.js

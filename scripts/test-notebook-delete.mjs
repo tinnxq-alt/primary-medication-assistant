@@ -1,22 +1,22 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
 
-const source = fs.readFileSync(new URL("../notebook-delete-fix.js", import.meta.url), "utf8");
+const app = fs.readFileSync(new URL("../app.js", import.meta.url), "utf8");
+const unified = fs.readFileSync(new URL("../mark-notebook-ui.js", import.meta.url), "utf8");
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const worker = fs.readFileSync(new URL("../service-worker.js", import.meta.url), "utf8");
 
-assert.match(source, /currentRoute\(\) !== "notebook"/);
-assert.match(source, /\[data-delete-note\]/);
-assert.match(source, /\[data-delete-mark\]/);
-assert.match(source, /event\.stopImmediatePropagation\(\)/);
-assert.match(source, /storageKey:\s*"notes"/);
-assert.match(source, /storageKey:\s*"marks"/);
-assert.match(source, /data-notebook-delete-confirm/);
-assert.match(source, /location\.reload\(\)/);
-assert.match(html, /notebook-delete-fix\.js/);
-assert.ok(html.indexOf("text-mark-fix.js") < html.indexOf("notebook-delete-fix.js"), "删除修复脚本应在文本标记脚本之后加载");
-assert.match(worker, /notebook-delete-fix\.js/);
+assert.match(app, /\[data-delete-note\]/, "普通笔记删除应继续由主应用状态处理");
+assert.match(app, /\[data-delete-mark\]/, "文本标记删除应继续由主应用状态处理");
+assert.match(app, /confirmModal\("确认删除这条笔记？"/);
+assert.match(app, /confirmModal\("确认删除这条文本标记？"/);
+assert.match(unified, /groupNotebookSection\("全部药品笔记", "notes"\)/);
+assert.match(unified, /groupNotebookSection\("文本标记", "marks"\)/);
+assert.doesNotMatch(html, /src="notebook-delete-fix\.js"/, "不得再加载会整页 reload 的旧删除补丁");
+assert.ok(html.indexOf('src="notebook-scroll-fix.js"') < html.indexOf('src="mark-notebook-ui.js"'), "滚动保护应先于统一标记层加载");
+assert.doesNotMatch(worker, /"\.\/notebook-delete-fix\.js"/);
+assert.match(worker, /"\.\/mark-notebook-ui\.js"/);
 const cacheVersion = worker.match(/primary-medication-v(\d+)/);
-assert.ok(cacheVersion && Number(cacheVersion[1]) >= 30, "PWA 缓存版本不得低于 v30");
+assert.ok(cacheVersion && Number(cacheVersion[1]) >= 33, "PWA 缓存版本不得低于 v33");
 
-console.log("笔记本普通笔记与文本标记删除契约检查通过");
+console.log("笔记本删除由主状态处理且不再依赖 reload 补丁");
