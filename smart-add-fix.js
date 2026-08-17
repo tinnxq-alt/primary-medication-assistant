@@ -127,51 +127,53 @@
     }
   }
 
-  async function remoteNewDrugCandidate(query) {
+  async function remoteNewDrugCandidates(query) {
     const base = endpoint();
     if (!base) throw new Error("智能识别服务未配置");
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 20_000);
+    const timer = setTimeout(() => controller.abort(), 25_000);
     try {
       const response = await fetch(`${base}/v1/drugs/search`, {
         method: "POST",
         cache: "no-store",
         signal: controller.signal,
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query, newDrugOnly: true })
+        body: JSON.stringify({ query, newDrugOnly: true, candidateCount: 3 })
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || `智能识别服务返回 ${response.status}`);
-      const candidates = (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => {
-        const draft = item.draft === true || item.verified === false;
-        return {
-          drugName: item.drugName || "",
-          tradeName: item.tradeName || "",
-          specification: item.specification || "",
-          category: normalizeCategory(item.category, item.drugName),
-          clinical: {
-            indication: item.indications || item.clinical?.indication || "",
-            dosage: item.dosage || item.clinical?.dosage || "",
-            adverseReactions: item.adverseReactions || item.clinical?.adverseReactions || "",
-            precautions: item.precautions || item.clinical?.precautions || ""
-          },
-          source: {
-            status: draft ? "unverified-draft" : "needs-review",
-            label: item.sourceTitle || "AI 新药录入草稿（未核验）",
-            url: item.sourceUrl || "",
-            checkedAt: item.sourceCheckedAt || new Date().toISOString().slice(0, 10)
-          },
-          smartMeta: {
-            confidence: item.confidence || "low",
-            approvalNumber: item.approvalNumber || "",
-            draft,
-            verified: item.verified === true
-          }
-        };
-      }).filter(item => hasChinese(item.drugName) && hasChinese(item.clinical.indication) && hasChinese(item.clinical.dosage)).slice(0, 3);
-      return { candidates, warnings: Array.isArray(payload.warnings) ? payload.warnings : [], mode: payload.mode || "" };
+      const candidates = (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => ({
+        drugName: item.drugName || "",
+        tradeName: item.tradeName || "",
+        specification: item.specification || "",
+        category: normalizeCategory(item.category, item.drugName),
+        clinical: {
+          indication: item.indications || item.clinical?.indication || "",
+          dosage: item.dosage || item.clinical?.dosage || "",
+          adverseReactions: item.adverseReactions || item.clinical?.adverseReactions || "",
+          precautions: item.precautions || item.clinical?.precautions || ""
+        },
+        source: {
+          status: "unverified-draft",
+          label: item.sourceTitle || "Cloudflare Workers AI（模型生成，未核验）",
+          url: item.sourceUrl || "",
+          checkedAt: item.sourceCheckedAt || new Date().toISOString().slice(0, 10)
+        },
+        smartMeta: {
+          confidence: item.confidence || "low",
+          approvalNumber: item.approvalNumber || "",
+          draft: true,
+          verified: false
+        }
+      })).filter(item => hasChinese(item.drugName) && hasChinese(item.clinical.indication) && hasChinese(item.clinical.dosage)).slice(0, 5);
+      return {
+        candidates,
+        warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
+        mode: payload.mode || "",
+        elapsedMs: Number(payload.elapsedMs) || 0
+      };
     } catch (error) {
-      if (error.name === "AbortError") throw new Error("智能识别超过 20 秒，请重试或手动录入");
+      if (error.name === "AbortError") throw new Error("智能识别超过 25 秒，请重试或手动录入");
       throw error;
     } finally {
       clearTimeout(timer);
@@ -193,26 +195,27 @@
     ["drugName", "tradeName", "specification"].forEach(name => setField(node, name, candidate[name] || ""));
     setField(node, "category", normalizeCategory(candidate.category, candidate.drugName));
     ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(node, name, candidate.clinical?.[name] || ""));
-    setField(node, "sourceLabel", candidate.source?.label || "AI 新药录入草稿（未核验）");
+    setField(node, "sourceLabel", candidate.source?.label || "Cloudflare Workers AI（模型生成，未核验）");
     setField(node, "sourceUrl", candidate.source?.url || "");
     setField(node, "sourceCheckedAt", candidate.source?.checkedAt || "");
-    setField(node, "sourceStatus", candidate.source?.status || "unverified-draft");
+    setField(node, "sourceStatus", "unverified-draft");
     const source = document.getElementById("selectedSource");
-    if (source) source.textContent = `当前来源：${candidate.source?.label || "AI 新药录入草稿"}（未核验；所有字段可修改，保存前请核对药盒/说明书）`;
-    toast("新药候选已自动填入");
+    if (source) source.textContent = `来源：${candidate.source?.label || "Cloudflare Workers AI（模型生成，未核验）"}`;
+    toast(`已选择：${candidate.drugName}`);
   }
 
   function renderCandidates(candidates) {
     const results = document.getElementById("lookupResults");
     if (!results) return;
     candidateMap = new Map();
+    const stamp = Date.now();
     candidates.forEach((candidate, index) => {
-      candidate.lookupId = `new-drug-${Date.now()}-${index}`;
+      candidate.lookupId = `new-drug-${stamp}-${index}`;
       candidateMap.set(candidate.lookupId, candidate);
     });
-    results.innerHTML = candidates.length ? candidates.map(candidate =>
-      `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待核对")} · ${esc(normalizeCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge warn">未核验草稿</span> ${esc(candidate.source?.label || "AI 新药录入草稿")}</p><div class="toolbar"><button class="btn secondary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">填入此项</button></div></div></article>`
-    ).join("") : '<div class="empty"><p>暂未生成新药候选，可重试或直接手动填写。</p></div>';
+    results.innerHTML = candidates.length ? candidates.map((candidate, index) =>
+      `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge warn">AI 生成</span> 来源：${esc(candidate.source?.label || "Cloudflare Workers AI（模型生成，未核验）")}</p><div class="toolbar"><button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并填充</button></div></div></article>`
+    ).join("") : '<div class="empty"><p>暂未生成候选，可重试或直接手动填写。</p></div>';
   }
 
   function clearResults() {
@@ -228,10 +231,10 @@
     const panel = document.querySelector("#drugForm")?.closest(".panel");
     if (!panel) return;
     const heading = [...panel.querySelectorAll("h3")].find(node => node.textContent.includes("智能识别"));
-    if (heading) heading.textContent = "1. 新药智能识别（自动填充）";
+    if (heading) heading.textContent = "1. 新药智能识别（多候选）";
     const notice = heading?.nextElementSibling;
     if (notice?.classList.contains("notice")) {
-      notice.textContent = "用于添加当前药库尚未收录的新药。系统先在本机快速检查重复；确认未收录后直接生成可编辑的新药草稿并自动填充。";
+      notice.textContent = "用于添加当前药库尚未收录的新药。输入药名后一次生成多个 AI 候选，选择对应药物即可自动填充；每个候选都会标注生成来源。";
     }
   }
 
@@ -245,7 +248,7 @@
     const id = ++requestId;
     const button = document.getElementById("lookupDrugBtn");
     const status = document.getElementById("lookupStatus");
-    if (button) { button.disabled = true; button.textContent = "识别中…"; }
+    if (button) { button.disabled = true; button.textContent = "生成候选中…"; }
     clearResults();
     if (status) status.textContent = "正在检查药库是否已经收录…";
 
@@ -261,15 +264,15 @@
 
       const similar = similarKnownDrug(query);
       if (status) status.textContent = similar
-        ? `未发现同名药；发现相似条目“${similar.drugName}”，正在按新药继续智能识别…`
-        : "确认药库未收录，正在快速生成新药候选…";
+        ? `发现相似条目“${similar.drugName}”，正在继续生成新药候选…`
+        : "确认药库未收录，正在生成多个候选…";
 
-      const result = await remoteNewDrugCandidate(query);
+      const result = await remoteNewDrugCandidates(query);
       if (id !== requestId) return;
       renderCandidates(result.candidates);
-      if (result.candidates[0]) {
-        fill(result.candidates[0], node);
-        if (status) status.textContent = `新药识别完成，已自动填入第 1 个候选。${similar ? ` 请特别核对是否与“${similar.drugName}”属于不同药品/剂型。` : ""}${result.warnings.length ? ` ${result.warnings.join("；")}` : ""}`;
+      if (result.candidates.length) {
+        const timing = result.elapsedMs ? `（${(result.elapsedMs / 1000).toFixed(1)} 秒）` : "";
+        if (status) status.textContent = `已生成 ${result.candidates.length} 个候选${timing}，请选择对应药物后自动填充。${similar ? ` 请注意与相似条目“${similar.drugName}”区分。` : ""}`;
       } else if (status) {
         status.textContent = `暂未生成候选。${result.warnings.length ? result.warnings.join("；") : "可直接使用下方表单手动录入。"}`;
       }
@@ -294,7 +297,13 @@
     if (use) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      fill(candidateMap.get(use.dataset.newDrugUse));
+      const candidate = candidateMap.get(use.dataset.newDrugUse);
+      if (!candidate) return;
+      fill(candidate);
+      document.querySelectorAll("[data-candidate-card]").forEach(card => card.removeAttribute("data-selected"));
+      use.closest("[data-candidate-card]")?.setAttribute("data-selected", "true");
+      const status = document.getElementById("lookupStatus");
+      if (status) status.textContent = `已选择“${candidate.drugName}”，资料已自动填入下方表单。`;
     }
   }, true);
 
