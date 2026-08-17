@@ -19,7 +19,8 @@ assert(/word-break:\s*keep-all/.test(css), "中文标题必须保持横向词组
 assert(/writing-mode:\s*horizontal-tb/.test(css), "标题必须明确使用横向书写模式");
 assert(brandScript.includes("基层用药助手"), "品牌兼容脚本必须统一标题");
 assert(!JSON.parse(manifest).name.match(/pro/i), "PWA 应用名称不得包含 Pro");
-assert(worker.includes('primary-medication-v29'), "PWA 缓存必须升级到 v29");
+const cacheVersion = worker.match(/primary-medication-v(\d+)/);
+assert(cacheVersion && Number(cacheVersion[1]) >= 29, "PWA 缓存版本不得低于 v29");
 assert(worker.includes('header-layout.css') && worker.includes('header-brand.js'), "离线缓存必须包含标题布局资源");
 
 console.log("Header layout checks passed");
