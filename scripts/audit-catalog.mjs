@@ -45,11 +45,14 @@ function isHttpsUrl(value) {
 
 globalThis.window = {};
 await import(pathToFileURL(path.join(ROOT, "drugs.js")).href);
+await import(pathToFileURL(path.join(ROOT, "outpatient-drugs.js")).href);
 
 const catalog = globalThis.window.DRUG_CATALOG;
+const outpatientCatalog = globalThis.window.OUTPATIENT_DRUG_CATALOG;
 const labels = JSON.parse(readText("chinese-drug-labels.json"));
 
 if (!Array.isArray(catalog)) fail("drugs.js 未生成 window.DRUG_CATALOG 数组");
+if (!Array.isArray(outpatientCatalog)) fail("outpatient-drugs.js 未生成 window.OUTPATIENT_DRUG_CATALOG 数组");
 if (labels.schemaVersion !== 1 || labels.language !== "zh-CN" || !Array.isArray(labels.drugs)) {
   fail("chinese-drug-labels.json 的 schemaVersion、language 或 drugs 格式无效");
 }
@@ -104,8 +107,19 @@ for (const [index, drug] of (catalog || []).entries()) {
   }
   if (catalogIds.has(drug.id)) fail(`${label}使用了重复 ID：${drug.id}`);
   catalogIds.add(drug.id);
+  if (drug.pharmacyScopes?.length !== 1 || drug.pharmacyScopes[0] !== "ward") fail(`${label}必须且只能属于病房药库`);
   if (isNonEmpty(drug.therapeuticClass)) therapeuticClasses.add(drug.therapeuticClass);
   if (drug.therapeuticClass === "作用待分类") fail(`${label}尚未分配作用分类`);
+}
+
+for (const [index, drug] of (outpatientCatalog || []).entries()) {
+  const label = `门诊目录第 ${index + 1} 条（${drug.drugName || "未命名"}）`;
+  for (const field of ["id", "drugName", "genericName", "specification", "category", "dosageForm", "therapeuticClass"]) {
+    if (!isNonEmpty(drug[field])) fail(`${label}缺少 ${field}`);
+  }
+  if (catalogIds.has(drug.id)) fail(`${label}与其他药库使用了重复 ID：${drug.id}`);
+  catalogIds.add(drug.id);
+  if (!Array.isArray(drug.pharmacyScopes) || !drug.pharmacyScopes.includes("outpatient")) fail(`${label}必须属于门诊药库`);
 }
 
 if (therapeuticClasses.size !== EXPECTED_THERAPEUTIC_CLASS_COUNT) {
@@ -177,7 +191,7 @@ if (appCatalogVersions.length < 2 || new Set(appCatalogVersions).size !== 1 || a
   fail(`app.js 与 service-worker.js 的核验库缓存版本不一致：${appCatalogVersions.join("、") || "缺失"} / ${cacheCatalogVersion || "缺失"}`);
 }
 
-const runtimeFiles = ["app.js", "drug-lookup.js", "index.html", "style.css", "worker/src/index.js"];
+const runtimeFiles = ["app.js", "drug-lookup.js", "pharmacy-scope.js", "outpatient-drugs.js", "index.html", "style.css", "worker/src/index.js"];
 const forbiddenRuntimePatterns = [
   { label: "OCR", pattern: /\bocr\b/i },
   { label: "相机调用", pattern: /getUserMedia\s*\(/i },
@@ -194,6 +208,14 @@ const htmlSource = readText("index.html");
 if (htmlSource.indexOf('src="drug-lookup.js"') < 0 || htmlSource.indexOf('src="drug-lookup.js"') > htmlSource.indexOf('src="app.js"')) {
   fail("index.html 必须在 app.js 之前加载 drug-lookup.js");
 }
+for (const script of ["outpatient-drugs.js", "pharmacy-scope.js"]) {
+  if (htmlSource.indexOf(`src="${script}"`) < 0 || htmlSource.indexOf(`src="${script}"`) > htmlSource.indexOf('src="app.js"')) {
+    fail(`index.html 必须在 app.js 之前加载 ${script}`);
+  }
+}
+for (const shellFile of ["outpatient-drugs.js", "pharmacy-scope.js"]) {
+  if (!serviceWorkerSource.includes(`"./${shellFile}"`)) fail(`service-worker.js 必须离线缓存 ${shellFile}`);
+}
 if (/accept\s*=\s*["'][^"']*image/i.test(htmlSource)) fail("index.html 重新引入了图片文件上传入口");
 if (/<input\b[^>]*\bcapture(?:\s*=|\s|>)/i.test(htmlSource)) fail("index.html 重新引入了拍照上传入口");
 
@@ -205,7 +227,8 @@ if (errors.length) {
 
 console.log([
   "药品目录质控通过",
-  `目录 ${catalog.length} 条`,
+  `病房药库 ${catalog.length} 条`,
+  `门诊药库 ${outpatientCatalog.length} 条`,
   `可用核验资料 ${verifiedCount} 条`,
   `安全锁定 ${blocked.length} 条`,
   `作用分类 ${therapeuticClasses.size} 类`,

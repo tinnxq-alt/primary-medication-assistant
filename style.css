@@ -60,6 +60,11 @@ button { cursor: pointer; }
 .icon-btn:active { transform: scale(.96); }
 
 .app-shell { width: min(960px, 100%); min-height: calc(100vh - 146px); margin: 0 auto; padding: 18px 16px 96px; }
+.pharmacy-switcher { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; padding: 5px; border: 1px solid var(--line); border-radius: 18px; background: #e8f1ef; box-shadow: var(--shadow); }
+.pharmacy-switcher button { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 46px; border: 0; border-radius: 13px; color: var(--muted); font-weight: 800; background: transparent; }
+.pharmacy-switcher button strong { min-width: 25px; padding: 3px 7px; border-radius: 999px; color: inherit; font-size: 12px; background: rgba(255,255,255,.68); }
+.pharmacy-switcher button.active { color: white; background: var(--brand); box-shadow: 0 5px 14px rgba(15, 118, 110, .2); }
+.pharmacy-switcher button.active strong { color: var(--brand-dark); background: white; }
 .section { margin-bottom: 22px; }
 .section-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 12px; }
 .section-title h2 { margin: 0; font-size: 18px; }
@@ -137,6 +142,8 @@ button { cursor: pointer; }
 .badge.warn { color: #92400e; background: #fef3c7; }
 .badge.blocked { color: #991b1b; background: #fee2e2; }
 .badge.info { color: #075985; background: #e0f2fe; }
+.badge.pharmacy.ward { color: #115e59; background: #ccfbf1; }
+.badge.pharmacy.outpatient { color: #5b21b6; background: #ede9fe; }
 
 .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .toolbar input, .toolbar select, .field input, .field select, .field textarea {

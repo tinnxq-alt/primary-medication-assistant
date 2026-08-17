@@ -34,7 +34,9 @@ jobs:
         run: |
           node --check app.js
           node --check drug-lookup.js
+          node --check pharmacy-scope.js
           node --check drugs.js
+          node --check outpatient-drugs.js
           node --check service-worker.js
           node --check worker/src/index.js
 
@@ -43,6 +45,9 @@ jobs:
 
       - name: Drug name lookup tests
         run: node scripts/test-drug-lookup.mjs
+
+      - name: Pharmacy scope tests
+        run: node scripts/test-pharmacy-scope.mjs
 
       - name: Worker tests
         run: node worker/test.mjs

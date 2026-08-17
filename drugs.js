@@ -325,6 +325,7 @@ window.DRUG_CATALOG = (() => {
     };
     return {
       id: `drug-${String(index + 1).padStart(3, "0")}`,
+      pharmacyScopes: ["ward"],
       rawName,
       drugName,
       tradeName: drugName === "莫匹罗星软膏" ? "百多邦（清单所示）" : "",

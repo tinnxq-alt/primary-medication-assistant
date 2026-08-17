@@ -1,7 +1,7 @@
 {
   "name": "基层用药助手 Pro",
   "short_name": "用药助手",
-  "description": "基层药品目录、说明书核验、收藏、笔记与离线缓存工具",
+  "description": "病房与门诊双药库、说明书核验、收藏、笔记与离线缓存工具",
   "id": "./",
   "start_url": "./#/home",
   "scope": "./",
