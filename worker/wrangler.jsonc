@@ -8,6 +8,10 @@
   "ai": {
     "binding": "AI"
   },
+  "browser": {
+    "binding": "BROWSER",
+    "remote": true
+  },
   "vars": {
     "ALLOWED_ORIGINS": "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000",
     "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast"

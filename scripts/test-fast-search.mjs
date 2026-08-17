@@ -23,6 +23,7 @@ assert.match(lookup, /function|const rankDrugs/, "应提供可复用的本地排
 assert.ok(html.includes('src="fast-search-ui.js"'), "页面必须加载快速片段搜索脚本");
 assert.ok(html.indexOf('src="app.js"') < html.indexOf('src="fast-search-ui.js"'), "快速搜索增强应在主应用后加载");
 assert.ok(worker.includes('"./fast-search-ui.js"'), "PWA 必须缓存快速搜索脚本");
-assert.ok(worker.includes("primary-medication-v39"), "片段搜索上线应升级到 v39 缓存");
+const cacheVersion = Number(worker.match(/primary-medication-v(\d+)/)?.[1] || 0);
+assert.ok(cacheVersion >= 39, "片段搜索缓存版本不得低于 v39，后续安全修复允许继续升级");
 
 console.log("药名片段快速搜索、输入合并与首页即时候选检查通过");

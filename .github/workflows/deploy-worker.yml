@@ -1,4 +1,4 @@
-name: Deploy free Chinese verification Worker
+name: Deploy source-grounded medication Worker
 
 on:
   workflow_dispatch:
@@ -38,3 +38,36 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: worker
           command: deploy
+
+      - name: Smoke test live instruction retrieval
+        env:
+          WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
+        run: |
+          sleep 3
+          curl --fail --silent --show-error \
+            --max-time 40 \
+            -X POST "$WORKER_URL/v1/drugs/search" \
+            -H 'Origin: https://tinnxq-alt.github.io' \
+            -H 'Content-Type: application/json' \
+            --data '{"query":"司美"}' \
+            --output /tmp/smart-search-smoke.json
+          node - <<'NODE'
+          const fs = require('fs');
+          const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
+          if (payload.mode !== 'web-instruction-source-extraction') {
+            throw new Error(`unexpected mode: ${payload.mode || 'missing'}`);
+          }
+          const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+          const target = candidates.find(item =>
+            String(item.drugName || '').includes('司美') &&
+            item.category === '降糖药' &&
+            /^https:\/\//.test(String(item.sourceUrl || '')) &&
+            String(item.clinical?.indication || '').trim() &&
+            String(item.clinical?.dosage || '').trim()
+          );
+          if (!target) {
+            console.error(JSON.stringify(payload, null, 2));
+            throw new Error('live smoke test did not find a source-grounded semaglutide glucose-lowering candidate');
+          }
+          console.log(`live source-grounded candidate ok: ${target.drugName} | ${target.sourceUrl}`);
+          NODE

@@ -3,14 +3,11 @@
 
   const PREFIX = "primary-medication-pro:v1:";
   const DEFAULT_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
-  const CATEGORY_IDS = ["心血管","降压药","降糖药","调脂药","抗凝抗血小板","抗感染药","呼吸系统","消化系统","神经精神","镇痛抗炎","泌尿系统","内分泌","皮肤外用","维生素矿物质","中成药","其他"];
   const lookup = window.DRUG_LOOKUP || {};
   const normalize = lookup.normalize || (value => String(value || "").normalize("NFKC").toLowerCase().replace(/[\s()（）【】\[\]·•\-_]/g, ""));
-  const directMatch = lookup.directlyMatchesDrug || (() => false);
   let aliasPromise = null;
   let candidateMap = new Map();
   let requestId = 0;
-  let detailRequestId = 0;
   let lastWarmAt = 0;
 
   const esc = value => String(value ?? "")
@@ -40,34 +37,8 @@
     toast.timer = setTimeout(() => node.classList.remove("show"), 1800);
   }
 
-  function normalizeCategory(category, drugName = "") {
-    const value = String(category || "").trim();
-    if (CATEGORY_IDS.includes(value)) return value;
-    const text = `${drugName}${value}`;
-    if (/中成|丸|口服液|合剂/.test(text) && !/注射液/.test(text)) return "中成药";
-    if (/阿司匹林|氯吡格雷|利伐沙班|抗凝|抗血小板/.test(text)) return "抗凝抗血小板";
-    if (/胰岛素|二甲双胍|阿卡波糖|格列|列净|列汀|降糖/.test(text)) return "降糖药";
-    if (/他汀|依折麦布|降脂/.test(text)) return "调脂药";
-    if (/沙坦|普利|地平|美托洛尔|比索洛尔|多沙唑嗪|降压/.test(text)) return "降压药";
-    if (/乳膏|软膏|凝胶|贴膏|外用|滴眼液/.test(text)) return "皮肤外用";
-    if (/头孢|霉素|沙星|奥司他韦|玛巴洛沙韦|抗感染|抗菌|抗病毒/.test(text)) return "抗感染药";
-    if (/氨酚|伪麻|止咳|祛痰|羧甲司坦|溴己新|乙酰半胱氨酸|宣肺/.test(text)) return "呼吸系统";
-    if (/奥美拉唑|兰索拉唑|凯普拉生|莫沙必利|乳果糖|铝碳酸镁|开塞露|麻仁|洛哌丁胺|小檗碱/.test(text)) return "消化系统";
-    if (/布洛芬|双氯芬|洛索洛芬|吲哚美辛|萘普生|镇痛|止痛/.test(text)) return "镇痛抗炎";
-    if (/唑仑|唑吡坦|佐匹克隆|氯硝西泮|丙戊酸|普瑞巴林|氟桂利嗪|神经|精神/.test(text)) return "神经精神";
-    if (/坦索罗辛|非那雄胺|非布司他|苯溴马隆|呋塞米|螺内酯|泌尿/.test(text)) return "泌尿系统";
-    if (/左甲状腺素|地塞米松|骨化醇|内分泌/.test(text)) return "内分泌";
-    if (/维生素|叶酸|碳酸钙|氯化钾|矿物质/.test(text)) return "维生素矿物质";
-    if (/硝酸|救心|心通|心速宁|曲美他嗪|心血管/.test(text)) return "心血管";
-    return "其他";
-  }
-
   function endpoint() {
-    try {
-      return String(read("smartSearchEndpoint", DEFAULT_ENDPOINT) || DEFAULT_ENDPOINT).trim().replace(/\/+$/, "");
-    } catch {
-      return DEFAULT_ENDPOINT;
-    }
+    return String(read("smartSearchEndpoint", DEFAULT_ENDPOINT) || DEFAULT_ENDPOINT).trim().replace(/\/+$/, "");
   }
 
   function allKnownDrugs() {
@@ -94,26 +65,10 @@
     const drugs = allKnownDrugs();
     const direct = drugs.find(drug => [drug.drugName, drug.genericName, drug.tradeName, drug.rawName]
       .some(value => value && normalize(value) === q));
-    if (direct) return { drug: direct, matchedBy: "同名" };
-
+    if (direct) return direct;
     const alias = aliases.find(item => item?.tradeName && normalize(item.tradeName) === q);
     if (!alias) return null;
-    const target = drugs.find(drug => {
-      const names = [drug.drugName, drug.genericName].filter(Boolean).map(normalize);
-      return names.includes(normalize(alias.drugName)) || names.includes(normalize(alias.genericName));
-    });
-    return target ? { drug: target, matchedBy: `商品名“${alias.tradeName}”` } : null;
-  }
-
-  function similarKnownDrug(query) {
-    return allKnownDrugs().find(drug => directMatch(query, drug)) || null;
-  }
-
-  function pharmacyText(drug) {
-    const scopes = Array.isArray(drug?.pharmacyScopes) ? drug.pharmacyScopes : [];
-    if (scopes.includes("ward") && scopes.includes("outpatient")) return "病房/门诊药库";
-    if (scopes.includes("outpatient")) return "门诊药库";
-    return "病房药库";
+    return drugs.find(drug => [drug.drugName, drug.genericName].some(value => value && [alias.drugName, alias.genericName].some(target => normalize(value) === normalize(target)))) || null;
   }
 
   async function warmWorker() {
@@ -122,92 +77,58 @@
     lastWarmAt = now;
     const base = endpoint();
     if (!base) return;
-    try {
-      await fetch(`${base}/health`, { method: "GET", cache: "no-store", mode: "cors" });
-    } catch {
-      // 预热失败不影响正式识别。
-    }
+    try { await fetch(`${base}/health`, { cache: "no-store", mode: "cors" }); } catch {}
   }
 
-  async function postJson(path, body, timeoutMs, timeoutMessage) {
+  async function remoteInstructionCandidates(query) {
     const base = endpoint();
-    if (!base) throw new Error("智能识别服务未配置");
+    if (!base) throw new Error("联网说明书检索服务未配置");
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const timer = setTimeout(() => controller.abort(), 30000);
     try {
-      const response = await fetch(`${base}${path}`, {
+      const response = await fetch(`${base}/v1/drugs/search`, {
         method: "POST",
         cache: "no-store",
         signal: controller.signal,
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ query })
       });
       const payload = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(payload.error || `智能识别服务返回 ${response.status}`);
-      return payload;
+      if (!response.ok) throw new Error(payload.error || `联网检索返回 ${response.status}`);
+      return {
+        candidates: (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => ({
+          drugName: String(item.drugName || "").trim(),
+          tradeName: String(item.tradeName || "").trim(),
+          specification: String(item.specification || "").trim(),
+          manufacturer: String(item.manufacturer || "").trim(),
+          dosageForm: String(item.dosageForm || "").trim(),
+          approvalNumber: String(item.approvalNumber || "").trim(),
+          category: String(item.category || "其他"),
+          clinical: {
+            indication: String(item.clinical?.indication || "").trim(),
+            dosage: String(item.clinical?.dosage || "").trim(),
+            adverseReactions: String(item.clinical?.adverseReactions || "").trim(),
+            precautions: String(item.clinical?.precautions || "").trim()
+          },
+          source: {
+            status: "unverified-draft",
+            label: String(item.sourceTitle || item.sourceHost || "联网药品说明书"),
+            url: String(item.sourceUrl || ""),
+            host: String(item.sourceHost || ""),
+            quality: String(item.sourceQuality || "网页说明书来源"),
+            checkedAt: String(item.sourceCheckedAt || new Date().toISOString().slice(0, 10))
+          }
+        })).filter(item => hasChinese(item.drugName) && item.clinical.indication && item.clinical.dosage).slice(0, 3),
+        warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
+        elapsedMs: Number(payload.elapsedMs) || 0,
+        searchResultCount: Number(payload.searchResultCount) || 0
+      };
     } catch (error) {
-      if (error.name === "AbortError") throw new Error(timeoutMessage);
+      if (error.name === "AbortError") throw new Error("联网说明书检索超过 30 秒，请重试");
       throw error;
     } finally {
       clearTimeout(timer);
     }
-  }
-
-  async function remoteNewDrugCandidates(query) {
-    const payload = await postJson("/v1/drugs/search", { query, newDrugOnly: true, candidateCount: 3 }, 15_000, "候选识别超过 15 秒，请重试");
-    const candidates = (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => ({
-      drugName: item.drugName || "",
-      tradeName: item.tradeName || "",
-      specification: item.specification || "",
-      category: normalizeCategory(item.category, item.drugName),
-      clinical: null,
-      originalQuery: query,
-      source: {
-        status: "unverified-draft",
-        label: item.sourceTitle || "Cloudflare Workers AI（AI 生成）",
-        url: "",
-        checkedAt: item.sourceCheckedAt || new Date().toISOString().slice(0, 10)
-      },
-      smartMeta: { draft: true, verified: false }
-    })).filter(item => hasChinese(item.drugName)).slice(0, 5);
-    return {
-      candidates,
-      warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
-      mode: payload.mode || "",
-      elapsedMs: Number(payload.elapsedMs) || 0
-    };
-  }
-
-  async function remoteCandidateDetail(candidate) {
-    const payload = await postJson("/v1/drugs/detail", {
-      query: candidate.originalQuery || candidate.drugName,
-      candidate: {
-        drugName: candidate.drugName,
-        tradeName: candidate.tradeName,
-        category: candidate.category,
-        specification: candidate.specification
-      }
-    }, 18_000, "资料生成超过 18 秒，请重试");
-    const detail = payload.candidate || {};
-    return {
-      ...candidate,
-      drugName: detail.drugName || candidate.drugName,
-      tradeName: detail.tradeName ?? candidate.tradeName,
-      specification: detail.specification ?? candidate.specification,
-      category: normalizeCategory(detail.category || candidate.category, detail.drugName || candidate.drugName),
-      clinical: {
-        indication: detail.indications || "",
-        dosage: detail.dosage || "",
-        adverseReactions: detail.adverseReactions || "",
-        precautions: detail.precautions || ""
-      },
-      source: {
-        status: "unverified-draft",
-        label: detail.sourceTitle || candidate.source?.label || "Cloudflare Workers AI（AI 生成）",
-        url: "",
-        checkedAt: detail.sourceCheckedAt || candidate.source?.checkedAt || new Date().toISOString().slice(0, 10)
-      }
-    };
   }
 
   function currentForm() {
@@ -222,16 +143,24 @@
 
   function fill(candidate, node = currentForm()) {
     if (!candidate || !node) return;
-    ["drugName", "tradeName", "specification"].forEach(name => setField(node, name, candidate[name] || ""));
-    setField(node, "category", normalizeCategory(candidate.category, candidate.drugName));
-    ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(node, name, candidate.clinical?.[name] || ""));
-    setField(node, "sourceLabel", candidate.source?.label || "Cloudflare Workers AI（AI 生成）");
-    setField(node, "sourceUrl", "");
+    setField(node, "drugName", candidate.drugName || "");
+    setField(node, "tradeName", candidate.tradeName || "");
+    setField(node, "specification", candidate.specification || "");
+    setField(node, "category", candidate.category && candidate.category !== "其他" ? candidate.category : "其他");
+    setField(node, "indication", candidate.clinical?.indication || "");
+    setField(node, "dosage", candidate.clinical?.dosage || "");
+    setField(node, "adverseReactions", candidate.clinical?.adverseReactions || "");
+    setField(node, "precautions", candidate.clinical?.precautions || "");
+    setField(node, "sourceLabel", `${candidate.source?.label || "联网药品说明书"}｜${candidate.source?.quality || "网页来源"}`);
+    setField(node, "sourceUrl", candidate.source?.url || "");
     setField(node, "sourceCheckedAt", candidate.source?.checkedAt || "");
     setField(node, "sourceStatus", "unverified-draft");
     const source = document.getElementById("selectedSource");
-    if (source) source.textContent = `来源：${candidate.source?.label || "Cloudflare Workers AI（AI 生成）"}`;
-    toast(`已选择：${candidate.drugName}`);
+    if (source) {
+      const extra = [candidate.manufacturer && `生产企业：${candidate.manufacturer}`, candidate.approvalNumber && `批准文号：${candidate.approvalNumber}`].filter(Boolean).join("；");
+      source.textContent = `当前来源：${candidate.source?.label || "联网药品说明书"}（${candidate.source?.quality || "网页来源"}）${extra ? `；${extra}` : ""}`;
+    }
+    toast(`已从说明书原文填入：${candidate.drugName}`);
   }
 
   function renderCandidates(candidates) {
@@ -240,12 +169,14 @@
     candidateMap = new Map();
     const stamp = Date.now();
     candidates.forEach((candidate, index) => {
-      candidate.lookupId = `new-drug-${stamp}-${index}`;
+      candidate.lookupId = `web-label-${stamp}-${index}`;
       candidateMap.set(candidate.lookupId, candidate);
     });
-    results.innerHTML = candidates.length ? candidates.map((candidate, index) =>
-      `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge info">AI 生成</span> 来源：${esc(candidate.source?.label || "Cloudflare Workers AI（AI 生成）")}</p><div class="toolbar"><button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并自动填充</button></div></div></article>`
-    ).join("") : '<div class="empty"><p>暂未生成候选，可重试或直接手动填写。</p></div>';
+    results.innerHTML = candidates.length ? candidates.map((candidate, index) => {
+      const meta = [candidate.tradeName, candidate.specification, candidate.manufacturer].filter(Boolean).join(" · ");
+      const sourceLink = candidate.source?.url ? `<a class="btn ghost small link-btn" href="${esc(candidate.source.url)}" target="_blank" rel="noopener">查看原说明书</a>` : "";
+      return `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">说明书候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(meta || "规格/厂家以来源页为准")} · ${esc(candidate.category || "其他")}</p><p class="drug-sub"><span class="badge ok">网页原文摘录</span> ${esc(candidate.source?.quality || "网页来源")}：${esc(candidate.source?.host || candidate.source?.label || "")}</p><div class="toolbar">${sourceLink}<button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并自动填充</button></div></div></article>`;
+    }).join("") : '<div class="empty"><p>未找到同时含药名、适应症和用法用量的可解析说明书网页。请补充药名后重试。</p></div>';
   }
 
   function clearResults() {
@@ -261,13 +192,15 @@
     const panel = document.querySelector("#drugForm")?.closest(".panel");
     if (!panel) return;
     const heading = [...panel.querySelectorAll("h3")].find(node => node.textContent.includes("智能识别"));
-    if (heading) heading.textContent = "1. 新药智能识别（片段检索）";
+    if (heading) heading.textContent = "1. 联网检索药品说明书";
     const notice = heading?.nextElementSibling;
     if (notice?.classList.contains("notice")) {
-      notice.textContent = "无需输入药物全称：输入 2 个及以上汉字片段即可先快速生成多个候选；选择对应药物后再自动生成完整资料并填入表单。候选和填充资料均标注 AI 来源。";
+      notice.textContent = "无需输入完整药名。输入 2 个及以上汉字后联网搜索真实药品说明书；只有从来源网页原文中同时提取到药名、适应症和用法用量的页面才会成为候选。选择候选后自动填充，缺失字段不会猜测补写。";
     }
     const input = document.getElementById("drugNameInput");
     if (input) input.placeholder = "输入药名片段，如“司美”“孟鲁”“阿奇”";
+    const button = document.getElementById("lookupDrugBtn");
+    if (button && !button.disabled) button.textContent = "联网检索说明书";
   }
 
   async function run() {
@@ -276,74 +209,39 @@
     const query = String(node.elements.namedItem("drugName")?.value || "").trim();
     if (!query) return toast("请先输入药名片段");
     if (!hasChinese(query)) return toast("请输入中文药品名称");
-    if (chineseCount(query) < 2) return toast("再输入 1 个汉字，2 个字即可识别");
+    if (chineseCount(query) < 2) return toast("至少输入 2 个汉字");
 
     const id = ++requestId;
     const button = document.getElementById("lookupDrugBtn");
     const status = document.getElementById("lookupStatus");
-    if (button) { button.disabled = true; button.textContent = "快速找候选…"; }
+    if (button) { button.disabled = true; button.textContent = "正在检索全网…"; }
     clearResults();
-    if (status) status.textContent = "正在本机快速检查重复…";
+    if (status) status.textContent = "正在联网搜索药品说明书并读取网页原文…";
 
     try {
       const aliases = await loadAliases();
       if (id !== requestId) return;
       const duplicate = exactDuplicate(query, aliases);
       if (duplicate) {
-        if (status) status.textContent = `${duplicate.matchedBy}已匹配到${pharmacyText(duplicate.drug)}中的“${duplicate.drug.drugName}”，无需重复添加。`;
-        toast("该药已收录，不再重复添加");
+        if (status) status.textContent = `当前药库已收录“${duplicate.drugName || duplicate.genericName || query}”。如需添加不同规格/厂家，可继续补全名称后再检索。`;
+        toast("药库已有同名药物");
         return;
       }
 
-      const similar = similarKnownDrug(query);
-      if (status) status.textContent = similar
-        ? `片段匹配到相似条目“${similar.drugName}”，同时继续识别其他可能候选…`
-        : "正在按药名片段快速生成候选…";
-
-      const result = await remoteNewDrugCandidates(query);
+      const result = await remoteInstructionCandidates(query);
       if (id !== requestId) return;
       renderCandidates(result.candidates);
-      if (result.candidates.length) {
-        const timing = result.elapsedMs ? `（${(result.elapsedMs / 1000).toFixed(1)} 秒）` : "";
-        if (status) status.textContent = `已生成 ${result.candidates.length} 个候选${timing}。请选择对应药物，选中后再生成这一项的完整资料并自动填充。`;
-      } else if (status) {
-        status.textContent = `暂未生成候选。${result.warnings.length ? result.warnings.join("；") : "可直接使用下方表单手动录入。"}`;
-      }
+      const timing = result.elapsedMs ? `，耗时 ${(result.elapsedMs / 1000).toFixed(1)} 秒` : "";
+      if (status) status.textContent = result.candidates.length
+        ? `从 ${result.searchResultCount || "多个"} 个网页搜索结果中筛出 ${result.candidates.length} 份可解析说明书${timing}。请选择与药盒规格/厂家对应的一项。`
+        : `没有找到可安全自动填充的说明书${timing}。${result.warnings.join("；")}`;
     } catch (error) {
       if (id !== requestId) return;
       renderCandidates([]);
-      if (status) status.textContent = `新药智能识别暂不可用：${error.message || "网络异常"}。可以直接手动填写。`;
-      toast("智能识别暂不可用，可手动录入");
+      if (status) status.textContent = `联网说明书检索失败：${error.message || "网络异常"}`;
+      toast("联网说明书检索暂不可用");
     } finally {
-      if (id === requestId && button) { button.disabled = false; button.textContent = "智能识别"; }
-    }
-  }
-
-  async function chooseCandidate(use) {
-    const candidate = candidateMap.get(use.dataset.newDrugUse);
-    if (!candidate) return;
-    const id = ++detailRequestId;
-    const status = document.getElementById("lookupStatus");
-    const originalText = use.textContent;
-    use.disabled = true;
-    use.textContent = "生成资料中…";
-    if (status) status.textContent = `已选择“${candidate.drugName}”，正在生成这一项的完整资料…`;
-    try {
-      const completed = await remoteCandidateDetail(candidate);
-      if (id !== detailRequestId) return;
-      candidateMap.set(candidate.lookupId, completed);
-      fill(completed);
-      document.querySelectorAll("[data-candidate-card]").forEach(card => card.removeAttribute("data-selected"));
-      use.closest("[data-candidate-card]")?.setAttribute("data-selected", "true");
-      if (status) status.textContent = `已选择“${completed.drugName}”，完整资料已自动填入下方表单。来源：${completed.source?.label || "Cloudflare Workers AI"}。`;
-      use.textContent = "已选择并填充";
-    } catch (error) {
-      if (id !== detailRequestId) return;
-      fill(candidate);
-      if (status) status.textContent = `“${candidate.drugName}”基础信息已填入；完整资料生成失败：${error.message || "网络异常"}。`;
-      toast("完整资料生成失败，已填入基础信息");
-      use.disabled = false;
-      use.textContent = originalText;
+      if (id === requestId && button) { button.disabled = false; button.textContent = "联网检索说明书"; }
     }
   }
 
@@ -358,7 +256,14 @@
     if (use) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      chooseCandidate(use);
+      const candidate = candidateMap.get(use.dataset.newDrugUse);
+      if (!candidate) return;
+      fill(candidate);
+      document.querySelectorAll("[data-candidate-card]").forEach(card => card.removeAttribute("data-selected"));
+      use.closest("[data-candidate-card]")?.setAttribute("data-selected", "true");
+      const status = document.getElementById("lookupStatus");
+      if (status) status.textContent = `已选择“${candidate.drugName}”，适应症、用法用量等内容均来自该候选说明书网页原文。请结合规格/厂家确认是否为目标品种。`;
+      use.textContent = "已选择并填充";
     }
   }, true);
 
