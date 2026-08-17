@@ -1,4 +1,4 @@
-const CACHE_NAME = "primary-medication-v36";
+const CACHE_NAME = "primary-medication-v37";
 const APP_SHELL = ["./", "./index.html", "./style.css", "./header-layout.css", "./text-mark-fix.css", "./drugs.js", "./catalog-retirements.js", "./outpatient-drugs.js", "./drug-lookup.js", "./pharmacy-scope.js", "./chinese-drug-labels.json?v=12", "./app.js", "./smart-add-fix.js", "./notebook-scroll-fix.js", "./mark-notebook-ui.js", "./mark-menu-below-selection.js", "./header-brand.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
