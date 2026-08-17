@@ -140,11 +140,18 @@ async function browserScrapeLinks(browser, input) {
   return linksFromScrape(payload, input?.url || "https://www.bing.com/");
 }
 
+async function renderedHtmlFromContentResponse(response) {
+  if (!response?.ok) return "";
+  let payload;
+  try { payload = await response.json(); }
+  catch { return ""; }
+  return payload?.success && typeof payload.result === "string" ? payload.result : "";
+}
+
 async function browserContentLinks(browser, input) {
   const response = await browser.quickAction("content", cleanBrowserOptions(input));
-  if (!response.ok) return [];
-  const html = await response.text();
-  return linksFromHtml(html, input?.url || "https://www.bing.com/");
+  const html = await renderedHtmlFromContentResponse(response);
+  return html ? linksFromHtml(html, input?.url || "https://www.bing.com/") : [];
 }
 
 async function publicSearchFallbacks(input) {
@@ -201,10 +208,12 @@ export default {
 
 export {
   bingRssLinks,
+  browserContentLinks,
   duckDuckGoLinks,
   linksFromHtml,
   linksFromScrape,
   publicSearchFallbacks,
+  renderedHtmlFromContentResponse,
   searchQueryFromBingUrl,
   shouldKeepHref,
   unwrapDuckDuckGo
