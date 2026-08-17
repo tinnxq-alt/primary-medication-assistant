@@ -4,6 +4,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/diagnose-39-search.yml"
+      - "worker/src/diagnose-39.js"
+      - "worker/wrangler.diagnose.jsonc"
   workflow_dispatch:
 
 permissions:
@@ -12,115 +14,39 @@ permissions:
 jobs:
   diagnose:
     runs-on: ubuntu-latest
-    timeout-minutes: 8
+    timeout-minutes: 10
     env:
-      CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      DIAG_URL: https://primary-medication-search-diagnose.tinnxq.workers.dev
     steps:
       - uses: actions/checkout@v7
 
-      - name: Inspect 39 homepage and search page with Browser Rendering
+      - name: Install Wrangler
+        working-directory: worker
+        run: npm ci
+
+      - name: Deploy temporary diagnostic Worker
+        working-directory: worker
+        run: npx wrangler deploy --config wrangler.diagnose.jsonc
+
+      - name: Inspect 39 homepage and search page through Browser binding
         shell: bash
         run: |
           set -euo pipefail
-          if [ -z "${CF_ACCOUNT_ID:-}" ] || [ -z "${CF_API_TOKEN:-}" ]; then
-            echo "Cloudflare diagnostics secrets are unavailable" >&2
+          sleep 8
+          HTTP_CODE=$(curl --silent --show-error --max-time 70 \
+            "$DIAG_URL/" \
+            --output /tmp/diag.json \
+            --write-out '%{http_code}')
+          echo "diagnostic HTTP status: $HTTP_CODE"
+          cat /tmp/diag.json || true
+          echo
+          if [ "$HTTP_CODE" != "200" ]; then
             exit 1
           fi
 
-          API="https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/browser-rendering"
-          AUTH="Authorization: Bearer ${CF_API_TOKEN}"
-
-          cat > /tmp/home-body.json <<'JSON'
-          {
-            "url": "https://ypk.39.net/",
-            "elements": [
-              {"selector": "form"},
-              {"selector": "input"},
-              {"selector": "button"}
-            ],
-            "gotoOptions": {"waitUntil": "domcontentloaded", "timeout": 15000},
-            "waitForTimeout": 1500,
-            "rejectResourceTypes": ["image", "media", "font"]
-          }
-          JSON
-
-          curl --silent --show-error --fail-with-body \
-            -X POST "${API}/scrape" \
-            -H "$AUTH" -H 'Content-Type: application/json' \
-            --data @/tmp/home-body.json > /tmp/home-scrape.json
-
-          cat > /tmp/search-body.json <<'JSON'
-          {
-            "url": "https://ypk.39.net/search/%E5%8F%B8%E7%BE%8E",
-            "elements": [
-              {"selector": "a[href]"},
-              {"selector": "form"},
-              {"selector": "input"}
-            ],
-            "gotoOptions": {"waitUntil": "domcontentloaded", "timeout": 15000},
-            "waitForTimeout": 2500,
-            "rejectResourceTypes": ["image", "media", "font"]
-          }
-          JSON
-
-          curl --silent --show-error --fail-with-body \
-            -X POST "${API}/scrape" \
-            -H "$AUTH" -H 'Content-Type: application/json' \
-            --data @/tmp/search-body.json > /tmp/search-scrape.json
-
-          cat > /tmp/content-body.json <<'JSON'
-          {
-            "url": "https://ypk.39.net/search/%E5%8F%B8%E7%BE%8E",
-            "gotoOptions": {"waitUntil": "domcontentloaded", "timeout": 15000},
-            "waitForTimeout": 2500,
-            "rejectResourceTypes": ["image", "media", "font"]
-          }
-          JSON
-
-          curl --silent --show-error --fail-with-body \
-            -X POST "${API}/content" \
-            -H "$AUTH" -H 'Content-Type: application/json' \
-            --data @/tmp/content-body.json > /tmp/search-content.json
-
-          node - <<'NODE'
-          const fs = require('fs');
-          const read = p => JSON.parse(fs.readFileSync(p, 'utf8'));
-          const attrs = item => Object.fromEntries((item.attributes || []).map(a => [a.name, a.value]));
-          const printSet = (label, payload) => {
-            console.log(`\n=== ${label} success=${payload.success} ===`);
-            for (const group of payload.result || []) {
-              console.log(`selector: ${group.selector} count=${(group.results || []).length}`);
-              for (const item of (group.results || []).slice(0, 30)) {
-                const a = attrs(item);
-                console.log(JSON.stringify({ text: String(item.text || '').slice(0, 180), attributes: a }));
-              }
-            }
-          };
-          printSet('HOME SCRAPE', read('/tmp/home-scrape.json'));
-
-          const search = read('/tmp/search-scrape.json');
-          console.log(`\n=== SEARCH SCRAPE success=${search.success} ===`);
-          for (const group of search.result || []) {
-            const rows = group.results || [];
-            console.log(`selector: ${group.selector} count=${rows.length}`);
-            const filtered = group.selector === 'a[href]'
-              ? rows.filter(item => {
-                  const a = attrs(item);
-                  const text = String(item.text || '');
-                  const href = String(a.href || '');
-                  return text.includes('司美') || /\/(?:\d{5,})(?:\/|$)/.test(href) || href.includes('/search');
-                }).slice(0, 60)
-              : rows.slice(0, 30);
-            for (const item of filtered) {
-              console.log(JSON.stringify({ text: String(item.text || '').slice(0, 220), attributes: attrs(item) }));
-            }
-          }
-
-          const content = read('/tmp/search-content.json');
-          const html = typeof content.result === 'string' ? content.result : '';
-          const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<[^>]+>/g, ' ').trim() || '';
-          const numericHrefs = [...html.matchAll(/href=["']([^"']*\/\d{5,}[^"']*)["']/gi)].map(m => m[1]);
-          console.log('\n=== SEARCH CONTENT ===');
-          console.log(JSON.stringify({ success: content.success, htmlLength: html.length, title, containsQuery: html.includes('司美'), numericHrefSamples: [...new Set(numericHrefs)].slice(0, 40) }, null, 2));
-          NODE
+      - name: Delete temporary diagnostic Worker
+        if: always()
+        working-directory: worker
+        run: npx wrangler delete --name primary-medication-search-diagnose --config wrangler.diagnose.jsonc --force || true
