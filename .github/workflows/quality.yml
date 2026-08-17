@@ -33,6 +33,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
+          node --check text-mark-fix.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
