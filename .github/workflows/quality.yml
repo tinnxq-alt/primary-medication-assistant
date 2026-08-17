@@ -51,6 +51,7 @@ jobs:
           node --check worker/src/index-v4.js
           node --check worker/src/index-v5.js
           node --check worker/src/index-v6.js
+          node --check worker/src/index-v7.js
 
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
