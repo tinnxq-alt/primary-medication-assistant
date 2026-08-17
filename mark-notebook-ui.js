@@ -2,14 +2,13 @@
   "use strict";
 
   const STORAGE_PREFIX = "primary-medication-pro:v1:";
-  const RESTORE_KEY = "primary-medication:view-restore";
+  const LEGACY_RESTORE_KEY = "primary-medication:view-restore";
   const TYPE_LABELS = { underline: "划线", bold: "加粗", highlight: "荧光笔" };
+  const FIELD_LABELS = { indication: "适应症", dosage: "用法用量", adverseReactions: "不良反应", precautions: "注意事项" };
   const app = document.getElementById("app");
   let activeSelection = null;
   let enhanceQueued = false;
   let selectionTimer = null;
-  let pendingRestore = null;
-  let restoreAttempts = 0;
 
   const esc = value => String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -31,14 +30,21 @@
   const routeParts = () => location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const currentRoute = () => routeParts()[0] || "home";
   const currentDrugId = () => currentRoute() === "detail" ? decodeURIComponent(routeParts().slice(1).join("/")) : "";
-  const fieldSelector = fieldName => `.markable[data-mark-field="${String(fieldName || "").replaceAll('"', '\\"')}"]`;
+
+  function toast(message) {
+    const node = document.getElementById("toast");
+    if (!node) return;
+    node.textContent = message;
+    node.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => node.classList.remove("show"), 1500);
+  }
 
   function drugNameById(drugId) {
-    const custom = readList("customDrugs");
     const all = [
       ...(window.DRUG_CATALOG || []),
       ...(window.OUTPATIENT_DRUG_CATALOG || []),
-      ...custom
+      ...readList("customDrugs")
     ];
     return all.find(drug => drug?.id === drugId)?.drugName || "已删除药品";
   }
@@ -92,7 +98,21 @@
     });
     const hint = [...document.querySelectorAll("p.muted")]
       .find(node => node.textContent.includes("长按或拖选说明书摘要文字"));
-    if (hint) hint.textContent = "直接长按或拖选说明书文字，松手后即可选择划线、加粗或荧光笔；点击已有标记可删除。";
+    if (hint) hint.textContent = "长按或拖选文字后，标记条会直接出现在选中文字旁边；点击已有标记可删除。";
+  }
+
+  function rangeAnchorRect(range) {
+    const rects = [...range.getClientRects()].filter(rect => rect.width > 0 || rect.height > 0);
+    const rect = rects.at(-1) || range.getBoundingClientRect();
+    if (!rect || (!rect.width && !rect.height)) return null;
+    return {
+      top: rect.top,
+      right: rect.right,
+      bottom: rect.bottom,
+      left: rect.left,
+      width: rect.width,
+      height: rect.height
+    };
   }
 
   function selectedRangeInfo() {
@@ -136,13 +156,46 @@
       field: field.dataset.markField,
       text,
       start,
-      end
+      end,
+      anchorRect: rangeAnchorRect(range)
     };
   }
 
   function removeFloatingMenus() {
     document.querySelector(".mark-selection-menu")?.remove();
     document.querySelector(".mark-delete-menu")?.remove();
+  }
+
+  function positionMenu(menu, anchorRect) {
+    if (!anchorRect) return;
+    menu.style.visibility = "hidden";
+    menu.style.left = "0px";
+    menu.style.top = "0px";
+    menu.style.bottom = "auto";
+    menu.style.transform = "none";
+
+    const viewport = window.visualViewport;
+    const viewportLeft = viewport?.offsetLeft || 0;
+    const viewportTop = viewport?.offsetTop || 0;
+    const viewportWidth = viewport?.width || window.innerWidth;
+    const viewportHeight = viewport?.height || window.innerHeight;
+    const gap = 8;
+    const edge = 8;
+    const width = Math.min(menu.offsetWidth, viewportWidth - edge * 2);
+    const height = menu.offsetHeight;
+    const centerX = anchorRect.left + anchorRect.width / 2;
+    const minLeft = viewportLeft + edge;
+    const maxLeft = viewportLeft + viewportWidth - width - edge;
+    const left = Math.min(maxLeft, Math.max(minLeft, centerX - width / 2));
+
+    let top = anchorRect.top - height - gap;
+    if (top < viewportTop + edge) top = anchorRect.bottom + gap;
+    const maxTop = viewportTop + viewportHeight - height - edge;
+    top = Math.min(maxTop, Math.max(viewportTop + edge, top));
+
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.visibility = "visible";
   }
 
   function showSelectionMenu(info) {
@@ -155,34 +208,22 @@
       menu.setAttribute("aria-label", "添加文本标记");
       document.body.appendChild(menu);
     }
-    menu.innerHTML = `<small>已选：${esc(info.text.slice(0, 26))}${info.text.length > 26 ? "…" : ""}</small><div><button type="button" class="btn secondary small" data-direct-mark-type="underline">划线</button><button type="button" class="btn secondary small" data-direct-mark-type="bold">加粗</button><button type="button" class="btn secondary small" data-direct-mark-type="highlight">荧光笔</button><button type="button" class="btn ghost small" data-close-direct-mark>取消</button></div>`;
+    menu.innerHTML = `<div class="mark-inline-actions"><button type="button" class="btn secondary small" data-direct-mark-type="underline">划线</button><button type="button" class="btn secondary small" data-direct-mark-type="bold">加粗</button><button type="button" class="btn secondary small" data-direct-mark-type="highlight">荧光笔</button><button type="button" class="btn ghost small" data-close-direct-mark>×</button></div>`;
+    requestAnimationFrame(() => positionMenu(menu, info.anchorRect));
   }
 
-  function rememberSelection() {
+  function rememberSelection(delay = 0) {
     clearTimeout(selectionTimer);
     selectionTimer = setTimeout(() => {
       const info = selectedRangeInfo();
       if (!info) return;
       activeSelection = info;
       showSelectionMenu(info);
-    }, 40);
+    }, delay);
   }
 
-  function makeRestorePayload(fieldName = "") {
-    const field = fieldName ? document.querySelector(fieldSelector(fieldName)) : null;
-    return {
-      hash: location.hash,
-      scrollY: Math.max(0, window.scrollY || window.pageYOffset || 0),
-      field: fieldName || "",
-      fieldViewportTop: field ? field.getBoundingClientRect().top : null,
-      createdAt: Date.now()
-    };
-  }
-
-  function reloadWithoutVisibleJump(fieldName = "") {
-    try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify(makeRestorePayload(fieldName))); } catch {}
-    document.documentElement.classList.add("restoring-view");
-    location.reload();
+  function syncMarks(marks) {
+    window.dispatchEvent(new CustomEvent("primary-medication:marks-local-change", { detail: { marks } }));
   }
 
   function addDirectMark(type) {
@@ -194,6 +235,7 @@
       && mark.start === info.start
       && mark.end === info.end
       && mark.type === type);
+
     if (!duplicate) {
       marks.push({
         id: `mark-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
@@ -206,9 +248,14 @@
         createdAt: new Date().toISOString()
       });
       writeList("marks", marks);
+      syncMarks(marks);
     }
+
     window.getSelection()?.removeAllRanges();
-    reloadWithoutVisibleJump(info.field);
+    activeSelection = null;
+    removeFloatingMenus();
+    renderDetailMarks();
+    toast(duplicate ? "该标记已存在" : `${TYPE_LABELS[type]}已保存`);
   }
 
   function openDeleteMenu(markElement) {
@@ -222,26 +269,39 @@
     menu.className = "mark-delete-menu";
     menu.setAttribute("role", "dialog");
     menu.setAttribute("aria-label", "文本标记操作");
-    menu.innerHTML = `<strong>文本标记</strong><div>${marks.map(mark => `<button type="button" class="btn danger small" data-direct-delete-mark="${esc(mark.id)}" data-direct-delete-field="${esc(mark.field)}">删除${esc(TYPE_LABELS[mark.type] || "标记")}</button>`).join("")}<button type="button" class="btn ghost small" data-close-direct-mark>取消</button></div>`;
+    menu.innerHTML = `<div class="mark-inline-actions">${marks.map(mark => `<button type="button" class="btn danger small" data-direct-delete-mark="${esc(mark.id)}">删除${esc(TYPE_LABELS[mark.type] || "标记")}</button>`).join("")}<button type="button" class="btn ghost small" data-close-direct-mark>×</button></div>`;
     document.body.appendChild(menu);
-
-    const rect = markElement.getBoundingClientRect();
-    const width = Math.min(300, Math.max(220, menu.offsetWidth));
-    const left = Math.min(window.innerWidth - width - 12, Math.max(12, rect.left));
-    const preferredTop = rect.bottom + 8;
-    const top = preferredTop + menu.offsetHeight < window.innerHeight
-      ? preferredTop
-      : Math.max(12, rect.top - menu.offsetHeight - 8);
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
+    positionMenu(menu, markElement.getBoundingClientRect());
   }
 
-  function deleteDirectMark(id, fieldName) {
+  function deleteDirectMark(id) {
     const marks = readList("marks");
     const next = marks.filter(mark => mark.id !== id);
     if (next.length === marks.length) return removeFloatingMenus();
     writeList("marks", next);
-    reloadWithoutVisibleJump(fieldName);
+    syncMarks(next);
+    removeFloatingMenus();
+    renderDetailMarks();
+    toast("标记已删除");
+  }
+
+  function notebookMarkCard(mark) {
+    return `<article class="card"><div class="detail-head"><div><h3>${esc(drugNameById(mark.drugId))}</h3><span class="badge info">${esc(FIELD_LABELS[mark.field] || mark.field)} · ${esc(TYPE_LABELS[mark.type] || mark.type)}</span></div><button class="btn ghost small" data-delete-mark="${esc(mark.id)}">删除</button></div><p class="mark-quote">${esc(mark.text)}</p></article>`;
+  }
+
+  function refreshNotebookMarks() {
+    if (currentRoute() !== "notebook") return;
+    const section = [...document.querySelectorAll("#app > .section, #app .section")]
+      .find(node => node.querySelector(":scope > .section-title h2")?.textContent.trim() === "文本标记");
+    const list = section?.querySelector(":scope > .marks-list");
+    if (!section || !list) return;
+    const marks = readList("marks");
+    const count = section.querySelector(":scope > .section-title small");
+    if (count) count.textContent = `${marks.length} 条`;
+    list.innerHTML = marks.length
+      ? marks.map(notebookMarkCard).join("")
+      : '<div class="empty"><p>还没有划线、加粗或荧光笔标记。</p></div>';
+    list.dataset.localMarksFresh = "true";
   }
 
   function groupNotebookSection(title, kind) {
@@ -286,41 +346,49 @@
   }
 
   function groupNotebook() {
+    refreshNotebookMarks();
     groupNotebookSection("全部药品笔记", "notes");
     groupNotebookSection("文本标记", "marks");
   }
 
-  function loadRestorePayload() {
-    try { pendingRestore = JSON.parse(sessionStorage.getItem(RESTORE_KEY) || "null"); } catch { pendingRestore = null; }
-    if (!pendingRestore || pendingRestore.hash !== location.hash || Date.now() - Number(pendingRestore.createdAt || 0) > 10000) {
-      pendingRestore = null;
-      sessionStorage.removeItem(RESTORE_KEY);
-      document.documentElement.classList.remove("restoring-view");
-    }
+  function deleteNotebookMark(id) {
+    const marks = readList("marks");
+    const next = marks.filter(mark => mark.id !== id);
+    if (next.length === marks.length) return;
+    writeList("marks", next);
+    syncMarks(next);
+    refreshNotebookMarks();
+    groupNotebookSection("文本标记", "marks");
+    toast("标记已删除");
   }
 
-  function tryRestoreView() {
-    if (!pendingRestore) return;
-    const route = currentRoute();
-    const detailReady = route !== "detail" || Boolean(document.querySelector(".markable[data-mark-field]"));
-    const notebookReady = route !== "notebook" || Boolean(app?.querySelector(".section-title"));
-    if ((!detailReady || !notebookReady) && restoreAttempts < 80) {
-      restoreAttempts += 1;
-      setTimeout(tryRestoreView, 40);
+  function exportNotebookFromStorage() {
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      notes: readList("notes"),
+      marks: readList("marks")
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "drug-notebook.json";
+    link.click();
+    URL.revokeObjectURL(url);
+    toast("已生成导出文件");
+  }
+
+  function restoreLegacyViewOnce() {
+    let payload = null;
+    try { payload = JSON.parse(sessionStorage.getItem(LEGACY_RESTORE_KEY) || "null"); } catch {}
+    sessionStorage.removeItem(LEGACY_RESTORE_KEY);
+    if (!payload || payload.hash !== location.hash) {
+      document.documentElement.classList.remove("restoring-view");
       return;
     }
-
-    const payload = pendingRestore;
-    pendingRestore = null;
-    sessionStorage.removeItem(RESTORE_KEY);
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      let top = Number(payload.scrollY || 0);
-      if (payload.field && Number.isFinite(payload.fieldViewportTop)) {
-        const field = document.querySelector(fieldSelector(payload.field));
-        if (field) top = Math.max(0, window.scrollY + field.getBoundingClientRect().top - payload.fieldViewportTop);
-      }
-      window.scrollTo({ top, left: 0, behavior: "auto" });
-      requestAnimationFrame(() => document.documentElement.classList.remove("restoring-view"));
+      window.scrollTo({ top: Math.max(0, Number(payload.scrollY || 0)), left: 0, behavior: "auto" });
+      document.documentElement.classList.remove("restoring-view");
     }));
   }
 
@@ -328,7 +396,6 @@
     enhanceQueued = false;
     if (currentRoute() === "detail") renderDetailMarks();
     if (currentRoute() === "notebook") groupNotebook();
-    tryRestoreView();
   }
 
   function queueEnhance() {
@@ -337,12 +404,12 @@
     requestAnimationFrame(enhance);
   }
 
-  document.addEventListener("selectionchange", rememberSelection);
-  document.addEventListener("mouseup", rememberSelection, true);
-  document.addEventListener("touchend", rememberSelection, { capture: true, passive: true });
+  document.addEventListener("selectionchange", () => rememberSelection(18));
+  document.addEventListener("mouseup", () => rememberSelection(0), true);
+  document.addEventListener("touchend", () => rememberSelection(18), { capture: true, passive: true });
 
   document.addEventListener("pointerdown", event => {
-    if (event.target.closest?.(".mark-selection-menu button")) event.preventDefault();
+    if (event.target.closest?.(".mark-selection-menu button, .mark-delete-menu button")) event.preventDefault();
   }, true);
 
   document.addEventListener("click", event => {
@@ -358,7 +425,7 @@
     if (directDelete) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      deleteDirectMark(directDelete.dataset.directDeleteMark, directDelete.dataset.directDeleteField || "");
+      deleteDirectMark(directDelete.dataset.directDeleteMark);
       return;
     }
 
@@ -379,6 +446,21 @@
       return;
     }
 
+    const notebookDelete = event.target.closest?.("[data-delete-mark]");
+    if (notebookDelete && currentRoute() === "notebook") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (window.confirm("确认删除这条文本标记？")) deleteNotebookMark(notebookDelete.dataset.deleteMark);
+      return;
+    }
+
+    if (event.target.closest?.("#exportNotes") && currentRoute() === "notebook") {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      exportNotebookFromStorage();
+      return;
+    }
+
     if (!event.target.closest?.(".mark-selection-menu, .mark-delete-menu")) {
       document.querySelector(".mark-delete-menu")?.remove();
     }
@@ -390,9 +472,9 @@
     removeFloatingMenus();
     queueEnhance();
   });
-  window.addEventListener("resize", () => document.querySelector(".mark-delete-menu")?.remove());
+  window.addEventListener("resize", removeFloatingMenus);
+  window.visualViewport?.addEventListener("resize", removeFloatingMenus);
 
-  loadRestorePayload();
+  restoreLegacyViewOnce();
   queueEnhance();
-  tryRestoreView();
 })();
