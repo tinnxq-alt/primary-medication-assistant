@@ -33,6 +33,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
+          node --check text-mark-fix.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -48,6 +49,9 @@ jobs:
 
       - name: Pharmacy scope tests
         run: node scripts/test-pharmacy-scope.mjs
+
+      - name: Text mark and notebook tests
+        run: node scripts/test-text-mark-fix.mjs
 
       - name: Worker tests
         run: node worker/test.mjs

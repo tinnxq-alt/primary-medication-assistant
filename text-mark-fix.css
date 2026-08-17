@@ -1,0 +1,46 @@
+.text-mark[data-text-mark-id] {
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(15, 118, 110, 0.14);
+}
+
+.mark-delete-menu {
+  position: fixed;
+  z-index: 1200;
+  max-width: calc(100vw - 24px);
+  padding: 12px;
+  border: 1px solid var(--border, #d7e2e0);
+  border-radius: 14px;
+  background: var(--surface, #fff);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+}
+
+.mark-delete-menu > strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.mark-delete-menu > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.note-group-card {
+  padding: 16px;
+}
+
+.note-group-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.note-group-entry {
+  margin: 0;
+  padding: 12px;
+  background: var(--surface-soft, #f7faf9);
+}
+
+.note-group-entry .detail-head {
+  align-items: flex-start;
+}
