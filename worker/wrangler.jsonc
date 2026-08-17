@@ -1,7 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "primary-medication-smart-search",
-  "main": "src/index-v4.js",
+  "main": "src/index-v5.js",
   "compatibility_date": "2026-08-16",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
