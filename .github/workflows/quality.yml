@@ -23,13 +23,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
-
       - name: Use Node.js 24
         uses: actions/setup-node@v7
         with:
           node-version: 24
           package-manager-cache: false
-
       - name: JavaScript syntax
         run: |
           node --check app.js
@@ -54,36 +52,26 @@ jobs:
           node --check worker/src/index-v7.js
           node --check worker/src/index-v8.js
           node --check worker/src/index-v9.js
-
+          node --check worker/src/index-v10.js
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
-
       - name: Catalog retirements tests
         run: node scripts/test-catalog-retirements.mjs
-
       - name: Drug name lookup tests
         run: node scripts/test-drug-lookup.mjs
-
       - name: Fast partial-name search tests
         run: node scripts/test-fast-search.mjs
-
       - name: Smart add autofill tests
         run: node scripts/test-smart-add-fix.mjs
-
       - name: Pharmacy scope tests
         run: node scripts/test-pharmacy-scope.mjs
-
       - name: Text mark and notebook tests
         run: node scripts/test-text-mark-fix.mjs
-
       - name: Notebook delete tests
         run: node scripts/test-notebook-delete.mjs
-
       - name: Notebook scroll tests
         run: node scripts/test-notebook-scroll.mjs
-
       - name: Header layout tests
         run: node scripts/test-header-layout.mjs
-
       - name: Worker tests
         run: node worker/test.mjs
