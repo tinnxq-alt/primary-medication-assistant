@@ -44,13 +44,21 @@ jobs:
           WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
         run: |
           sleep 10
-          curl --fail --silent --show-error \
-            --max-time 50 \
+          HTTP_CODE=$(curl --silent --show-error \
+            --max-time 55 \
             -X POST "$WORKER_URL/v1/drugs/search" \
             -H 'Origin: https://tinnxq-alt.github.io' \
             -H 'Content-Type: application/json' \
             --data '{"query":"司美"}' \
-            --output /tmp/smart-search-smoke.json
+            --output /tmp/smart-search-smoke.json \
+            --write-out '%{http_code}')
+          echo "live HTTP status: $HTTP_CODE"
+          cat /tmp/smart-search-smoke.json || true
+          echo
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "Live Worker returned HTTP $HTTP_CODE" >&2
+            exit 1
+          fi
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
