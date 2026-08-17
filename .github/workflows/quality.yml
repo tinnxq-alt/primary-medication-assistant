@@ -46,6 +46,7 @@ jobs:
           node --check outpatient-drugs.js
           node --check service-worker.js
           node --check worker/src/index.js
+          node --check worker/src/index-v2.js
 
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
