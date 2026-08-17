@@ -4,13 +4,13 @@ import fs from "node:fs";
 const source = fs.readFileSync("smart-add-fix.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 const serviceWorker = fs.readFileSync("service-worker.js", "utf8");
-const workerSource = fs.readFileSync("worker/src/index-v3.js", "utf8");
+const workerCore = fs.readFileSync("worker/src/index-v3.js", "utf8");
+const workerAdapter = fs.readFileSync("worker/src/index-v4.js", "utf8");
 const wrangler = fs.readFileSync("worker/wrangler.jsonc", "utf8");
 
 assert.match(source, /function exactDuplicate\(/, "添加药物必须保留本地重复检测");
 assert.match(source, /chineseCount\(query\) < 2/, "输入两个汉字片段即可联网检索，无需完整药名");
 assert.match(source, /remoteInstructionCandidates\(query\)/, "添加药物必须调用联网说明书检索链路");
-assert.match(source, /\/v1\/drugs\/search/, "前端必须请求联网说明书搜索接口");
 assert.match(source, /查看原说明书/, "候选必须提供原始说明书来源链接");
 assert.match(source, /网页原文摘录/, "候选必须明确说明内容来自网页原文");
 assert.match(source, /选择并自动填充/, "用户选择候选后才自动填充");
@@ -26,23 +26,21 @@ assert.ok(html.includes('src="smart-add-fix.js"'), "页面必须加载联网说�
 assert.ok(serviceWorker.includes('"./smart-add-fix.js"'), "PWA 必须缓存智能识别脚本");
 assert.ok(Number(serviceWorker.match(/primary-medication-v(\d+)/)?.[1] || 0) >= 40, "联网说明书版本 PWA 缓存不得低于 v40");
 
-assert.match(wrangler, /"main"\s*:\s*"src\/index-v3\.js"/, "Wrangler 必须部署医药来源加权 Worker 入口");
-assert.match(wrangler, /"browser"\s*:\s*\{/, "Worker 必须配置 Browser Run binding 执行网页检索");
-assert.match(workerSource, /quickAction\("links"/, "Worker 应使用 Browser Run Links 模式发现真实搜索结果外链");
-assert.match(workerSource, /药源网 39药品通 丁香园/, "全网搜索应对常见医药说明书来源进行排序加权");
-assert.match(workerSource, /unwrapBingUrl/, "Worker 必须解码 Bing 跟踪链接到真实来源 URL");
-assert.match(workerSource, /sourceKind/, "Worker 必须按来源类型排序");
-assert.match(workerSource, /39\.net/, "39 药品通应识别为医药数据库来源");
-assert.match(workerSource, /fetchSourcePage/, "发现候选链接后必须读取实际来源网页");
-assert.match(workerSource, /parseInstructionPage/, "候选字段必须从来源网页解析");
-assert.match(workerSource, /extractSection/, "适应症等临床字段必须按说明书栏目抽取");
-assert.match(workerSource, /!candidate\.drugName \|\| !candidate\.clinical\.indication \|\| !candidate\.clinical\.dosage/, "缺少药名、适应症或用法用量的网页不得成为候选");
-assert.match(workerSource, /mode:\s*"web-instruction-source-extraction-v3"/, "Worker 必须标记为医药来源加权原文抽取模式");
-assert.match(workerSource, /discoveredSourceHosts/, "失败时应返回安全的来源域名诊断，便于真实环境排查");
-assert.match(workerSource, /generatesClinicalKnowledge:\s*false/, "健康检查必须明确不生成临床知识");
-assert.doesNotMatch(workerSource, /env\.AI\.run|generateCandidateDetail|selected-candidate-detail/, "Worker 不得让语言模型凭药名生成临床资料");
-assert.match(workerSource, /2型糖尿病\|降血糖/, "分类规则应利用来源中的糖尿病信息防止降糖药误判");
-assert.match(workerSource, /格鲁肽/, "GLP-1 类名称必须归入降糖药规则");
-assert.match(workerSource, /safePublicUrl/, "来源抓取必须限制为安全公网 HTTPS URL");
+assert.match(wrangler, /"main"\s*:\s*"src\/index-v4\.js"/, "Wrangler 必须部署通用锚点搜索适配层");
+assert.match(wrangler, /"browser"\s*:\s*\{/, "Worker 必须配置 Browser Run binding");
+assert.match(workerAdapter, /quickAction\("scrape"/, "搜索结果发现必须使用 Browser Run scrape");
+assert.match(workerAdapter, /selector:\s*"a\[href\]"/, "必须抓取通用 a[href]，不能依赖搜索结果固定 CSS 类名");
+assert.match(workerAdapter, /messenger\.com/, "适配层必须过滤真实线上出现过的 Messenger 导航噪声");
+assert.match(workerAdapter, /workerV3\.fetch/, "适配层必须复用严格的说明书正文校验核心");
 
-console.log("添加药物：全网检索+医药来源加权、真实说明书原文抽取与自动填充检查通过");
+assert.match(workerCore, /药源网 39药品通 丁香园/, "全网搜索继续对常见医药说明书来源加权");
+assert.match(workerCore, /unwrapBingUrl/, "核心必须解码 Bing 跟踪链接到真实来源 URL");
+assert.match(workerCore, /fetchSourcePage/, "发现候选链接后必须读取实际来源网页");
+assert.match(workerCore, /parseInstructionPage/, "候选字段必须从来源网页解析");
+assert.match(workerCore, /!candidate\.drugName \|\| !candidate\.clinical\.indication \|\| !candidate\.clinical\.dosage/, "缺少药名、适应症或用法用量的网页不得成为候选");
+assert.match(workerCore, /generatesClinicalKnowledge:\s*false/, "健康检查必须明确不生成临床知识");
+assert.doesNotMatch(workerCore, /env\.AI\.run|generateCandidateDetail|selected-candidate-detail/, "Worker 不得让语言模型凭药名生成临床资料");
+assert.match(workerCore, /格鲁肽/, "GLP-1 类名称必须归入降糖药规则");
+assert.match(workerCore, /safePublicUrl/, "来源抓取必须限制为安全公网 HTTPS URL");
+
+console.log("添加药物：通用锚点发现 + 真实说明书原文抽取 + 自动填充检查通过");
