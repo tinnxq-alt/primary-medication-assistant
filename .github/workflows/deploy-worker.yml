@@ -45,7 +45,7 @@ jobs:
         run: |
           sleep 10
           HTTP_CODE=$(curl --silent --show-error \
-            --max-time 55 \
+            --max-time 70 \
             -X POST "$WORKER_URL/v1/drugs/search" \
             -H 'Origin: https://tinnxq-alt.github.io' \
             -H 'Content-Type: application/json' \
@@ -66,21 +66,38 @@ jobs:
             console.error(JSON.stringify(payload, null, 2));
             throw new Error(`unexpected mode: ${payload.mode || 'missing'}`);
           }
-          if (!(Number(payload.searchResultCount) > 0)) {
+          if (payload.discovery !== 'trusted-source-discovery-v8') {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error('live web search did not discover any external instruction-source links');
+            throw new Error(`unexpected discovery mode: ${payload.discovery || 'missing'}`);
           }
+          if (payload.generatesClinicalKnowledge !== false || payload.sourceGrounded !== true) {
+            console.error(JSON.stringify(payload, null, 2));
+            throw new Error('live Worker must remain source-grounded and must not generate clinical knowledge');
+          }
+          const trustedHost = host => host === 'ypk.39.net'
+            || host === 'yaopinnet.com'
+            || host === 'www.yaopinnet.com'
+            || host === 'nmpa.gov.cn'
+            || host.endsWith('.nmpa.gov.cn')
+            || host === 'cde.org.cn'
+            || host.endsWith('.cde.org.cn');
           const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
-          const target = candidates.find(item =>
-            String(item.drugName || '').includes('司美') &&
-            item.category === '降糖药' &&
-            /^https:\/\//.test(String(item.sourceUrl || '')) &&
-            String(item.clinical?.indication || '').trim() &&
-            String(item.clinical?.dosage || '').trim()
-          );
+          const target = candidates.find(item => {
+            let host = '';
+            try { host = new URL(String(item.sourceUrl || '')).hostname.toLowerCase(); } catch {}
+            return String(item.drugName || '').includes('司美格鲁肽')
+              && item.category === '降糖药'
+              && trustedHost(host)
+              && String(item.clinical?.indication || '').trim()
+              && String(item.clinical?.dosage || '').trim();
+          });
           if (!target) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error(`live smoke failed; discovered hosts: ${(payload.discoveredSourceHosts || []).join(', ') || 'none'}`);
+            throw new Error(`live smoke failed; trusted hosts: ${(payload.discoveredSourceHosts || []).join(', ') || 'none'}`);
           }
-          console.log(`live source-grounded candidate ok: ${target.drugName} | ${target.sourceUrl}`);
+          for (const item of payload.verificationLinks || []) {
+            const host = new URL(item.url).hostname.toLowerCase();
+            if (!trustedHost(host)) throw new Error(`untrusted verification source leaked into response: ${host}`);
+          }
+          console.log(`live trusted source candidate ok: ${target.drugName} | ${target.sourceUrl}`);
           NODE
