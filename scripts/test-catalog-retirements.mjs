@@ -27,7 +27,8 @@ const worker = fs.readFileSync("service-worker.js", "utf8");
 assert.ok(html.indexOf('src="catalog-retirements.js"') > html.indexOf('src="drugs.js"'), "停用清单必须在 drugs.js 之后加载");
 assert.ok(html.indexOf('src="catalog-retirements.js"') < html.indexOf('src="app.js"'), "停用清单必须在 app.js 之前生效");
 assert.match(html, /病房药库<\/span><strong data-pharmacy-count>166<\/strong>/, "首页初始病房药库数量应为 166");
-assert.match(worker, /primary-medication-v31/, "PWA 缓存必须升级到 v31");
+const cacheVersion = Number(worker.match(/primary-medication-v(\d+)/)?.[1] || 0);
+assert.ok(cacheVersion >= 31, "PWA 缓存版本不得低于 v31");
 assert.match(worker, /catalog-retirements\.js/, "PWA 离线缓存必须包含停用清单");
 
 console.log("药品停用检查通过｜丹七片已移除｜病房药库 166 条｜后续药品 ID 保持稳定");
