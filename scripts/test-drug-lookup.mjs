@@ -9,12 +9,18 @@ const context = { window: {} };
 vm.createContext(context);
 vm.runInContext(fs.readFileSync(path.join(root, "drug-lookup.js"), "utf8"), context);
 
-const { directlyMatchesDrug, normalize, normalizeTradeNameAliases, tradeNameAliasForDrug } = context.window.DRUG_LOOKUP;
+const { directlyMatchesDrug, normalize, normalizeTradeNameAliases, rankDrugs, tradeNameAliasForDrug } = context.window.DRUG_LOOKUP;
 const payload = JSON.parse(fs.readFileSync(path.join(root, "chinese-drug-labels.json"), "utf8"));
 const aliases = normalizeTradeNameAliases(payload.tradeNameAliases);
 
 assert.equal(normalize("优思灵Ｒ（笔芯）"), "优思灵r笔芯");
+assert.equal(directlyMatchesDrug("阿卡", payload.drugs.find(drug => drug.drugName === "阿卡波糖片")), true, "通用名片段应直接匹配");
 assert.equal(directlyMatchesDrug("阿卡波糖", payload.drugs.find(drug => drug.drugName === "阿卡波糖片")), true);
+
+const partialAliasDrug = payload.drugs.find(drug => drug.genericName === "苯磺酸氨氯地平");
+assert.equal(tradeNameAliasForDrug("络活", partialAliasDrug, aliases)?.tradeName, "络活喜", "商品名无需输入全称");
+const rankedAlias = rankDrugs("络活", payload.drugs, aliases, 5);
+assert.equal(rankedAlias[0]?.genericName, "苯磺酸氨氯地平", "商品名片段应把对应通用名排在前面");
 
 const queryOverrides = new Map([
   ["络活喜", "络活喜 5mg"],
@@ -39,6 +45,6 @@ for (const expectedAlias of aliases) {
 }
 
 const wrongDrug = payload.drugs.find(drug => drug.drugName === "阿司匹林肠溶片");
-assert.equal(tradeNameAliasForDrug("络活喜", wrongDrug, aliases), undefined, "商品名不得映射到错误通用名");
+assert.equal(tradeNameAliasForDrug("络活", wrongDrug, aliases), undefined, "商品名片段不得映射到错误通用名");
 
-console.log(`前端药名识别测试通过｜通用名 1 例｜商品名 ${aliases.length} 例`);
+console.log(`前端药名片段识别测试通过｜商品名 ${aliases.length} 例`);
