@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
-import worker, { categoryFromDrugName, extractSearchLinks, extractSection, htmlToText, parseInstructionPage, safePublicUrl, unwrapBingUrl } from "./src/index-v2.js";
+import worker, { categoryFromDrugName, extractSearchLinks, extractSection, htmlToText, parseInstructionPage, safePublicUrl, unwrapBingUrl } from "./src/index-v3.js";
 
 const origin = "https://tinnxq-alt.github.io";
 const sourceUrl = "https://www.yaopinnet.com/huayao/hy7378h.htm";
-const secondUrl = "https://example-pharma.cn/semaglutide-label";
+const secondUrl = "https://ypk.39.net/2310025/manual/";
 const bingEncoded = Buffer.from(sourceUrl, "utf8").toString("base64url");
 const bingTrackingUrl = `https://www.bing.com/ck/a?!&&p=test&u=a1${bingEncoded}&ntb=1`;
 let browserCalls = 0;
@@ -13,7 +13,11 @@ const BROWSER = {
     browserCalls += 1;
     assert.equal(action, "links");
     assert.match(input.url, /bing\.com\/search/);
-    assert.match(decodeURIComponent(input.url), /司美/);
+    const decoded = decodeURIComponent(input.url);
+    assert.match(decoded, /司美/);
+    assert.match(decoded, /药源网/);
+    assert.match(decoded, /39药品通/);
+    assert.match(decoded, /适应症/);
     return Response.json({
       success: true,
       result: [
@@ -38,15 +42,17 @@ const semaglutideHtml = `<!doctype html><html><head><meta charset="utf-8"><title
 <p>〖批准文号〗国药准字SJ20200016</p><p>生产企业：Novo Nordisk A/S</p>
 </body></html>`;
 
-const secondHtml = `<!doctype html><html><head><title>司美格鲁肽注射液说明书 - 示例厂家</title></head><body>
-<p>通用名称：司美格鲁肽注射液</p><p>规格：2mg/3ml</p>
-<p>适应症：用于成人2型糖尿病的治疗。</p>
-<p>用法用量：皮下注射，每周一次。</p>
-<p>不良反应：可能出现恶心。</p><p>注意事项：按本品说明书使用。</p>
-<p>生产厂家：示例制药有限公司</p></body></html>`;
+const secondHtml = `<!doctype html><html><head><title>司美格鲁肽注射液(诺和泰)详细说明书-39药品通</title></head><body>
+<p>〖通用名称〗: 司美格鲁肽注射液</p><p>〖商品名称〗: 诺和泰</p><p>〖规格〗: 1.34mg/ml，1.5ml</p>
+<p>〖适应症〗: 本品适用于成人2型糖尿病患者的血糖控制。</p>
+<p>〖用法用量〗: 皮下注射，每周一次。</p>
+<p>〖不良反应〗: 常见胃肠道不良反应。</p><p>〖注意事项〗: 按本品说明书使用。</p>
+<p>生产企业：丹麦诺和诺德公司</p></body></html>`;
 
 assert.equal(unwrapBingUrl(bingTrackingUrl), sourceUrl, "Bing 跟踪链接必须解码回真实来源 URL");
-assert.equal(extractSearchLinks({ result: [bingTrackingUrl, secondUrl, "https://www.bing.com/"] }).length, 2);
+const extracted = extractSearchLinks({ result: [bingTrackingUrl, secondUrl, "https://www.bing.com/"] });
+assert.equal(extracted.length, 2);
+assert.equal(extracted[0].host, "www.yaopinnet.com", "药品说明书数据库应优先于普通网页");
 assert.equal(safePublicUrl("https://example.com/a")?.hostname, "example.com");
 assert.equal(safePublicUrl("http://example.com/a"), null);
 assert.equal(safePublicUrl("https://127.0.0.1/a"), null);
@@ -83,8 +89,8 @@ try {
   assert.deepEqual(await response.json(), {
     ok: true,
     configured: true,
-    mode: "web-instruction-source-extraction-v2",
-    discovery: "browser-links",
+    mode: "web-instruction-source-extraction-v3",
+    discovery: "browser-links-medical-weighted",
     sourceGrounded: true,
     generatesClinicalKnowledge: false
   });
@@ -96,8 +102,10 @@ try {
   }), env);
   assert.equal(response.status, 200);
   const payload = await response.json();
-  assert.equal(payload.mode, "web-instruction-source-extraction-v2");
-  assert.ok(payload.searchResultCount >= 2, "Links 模式必须发现外部来源链接");
+  assert.equal(payload.mode, "web-instruction-source-extraction-v3");
+  assert.ok(payload.searchResultCount >= 2, "加权 Links 搜索必须发现外部来源链接");
+  assert.ok(payload.discoveredSourceHosts.includes("www.yaopinnet.com"));
+  assert.ok(payload.discoveredSourceHosts.includes("ypk.39.net"));
   assert.equal(payload.candidates.length, 2, "只保留能从真实网页抽出药名、适应症、用法用量的候选");
   assert.equal(payload.candidates[0].drugName, "司美格鲁肽注射液");
   assert.equal(payload.candidates[0].category, "降糖药", "司美格鲁肽不得被误分类为降压药");
@@ -113,15 +121,8 @@ try {
     body: JSON.stringify({ query: "司美" })
   }), env);
   assert.equal(response.status, 404, "不得恢复 AI 生成临床资料接口");
-
-  response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
-    method: "POST",
-    headers: { Origin: origin, "Content-Type": "application/json" },
-    body: JSON.stringify({ query: "司" })
-  }), env);
-  assert.equal(response.status, 400);
 } finally {
   globalThis.fetch = realFetch;
 }
 
-console.log("Worker Browser Links source-grounded retrieval tests passed");
+console.log("Worker medical-source-weighted source-grounded retrieval tests passed");

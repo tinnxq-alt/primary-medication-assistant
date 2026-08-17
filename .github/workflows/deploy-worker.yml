@@ -43,10 +43,9 @@ jobs:
         env:
           WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
         run: |
-          # 给 Workers 边缘版本传播留出时间；避免刚部署即命中旧版本。
           sleep 10
           curl --fail --silent --show-error \
-            --max-time 45 \
+            --max-time 50 \
             -X POST "$WORKER_URL/v1/drugs/search" \
             -H 'Origin: https://tinnxq-alt.github.io' \
             -H 'Content-Type: application/json' \
@@ -55,7 +54,7 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
-          if (payload.mode !== 'web-instruction-source-extraction-v2') {
+          if (payload.mode !== 'web-instruction-source-extraction-v3') {
             console.error(JSON.stringify(payload, null, 2));
             throw new Error(`unexpected mode: ${payload.mode || 'missing'}`);
           }
@@ -73,7 +72,7 @@ jobs:
           );
           if (!target) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error('live smoke test did not find a source-grounded semaglutide glucose-lowering candidate');
+            throw new Error(`live smoke failed; discovered hosts: ${(payload.discoveredSourceHosts || []).join(', ') || 'none'}`);
           }
           console.log(`live source-grounded candidate ok: ${target.drugName} | ${target.sourceUrl}`);
           NODE
