@@ -36,6 +36,7 @@ jobs:
           node --check text-mark-fix.js
           node --check notebook-delete-fix.js
           node --check header-brand.js
+          node --check catalog-retirements.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -45,6 +46,9 @@ jobs:
 
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
+
+      - name: Catalog retirements tests
+        run: node scripts/test-catalog-retirements.mjs
 
       - name: Drug name lookup tests
         run: node scripts/test-drug-lookup.mjs
