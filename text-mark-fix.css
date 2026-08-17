@@ -7,36 +7,43 @@ html.restoring-view body {
   visibility: hidden;
 }
 
+/* 统一交互层接管文本标记，隐藏旧的详情页底部标记条。 */
+#markToolbar {
+  display: none !important;
+}
+
 .mark-selection-menu,
 .mark-delete-menu {
   position: fixed;
   z-index: 1200;
-  max-width: calc(100vw - 24px);
-  padding: 12px;
+  width: max-content;
+  max-width: calc(100vw - 16px);
+  padding: 7px;
   border: 1px solid var(--border, #d7e2e0);
-  border-radius: 14px;
+  border-radius: 12px;
   background: var(--surface, #fff);
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.18);
+  touch-action: manipulation;
 }
 
-.mark-selection-menu {
-  left: 50%;
-  bottom: calc(82px + env(safe-area-inset-bottom));
-  width: min(420px, calc(100vw - 24px));
-  transform: translateX(-50%);
-}
-
-.mark-selection-menu > small,
-.mark-delete-menu > strong {
-  display: block;
-  margin-bottom: 8px;
-}
-
-.mark-selection-menu > div,
-.mark-delete-menu > div {
+.mark-inline-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 5px;
+}
+
+.mark-inline-actions .btn.small {
+  min-height: 32px;
+  padding: 5px 9px;
+  white-space: nowrap;
+}
+
+.mark-inline-actions [data-close-direct-mark] {
+  min-width: 32px;
+  padding-inline: 7px;
+  font-size: 18px;
+  line-height: 1;
 }
 
 .note-group-card,
@@ -65,4 +72,22 @@ html.restoring-view body {
 
 .mark-group-entry .mark-quote {
   margin-top: 8px;
+}
+
+@media (max-width: 420px) {
+  .mark-selection-menu,
+  .mark-delete-menu {
+    max-width: calc(100vw - 12px);
+    padding: 6px;
+  }
+
+  .mark-inline-actions {
+    gap: 4px;
+  }
+
+  .mark-inline-actions .btn.small {
+    min-height: 30px;
+    padding: 4px 7px;
+    font-size: 12px;
+  }
 }

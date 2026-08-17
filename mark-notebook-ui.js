@@ -1,15 +1,14 @@
 (() => {
   "use strict";
 
-  const STORAGE_PREFIX = "primary-medication-pro:v1:";
-  const RESTORE_KEY = "primary-medication:view-restore";
+  const PREFIX = "primary-medication-pro:v1:";
+  const LEGACY_RESTORE_KEY = "primary-medication:view-restore";
   const TYPE_LABELS = { underline: "划线", bold: "加粗", highlight: "荧光笔" };
+  const FIELD_LABELS = { indication: "适应症", dosage: "用法用量", adverseReactions: "不良反应", precautions: "注意事项" };
   const app = document.getElementById("app");
   let activeSelection = null;
   let enhanceQueued = false;
   let selectionTimer = null;
-  let pendingRestore = null;
-  let restoreAttempts = 0;
 
   const esc = value => String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -20,53 +19,56 @@
 
   const readList = key => {
     try {
-      const value = JSON.parse(localStorage.getItem(`${STORAGE_PREFIX}${key}`));
+      const value = JSON.parse(localStorage.getItem(`${PREFIX}${key}`));
       return Array.isArray(value) ? value : [];
     } catch {
       return [];
     }
   };
-
-  const writeList = (key, value) => localStorage.setItem(`${STORAGE_PREFIX}${key}`, JSON.stringify(value));
+  const writeList = (key, value) => localStorage.setItem(`${PREFIX}${key}`, JSON.stringify(value));
   const routeParts = () => location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const currentRoute = () => routeParts()[0] || "home";
   const currentDrugId = () => currentRoute() === "detail" ? decodeURIComponent(routeParts().slice(1).join("/")) : "";
-  const fieldSelector = fieldName => `.markable[data-mark-field="${String(fieldName || "").replaceAll('"', '\\"')}"]`;
+
+  function toast(message) {
+    const node = document.getElementById("toast");
+    if (!node) return;
+    node.textContent = message;
+    node.classList.add("show");
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => node.classList.remove("show"), 1500);
+  }
 
   function drugNameById(drugId) {
-    const custom = readList("customDrugs");
-    const all = [
+    return [
       ...(window.DRUG_CATALOG || []),
       ...(window.OUTPATIENT_DRUG_CATALOG || []),
-      ...custom
-    ];
-    return all.find(drug => drug?.id === drugId)?.drugName || "已删除药品";
+      ...readList("customDrugs")
+    ].find(drug => drug?.id === drugId)?.drugName || "已删除药品";
   }
 
-  function resolveMarkRange(mark, text) {
-    const validOffsets = Number.isInteger(mark.start) && Number.isInteger(mark.end)
+  function resolveRange(mark, text) {
+    if (Number.isInteger(mark.start) && Number.isInteger(mark.end)
       && mark.start >= 0 && mark.end > mark.start && mark.end <= text.length
-      && text.slice(mark.start, mark.end) === mark.text;
-    if (validOffsets) return { ...mark, start: mark.start, end: mark.end };
-    const legacyStart = mark.text ? text.indexOf(mark.text) : -1;
-    if (legacyStart < 0) return null;
-    return { ...mark, start: legacyStart, end: legacyStart + mark.text.length };
+      && text.slice(mark.start, mark.end) === mark.text) {
+      return { ...mark, start: mark.start, end: mark.end };
+    }
+    const start = mark.text ? text.indexOf(mark.text) : -1;
+    return start >= 0 ? { ...mark, start, end: start + mark.text.length } : null;
   }
 
-  function exactMarkedHtml(drugId, fieldName, text) {
+  function markedHtml(drugId, fieldName, text) {
     const ranges = readList("marks")
       .filter(mark => mark?.id && mark.drugId === drugId && mark.field === fieldName && mark.text)
-      .map(mark => resolveMarkRange(mark, text))
+      .map(mark => resolveRange(mark, text))
       .filter(Boolean);
     if (!ranges.length) return esc(text);
 
-    const boundaries = [...new Set([0, text.length, ...ranges.flatMap(mark => [mark.start, mark.end])])]
-      .filter(value => value >= 0 && value <= text.length)
-      .sort((a, b) => a - b);
+    const boundaries = [...new Set([0, text.length, ...ranges.flatMap(mark => [mark.start, mark.end])])].sort((a, b) => a - b);
     let html = "";
-    for (let index = 0; index < boundaries.length - 1; index += 1) {
-      const start = boundaries[index];
-      const end = boundaries[index + 1];
+    for (let i = 0; i < boundaries.length - 1; i += 1) {
+      const start = boundaries[i];
+      const end = boundaries[i + 1];
       if (end <= start) continue;
       const segment = text.slice(start, end);
       const active = ranges.filter(mark => mark.start <= start && mark.end >= end);
@@ -87,23 +89,30 @@
     if (!drugId) return;
     document.querySelectorAll(".markable[data-mark-field]").forEach(field => {
       const text = field.textContent || "";
-      const html = exactMarkedHtml(drugId, field.dataset.markField, text);
+      const html = markedHtml(drugId, field.dataset.markField, text);
       if (field.innerHTML !== html) field.innerHTML = html;
     });
     const hint = [...document.querySelectorAll("p.muted")]
       .find(node => node.textContent.includes("长按或拖选说明书摘要文字"));
-    if (hint) hint.textContent = "直接长按或拖选说明书文字，松手后即可选择划线、加粗或荧光笔；点击已有标记可删除。";
+    if (hint) hint.textContent = "长按或拖选文字后，标记条会直接出现在选中文字旁边；点击已有标记可删除。";
   }
 
-  function selectedRangeInfo() {
+  function rangeRect(range) {
+    const rects = [...range.getClientRects()].filter(rect => rect.width > 0 || rect.height > 0);
+    const rect = rects.at(-1) || range.getBoundingClientRect();
+    if (!rect || (!rect.width && !rect.height)) return null;
+    return { top: rect.top, right: rect.right, bottom: rect.bottom, left: rect.left, width: rect.width, height: rect.height };
+  }
+
+  function selectionInfo() {
     if (currentRoute() !== "detail") return null;
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed || !selection.rangeCount) return null;
     const range = selection.getRangeAt(0);
-    const startElement = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
-    const endElement = range.endContainer.nodeType === Node.TEXT_NODE ? range.endContainer.parentElement : range.endContainer;
-    const field = startElement?.closest?.(".markable[data-mark-field]");
-    if (!field || !field.contains(endElement)) return null;
+    const startEl = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+    const endEl = range.endContainer.nodeType === Node.TEXT_NODE ? range.endContainer.parentElement : range.endContainer;
+    const field = startEl?.closest?.(".markable[data-mark-field]");
+    if (!field || !field.contains(endEl)) return null;
 
     const raw = range.toString();
     const text = raw.trim();
@@ -116,12 +125,11 @@
     endPrefix.selectNodeContents(field);
     endPrefix.setEnd(range.endContainer, range.endOffset);
 
-    const leadingWhitespace = raw.length - raw.trimStart().length;
-    const trailingWhitespace = raw.length - raw.trimEnd().length;
-    let start = startPrefix.toString().length + leadingWhitespace;
-    let end = endPrefix.toString().length - trailingWhitespace;
+    const leading = raw.length - raw.trimStart().length;
+    const trailing = raw.length - raw.trimEnd().length;
+    let start = startPrefix.toString().length + leading;
+    let end = endPrefix.toString().length - trailing;
     const fieldText = field.textContent || "";
-
     if (fieldText.slice(start, end) !== text) {
       const nearby = fieldText.indexOf(text, Math.max(0, start - 3));
       if (nearby >= 0 && nearby <= start + 3) {
@@ -130,19 +138,39 @@
       }
     }
     if (start < 0 || end <= start || fieldText.slice(start, end) !== text) return null;
-
-    return {
-      drugId: currentDrugId(),
-      field: field.dataset.markField,
-      text,
-      start,
-      end
-    };
+    return { drugId: currentDrugId(), field: field.dataset.markField, text, start, end, anchorRect: rangeRect(range) };
   }
 
-  function removeFloatingMenus() {
+  function removeMenus() {
     document.querySelector(".mark-selection-menu")?.remove();
     document.querySelector(".mark-delete-menu")?.remove();
+  }
+
+  function positionMenu(menu, anchor) {
+    if (!anchor) return;
+    menu.style.visibility = "hidden";
+    menu.style.left = "0px";
+    menu.style.top = "0px";
+    menu.style.bottom = "auto";
+    menu.style.transform = "none";
+
+    const vv = window.visualViewport;
+    const vx = vv?.offsetLeft || 0;
+    const vy = vv?.offsetTop || 0;
+    const vw = vv?.width || window.innerWidth;
+    const vh = vv?.height || window.innerHeight;
+    const edge = 8;
+    const gap = 8;
+    const width = Math.min(menu.offsetWidth, vw - edge * 2);
+    const height = menu.offsetHeight;
+    const center = anchor.left + anchor.width / 2;
+    const left = Math.min(vx + vw - width - edge, Math.max(vx + edge, center - width / 2));
+    let top = anchor.top - height - gap;
+    if (top < vy + edge) top = anchor.bottom + gap;
+    top = Math.min(vy + vh - height - edge, Math.max(vy + edge, top));
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.visibility = "visible";
   }
 
   function showSelectionMenu(info) {
@@ -155,60 +183,36 @@
       menu.setAttribute("aria-label", "添加文本标记");
       document.body.appendChild(menu);
     }
-    menu.innerHTML = `<small>已选：${esc(info.text.slice(0, 26))}${info.text.length > 26 ? "…" : ""}</small><div><button type="button" class="btn secondary small" data-direct-mark-type="underline">划线</button><button type="button" class="btn secondary small" data-direct-mark-type="bold">加粗</button><button type="button" class="btn secondary small" data-direct-mark-type="highlight">荧光笔</button><button type="button" class="btn ghost small" data-close-direct-mark>取消</button></div>`;
+    menu.innerHTML = `<div class="mark-inline-actions"><button type="button" class="btn secondary small" data-direct-mark-type="underline">划线</button><button type="button" class="btn secondary small" data-direct-mark-type="bold">加粗</button><button type="button" class="btn secondary small" data-direct-mark-type="highlight">荧光笔</button><button type="button" class="btn ghost small" data-close-direct-mark>×</button></div>`;
+    requestAnimationFrame(() => positionMenu(menu, info.anchorRect));
   }
 
-  function rememberSelection() {
+  function rememberSelection(delay = 0) {
     clearTimeout(selectionTimer);
     selectionTimer = setTimeout(() => {
-      const info = selectedRangeInfo();
+      const info = selectionInfo();
       if (!info) return;
       activeSelection = info;
       showSelectionMenu(info);
-    }, 40);
+    }, delay);
   }
 
-  function makeRestorePayload(fieldName = "") {
-    const field = fieldName ? document.querySelector(fieldSelector(fieldName)) : null;
-    return {
-      hash: location.hash,
-      scrollY: Math.max(0, window.scrollY || window.pageYOffset || 0),
-      field: fieldName || "",
-      fieldViewportTop: field ? field.getBoundingClientRect().top : null,
-      createdAt: Date.now()
-    };
-  }
-
-  function reloadWithoutVisibleJump(fieldName = "") {
-    try { sessionStorage.setItem(RESTORE_KEY, JSON.stringify(makeRestorePayload(fieldName))); } catch {}
-    document.documentElement.classList.add("restoring-view");
-    location.reload();
-  }
-
-  function addDirectMark(type) {
+  function addMark(type) {
     const info = activeSelection;
     if (!info || info.drugId !== currentDrugId() || !TYPE_LABELS[type]) return;
     const marks = readList("marks");
-    const duplicate = marks.some(mark => mark.drugId === info.drugId
-      && mark.field === info.field
-      && mark.start === info.start
-      && mark.end === info.end
-      && mark.type === type);
-    if (!duplicate) {
-      marks.push({
-        id: `mark-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-        drugId: info.drugId,
-        field: info.field,
-        text: info.text,
-        start: info.start,
-        end: info.end,
-        type,
-        createdAt: new Date().toISOString()
-      });
+    const exists = marks.some(mark => mark.drugId === info.drugId && mark.field === info.field
+      && mark.start === info.start && mark.end === info.end && mark.type === type);
+    if (!exists) {
+      marks.push({ id: `mark-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, drugId: info.drugId,
+        field: info.field, text: info.text, start: info.start, end: info.end, type, createdAt: new Date().toISOString() });
       writeList("marks", marks);
     }
     window.getSelection()?.removeAllRanges();
-    reloadWithoutVisibleJump(info.field);
+    activeSelection = null;
+    removeMenus();
+    renderDetailMarks();
+    toast(exists ? "该标记已存在" : `${TYPE_LABELS[type]}已保存`);
   }
 
   function openDeleteMenu(markElement) {
@@ -217,31 +221,43 @@
     const ids = [...new Set((markElement.dataset.textMarkId || "").split(",").filter(Boolean))];
     const marks = readList("marks").filter(mark => ids.includes(mark.id));
     if (!marks.length) return;
-
     const menu = document.createElement("div");
     menu.className = "mark-delete-menu";
     menu.setAttribute("role", "dialog");
-    menu.setAttribute("aria-label", "文本标记操作");
-    menu.innerHTML = `<strong>文本标记</strong><div>${marks.map(mark => `<button type="button" class="btn danger small" data-direct-delete-mark="${esc(mark.id)}" data-direct-delete-field="${esc(mark.field)}">删除${esc(TYPE_LABELS[mark.type] || "标记")}</button>`).join("")}<button type="button" class="btn ghost small" data-close-direct-mark>取消</button></div>`;
+    menu.innerHTML = `<div class="mark-inline-actions">${marks.map(mark => `<button type="button" class="btn danger small" data-direct-delete-mark="${esc(mark.id)}">删除${esc(TYPE_LABELS[mark.type] || "标记")}</button>`).join("")}<button type="button" class="btn ghost small" data-close-direct-mark>×</button></div>`;
     document.body.appendChild(menu);
-
-    const rect = markElement.getBoundingClientRect();
-    const width = Math.min(300, Math.max(220, menu.offsetWidth));
-    const left = Math.min(window.innerWidth - width - 12, Math.max(12, rect.left));
-    const preferredTop = rect.bottom + 8;
-    const top = preferredTop + menu.offsetHeight < window.innerHeight
-      ? preferredTop
-      : Math.max(12, rect.top - menu.offsetHeight - 8);
-    menu.style.left = `${left}px`;
-    menu.style.top = `${top}px`;
+    positionMenu(menu, markElement.getBoundingClientRect());
   }
 
-  function deleteDirectMark(id, fieldName) {
+  function deleteDetailMark(id) {
     const marks = readList("marks");
     const next = marks.filter(mark => mark.id !== id);
-    if (next.length === marks.length) return removeFloatingMenus();
+    if (next.length === marks.length) return removeMenus();
     writeList("marks", next);
-    reloadWithoutVisibleJump(fieldName);
+    removeMenus();
+    renderDetailMarks();
+    toast("标记已删除");
+  }
+
+  function notebookMarkCard(mark) {
+    return `<article class="card"><div class="detail-head"><div><h3>${esc(drugNameById(mark.drugId))}</h3><span class="badge info">${esc(FIELD_LABELS[mark.field] || mark.field)} · ${esc(TYPE_LABELS[mark.type] || mark.type)}</span></div><button class="btn ghost small" data-delete-mark="${esc(mark.id)}">删除</button></div><p class="mark-quote">${esc(mark.text)}</p></article>`;
+  }
+
+  function refreshNotebookMarks() {
+    if (currentRoute() !== "notebook") return false;
+    const section = [...document.querySelectorAll("#app > .section, #app .section")]
+      .find(node => node.querySelector(":scope > .section-title h2")?.textContent.trim() === "文本标记");
+    const list = section?.querySelector(":scope > .marks-list");
+    if (!section || !list) return false;
+    const marks = readList("marks");
+    const signature = marks.map(mark => `${mark.id}:${mark.type}`).join("|");
+    if (list.dataset.localMarksSignature === signature) return false;
+    const count = section.querySelector(":scope > .section-title small");
+    if (count) count.textContent = `${marks.length} 条`;
+    list.innerHTML = marks.length ? marks.map(notebookMarkCard).join("") : '<div class="empty"><p>还没有划线、加粗或荧光笔标记。</p></div>';
+    list.dataset.localMarksSignature = signature;
+    list.dataset.groupedByDrug = "false";
+    return true;
   }
 
   function groupNotebookSection(title, kind) {
@@ -252,22 +268,16 @@
     if (!list || list.dataset.groupedByDrug === "true") return;
     const cards = [...list.children].filter(node => node.matches("article.card"));
     if (!cards.length) return;
-
     const markById = new Map(readList("marks").map(mark => [mark.id, mark]));
     const groups = new Map();
     for (const card of cards) {
-      let drugId = "unknown";
-      if (kind === "notes") {
-        drugId = card.querySelector("[data-edit-note][data-note-drug]")?.dataset.noteDrug || "unknown";
-      } else {
-        const markId = card.querySelector("[data-delete-mark]")?.dataset.deleteMark || "";
-        drugId = markById.get(markId)?.drugId || "unknown";
-      }
+      const drugId = kind === "notes"
+        ? card.querySelector("[data-edit-note][data-note-drug]")?.dataset.noteDrug || "unknown"
+        : markById.get(card.querySelector("[data-delete-mark]")?.dataset.deleteMark || "")?.drugId || "unknown";
       const drugName = card.querySelector("h3")?.textContent.trim() || drugNameById(drugId);
       if (!groups.has(drugId)) {
         const wrapper = document.createElement("section");
         wrapper.className = `card ${kind === "notes" ? "note-group-card" : "mark-group-card"}`;
-        wrapper.dataset.notebookDrugGroup = drugId;
         wrapper.innerHTML = `<div class="detail-head"><div><h3>${esc(drugName)}</h3><small class="muted" data-group-count></small></div></div><div class="${kind === "notes" ? "note-group-list" : "mark-group-list"}"></div>`;
         groups.set(drugId, { wrapper, list: wrapper.lastElementChild, count: 0 });
       }
@@ -277,7 +287,6 @@
       card.querySelector("h3")?.remove();
       group.list.appendChild(card);
     }
-
     list.replaceChildren(...[...groups.values()].map(group => {
       group.wrapper.querySelector("[data-group-count]").textContent = `${group.count} 条${kind === "notes" ? "笔记" : "文本标记"}`;
       return group.wrapper;
@@ -286,41 +295,46 @@
   }
 
   function groupNotebook() {
+    refreshNotebookMarks();
     groupNotebookSection("全部药品笔记", "notes");
     groupNotebookSection("文本标记", "marks");
   }
 
-  function loadRestorePayload() {
-    try { pendingRestore = JSON.parse(sessionStorage.getItem(RESTORE_KEY) || "null"); } catch { pendingRestore = null; }
-    if (!pendingRestore || pendingRestore.hash !== location.hash || Date.now() - Number(pendingRestore.createdAt || 0) > 10000) {
-      pendingRestore = null;
-      sessionStorage.removeItem(RESTORE_KEY);
-      document.documentElement.classList.remove("restoring-view");
-    }
+  function deleteNotebookMark(id) {
+    const marks = readList("marks");
+    const next = marks.filter(mark => mark.id !== id);
+    if (next.length === marks.length) return;
+    writeList("marks", next);
+    const list = document.querySelector(".marks-list");
+    if (list) delete list.dataset.localMarksSignature;
+    refreshNotebookMarks();
+    groupNotebookSection("文本标记", "marks");
+    toast("标记已删除");
   }
 
-  function tryRestoreView() {
-    if (!pendingRestore) return;
-    const route = currentRoute();
-    const detailReady = route !== "detail" || Boolean(document.querySelector(".markable[data-mark-field]"));
-    const notebookReady = route !== "notebook" || Boolean(app?.querySelector(".section-title"));
-    if ((!detailReady || !notebookReady) && restoreAttempts < 80) {
-      restoreAttempts += 1;
-      setTimeout(tryRestoreView, 40);
+  function exportNotebook() {
+    const payload = { exportedAt: new Date().toISOString(), notes: readList("notes"), marks: readList("marks") };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "drug-notebook.json";
+    link.click();
+    URL.revokeObjectURL(url);
+    toast("已生成导出文件");
+  }
+
+  function restoreLegacyViewOnce() {
+    let payload = null;
+    try { payload = JSON.parse(sessionStorage.getItem(LEGACY_RESTORE_KEY) || "null"); } catch {}
+    sessionStorage.removeItem(LEGACY_RESTORE_KEY);
+    if (!payload || payload.hash !== location.hash) {
+      document.documentElement.classList.remove("restoring-view");
       return;
     }
-
-    const payload = pendingRestore;
-    pendingRestore = null;
-    sessionStorage.removeItem(RESTORE_KEY);
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      let top = Number(payload.scrollY || 0);
-      if (payload.field && Number.isFinite(payload.fieldViewportTop)) {
-        const field = document.querySelector(fieldSelector(payload.field));
-        if (field) top = Math.max(0, window.scrollY + field.getBoundingClientRect().top - payload.fieldViewportTop);
-      }
-      window.scrollTo({ top, left: 0, behavior: "auto" });
-      requestAnimationFrame(() => document.documentElement.classList.remove("restoring-view"));
+      window.scrollTo({ top: Math.max(0, Number(payload.scrollY || 0)), left: 0, behavior: "auto" });
+      document.documentElement.classList.remove("restoring-view");
     }));
   }
 
@@ -328,71 +342,53 @@
     enhanceQueued = false;
     if (currentRoute() === "detail") renderDetailMarks();
     if (currentRoute() === "notebook") groupNotebook();
-    tryRestoreView();
   }
-
   function queueEnhance() {
     if (enhanceQueued) return;
     enhanceQueued = true;
     requestAnimationFrame(enhance);
   }
 
-  document.addEventListener("selectionchange", rememberSelection);
-  document.addEventListener("mouseup", rememberSelection, true);
-  document.addEventListener("touchend", rememberSelection, { capture: true, passive: true });
-
+  document.addEventListener("selectionchange", () => rememberSelection(18));
+  document.addEventListener("mouseup", () => rememberSelection(0), true);
+  document.addEventListener("touchend", () => rememberSelection(18), { capture: true, passive: true });
   document.addEventListener("pointerdown", event => {
-    if (event.target.closest?.(".mark-selection-menu button")) event.preventDefault();
+    if (event.target.closest?.(".mark-selection-menu button, .mark-delete-menu button")) event.preventDefault();
   }, true);
 
   document.addEventListener("click", event => {
-    const directMark = event.target.closest?.("[data-direct-mark-type]");
-    if (directMark) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      addDirectMark(directMark.dataset.directMarkType);
-      return;
+    const markType = event.target.closest?.("[data-direct-mark-type]");
+    if (markType) {
+      event.preventDefault(); event.stopImmediatePropagation(); addMark(markType.dataset.directMarkType); return;
     }
-
-    const directDelete = event.target.closest?.("[data-direct-delete-mark]");
-    if (directDelete) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      deleteDirectMark(directDelete.dataset.directDeleteMark, directDelete.dataset.directDeleteField || "");
-      return;
+    const detailDelete = event.target.closest?.("[data-direct-delete-mark]");
+    if (detailDelete) {
+      event.preventDefault(); event.stopImmediatePropagation(); deleteDetailMark(detailDelete.dataset.directDeleteMark); return;
     }
-
     if (event.target.closest?.("[data-close-direct-mark]")) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      activeSelection = null;
-      removeFloatingMenus();
-      window.getSelection()?.removeAllRanges();
-      return;
+      event.preventDefault(); event.stopImmediatePropagation(); activeSelection = null; removeMenus(); window.getSelection()?.removeAllRanges(); return;
     }
-
     const marked = event.target.closest?.(".text-mark[data-text-mark-id]");
     if (marked) {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      openDeleteMenu(marked);
+      event.preventDefault(); event.stopImmediatePropagation(); openDeleteMenu(marked); return;
+    }
+    const notebookDelete = event.target.closest?.("[data-delete-mark]");
+    if (notebookDelete && currentRoute() === "notebook") {
+      event.preventDefault(); event.stopImmediatePropagation();
+      if (window.confirm("确认删除这条文本标记？")) deleteNotebookMark(notebookDelete.dataset.deleteMark);
       return;
     }
-
-    if (!event.target.closest?.(".mark-selection-menu, .mark-delete-menu")) {
-      document.querySelector(".mark-delete-menu")?.remove();
+    if (event.target.closest?.("#exportNotes") && currentRoute() === "notebook") {
+      event.preventDefault(); event.stopImmediatePropagation(); exportNotebook(); return;
     }
+    if (!event.target.closest?.(".mark-selection-menu, .mark-delete-menu")) document.querySelector(".mark-delete-menu")?.remove();
   }, true);
 
   if (app) new MutationObserver(queueEnhance).observe(app, { childList: true, subtree: true });
-  window.addEventListener("hashchange", () => {
-    activeSelection = null;
-    removeFloatingMenus();
-    queueEnhance();
-  });
-  window.addEventListener("resize", () => document.querySelector(".mark-delete-menu")?.remove());
+  window.addEventListener("hashchange", () => { activeSelection = null; removeMenus(); queueEnhance(); });
+  window.addEventListener("resize", removeMenus);
+  window.visualViewport?.addEventListener("resize", removeMenus);
 
-  loadRestorePayload();
+  restoreLegacyViewOnce();
   queueEnhance();
-  tryRestoreView();
 })();
