@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "primary-medication-search-diagnose",
+  "main": "src/diagnose-39.js",
+  "compatibility_date": "2026-08-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "browser": {
+    "binding": "BROWSER",
+    "remote": true
+  },
+  "observability": {
+    "enabled": false
+  }
+}
