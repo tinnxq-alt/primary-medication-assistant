@@ -9,7 +9,7 @@ const payload = JSON.parse(fs.readFileSync("chinese-drug-labels.json", "utf8"));
 
 assert.match(source, /localCandidates\(query, await loadCatalog\(\)\)/, "智能识别必须先读取本地核验库");
 assert.match(source, /remoteCandidates\(query\)/, "本地未命中时仍应保留 Worker 智能草稿");
-assert.ok(source.indexOf("localCandidates(query, await loadCatalog())") < source.indexOf("remoteCandidates(query)"), "本地候选必须先于远程 Worker 执行");
+assert.match(source, /localCandidates\(query, await loadCatalog\(\)\)[\s\S]*if \(local\.length\)[\s\S]*remoteCandidates\(query\)/, "运行流程必须先处理本地候选，再进入远程 Worker");
 assert.match(source, /if \(local\.length\)/, "本地命中后必须直接使用候选");
 assert.match(source, /fill\(local\[0\], node\)/, "本地第一个候选必须自动填充");
 assert.match(source, /setTimeout\(\(\) => controller\.abort\(\), 15000\)/, "Worker 等待时间应限制为 15 秒");
