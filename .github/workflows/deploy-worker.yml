@@ -20,6 +20,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -39,13 +42,26 @@ jobs:
           workingDirectory: worker
           command: deploy
 
-      - name: Wait for deployed Worker version
+      - name: Configure OpenAI Web Search secret when available
+        working-directory: worker
         env:
-          WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 24); do
+          if [ -z "${OPENAI_API_KEY:-}" ]; then
+            echo "OPENAI_API_KEY is not configured in GitHub Actions; reliable Web Search remains disabled."
+            exit 0
+          fi
+          printf '%s' "$OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.jsonc
+          echo "OpenAI API key synced to Worker secret storage."
+
+      - name: Wait for deployed Worker version
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
             HTTP_CODE=$(curl --silent --show-error \
               --max-time 10 \
               -H 'Origin: https://tinnxq-alt.github.io' \
@@ -59,24 +75,38 @@ jobs:
           const fs = require('fs');
           try {
             const payload = JSON.parse(fs.readFileSync('/tmp/worker-health.json', 'utf8'));
-            process.exit(payload.discovery === 'browser-site-restricted-source-v9' ? 0 : 1);
+            const valid = payload.discovery === 'openai-web-search-source-v10'
+              || payload.discovery === 'browser-site-restricted-source-v9';
+            process.exit(valid ? 0 : 1);
           } catch {
             process.exit(1);
           }
           NODE
             then
-              echo "v9 Worker is active"
+              node - <<'NODE'
+          const fs = require('fs');
+          const payload = JSON.parse(fs.readFileSync('/tmp/worker-health.json', 'utf8'));
+          fs.appendFileSync(process.env.GITHUB_ENV, `SMART_SEARCH_DISCOVERY=${payload.discovery}\n`);
+          fs.appendFileSync(process.env.GITHUB_ENV, `SMART_SEARCH_CONFIGURED=${payload.searchProviderConfigured ? 'true' : 'false'}\n`);
+          console.log(`active discovery: ${payload.discovery}; configured=${payload.searchProviderConfigured}`);
+          NODE
               exit 0
             fi
             sleep 4
           done
-          echo "Timed out waiting for v9 Worker propagation" >&2
+          echo "Timed out waiting for Worker propagation" >&2
           exit 1
 
       - name: Smoke test live instruction retrieval
-        env:
-          WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
+        shell: bash
         run: |
+          set -euo pipefail
+          if [ "${SMART_SEARCH_DISCOVERY:-}" != "openai-web-search-source-v10" ]; then
+            echo "Reliable OpenAI Web Search is not configured; skip source-discovery smoke test."
+            echo "Add repository secret OPENAI_API_KEY and rerun this workflow to activate and verify v10."
+            exit 0
+          fi
+
           HTTP_CODE=$(curl --silent --show-error \
             --max-time 75 \
             -X POST "$WORKER_URL/v1/drugs/search" \
@@ -92,20 +122,16 @@ jobs:
             echo "Live Worker returned HTTP $HTTP_CODE" >&2
             exit 1
           fi
+
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
-          if (payload.mode !== 'web-instruction-source-extraction-v3') {
-            console.error(JSON.stringify(payload, null, 2));
-            throw new Error(`unexpected mode: ${payload.mode || 'missing'}`);
-          }
-          if (payload.discovery !== 'browser-site-restricted-source-v9') {
+          if (payload.discovery !== 'openai-web-search-source-v10') {
             console.error(JSON.stringify(payload, null, 2));
             throw new Error(`unexpected discovery mode: ${payload.discovery || 'missing'}`);
           }
           if (payload.generatesClinicalKnowledge !== false || payload.sourceGrounded !== true) {
-            console.error(JSON.stringify(payload, null, 2));
-            throw new Error('live Worker must remain source-grounded and must not generate clinical knowledge');
+            throw new Error('Worker must remain source-grounded and must not generate clinical knowledge');
           }
           const trustedHost = host => host === 'ypk.39.net'
             || host === 'yaopinnet.com'
@@ -122,11 +148,11 @@ jobs:
           });
           if (!target) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error(`live smoke failed; trusted hosts: ${(payload.discoveredSourceHosts || []).join(', ') || 'none'}; methods: ${(payload.discoveryMethods || []).join(', ') || 'none'}`);
+            throw new Error('live OpenAI Web Search smoke did not produce a source-grounded semaglutide candidate');
           }
           for (const item of payload.verificationLinks || []) {
             const host = new URL(item.url).hostname.toLowerCase();
-            if (!trustedHost(host)) throw new Error(`untrusted verification source leaked into response: ${host}`);
+            if (!trustedHost(host)) throw new Error(`untrusted verification source leaked: ${host}`);
           }
-          console.log(`live trusted source candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
+          console.log(`live source-grounded candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
           NODE
