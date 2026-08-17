@@ -1,5 +1,5 @@
 const DEFAULT_ORIGINS = "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000";
-const DEFAULT_CATALOG_URL = "https://tinnxq-alt.github.io/primary-medication-assistant/chinese-drug-labels.json";
+const DEFAULT_CATALOG_URL = "https://tinnxq-alt.github.io/primary-medication-assistant/chinese-drug-labels.json?v=12";
 const DEFAULT_AI_MODEL = "@cf/meta/llama-3.1-8b-instruct-fast";
 const NMPA_DATABASE_URL = "https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp";
 const HAN_RE = /[\u3400-\u9fff]/;
@@ -57,6 +57,38 @@ function normalizeLookup(value) {
   return String(value || "").normalize("NFKC").toLowerCase().replace(/[\s()（）【】\[\]·•\-_]/g, "");
 }
 
+function normalizeTradeNameAliases(value) {
+  return Array.isArray(value)
+    ? value.filter(alias => alias && alias.tradeName && alias.drugName && alias.genericName)
+    : [];
+}
+
+function aliasesMatchingQuery(query, aliases) {
+  const q = normalizeLookup(query);
+  if (!q) return [];
+  return normalizeTradeNameAliases(aliases).filter(alias => {
+    const name = normalizeLookup(alias.tradeName);
+    return name.length >= 2 && (name === q || q.includes(name));
+  });
+}
+
+function aliasTargetsCatalogItem(alias, item) {
+  return normalizeLookup(alias.drugName) === normalizeLookup(item.drugName)
+    && normalizeLookup(alias.genericName) === normalizeLookup(item.genericName || item.drugName);
+}
+
+function tradeNameAliasForItem(query, item, aliases) {
+  return aliasesMatchingQuery(query, aliases).find(alias => aliasTargetsCatalogItem(alias, item));
+}
+
+function directlyMatchesCatalogItem(query, item) {
+  const q = normalizeLookup(query);
+  return [item.drugName, item.genericName, item.tradeName].some(value => {
+    const name = normalizeLookup(value);
+    return name && (name.includes(q) || (name.length >= 2 && q.includes(name)));
+  });
+}
+
 function categoryIdFor(category, drugName = "") {
   const value = String(category || "").trim();
   if (CATEGORY_IDS.includes(value)) return value;
@@ -88,7 +120,7 @@ function plainField(value, maxLength = 200) {
   return String(value || "").normalize("NFKC").replace(/[\u0000-\u001f]/g, " ").replace(/\s+/g, " ").trim().slice(0, maxLength);
 }
 
-function cleanCatalogCandidate(candidate) {
+function cleanCatalogCandidate(candidate, match = {}) {
   if (!candidate || !HAN_RE.test(`${candidate.drugName || ""}${candidate.genericName || ""}`)) return null;
   const sourceStatus = candidate.source?.status || candidate.clinical?.source?.status;
   if (!VERIFIED_SOURCE_STATUSES.has(sourceStatus)) return null;
@@ -110,16 +142,21 @@ function cleanCatalogCandidate(candidate) {
   const hospital = hospitalDomains.some(domainMatches);
   const sourceQuality = regulator ? "regulator" : manufacturer ? "manufacturer" : hospital ? "hospital" : medicalDatabase ? "medical-database" : "other";
   const drugName = chineseField(candidate.genericName || candidate.drugName, 80);
+  const matchedTradeName = chineseField(match.tradeName || candidate.tradeName, 80);
+  const matchedByTradeName = Boolean(match.tradeName);
   return {
-    drugName, tradeName: chineseField(candidate.tradeName, 80),
+    drugName, tradeName: matchedTradeName,
     category: categoryIdFor(candidate.category, `${candidate.drugName || ""}${drugName}`),
-    indications, specification: plainField(candidate.specification), dosage,
+    indications, specification: matchedByTradeName ? "" : plainField(candidate.specification), dosage,
     adverseReactions, precautions, approvalNumber: "",
     confidence: ["regulator", "manufacturer", "hospital"].includes(sourceQuality) ? "high" : "medium", sourceQuality,
     sourceTitle: chineseField(candidate.source?.label, 120) || "中文核验资料", sourceUrl,
     sourceCheckedAt: /^\d{4}-\d{2}-\d{2}$/.test(candidate.source?.checkedAt || "")
       ? candidate.source.checkedAt : new Date().toISOString().slice(0, 10),
-    draft: false, verified: true, editable: true
+    draft: false, verified: true, editable: true,
+    matchType: matchedByTradeName ? "trade-name" : "generic-name",
+    tradeNameSourceTitle: matchedByTradeName ? chineseField(match.source?.label, 120) : "",
+    tradeNameSourceUrl: matchedByTradeName ? canonicalUrl(match.source?.url) : ""
   };
 }
 
@@ -151,7 +188,7 @@ async function fetchCatalog(env) {
   if (!response.ok) throw new Error(`CATALOG_${response.status}`);
   const payload = await response.json();
   if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("CATALOG_INVALID");
-  return payload.drugs;
+  return { drugs: payload.drugs, tradeNameAliases: normalizeTradeNameAliases(payload.tradeNameAliases) };
 }
 
 function parseAiResponse(result) {
@@ -212,10 +249,16 @@ async function handleSearch(request, env, origin) {
   const warnings = [];
   let candidates = [];
   try {
-    const q = normalizeLookup(query);
-    candidates = (await fetchCatalog(env))
-      .filter(item => normalizeLookup(`${item.drugName || ""}${item.genericName || ""}${item.tradeName || ""}`).includes(q))
-      .map(cleanCatalogCandidate).filter(Boolean).slice(0, 6);
+    const catalog = await fetchCatalog(env);
+    candidates = catalog.drugs.map((item, index) => {
+      const alias = tradeNameAliasForItem(query, item, catalog.tradeNameAliases);
+      if (!alias && !directlyMatchesCatalogItem(query, item)) return null;
+      const exactNameMatch = [item.drugName, item.genericName, item.tradeName].some(value => normalizeLookup(value) === normalizeLookup(query));
+      const exactAliasMatch = alias && normalizeLookup(alias.tradeName) === normalizeLookup(query);
+      return { candidate: cleanCatalogCandidate(item, alias || {}), score: exactAliasMatch ? 0 : exactNameMatch ? 1 : alias ? 2 : 3, index };
+    }).filter(result => result?.candidate)
+      .sort((a, b) => a.score - b.score || a.index - b.index)
+      .map(result => result.candidate).slice(0, 6);
   } catch (error) {
     console.error(JSON.stringify({ message: "verified catalog unavailable", error: error instanceof Error ? error.message : "unknown" }));
     warnings.push("项目中文核验库暂时无法读取，已尝试生成未核验草稿。");
@@ -224,6 +267,9 @@ async function handleSearch(request, env, origin) {
   let mode = "free-verified";
   if (candidates.length) {
     warnings.push("已优先返回带中文来源的核验资料；填入后所有字段仍可编辑。");
+    if (candidates.some(candidate => candidate.matchType === "trade-name")) {
+      warnings.push("已按商品名识别通用名；不同厂家和包装的规格可能不同，规格已留空，请按药盒或现行说明书核对。");
+    }
   } else {
     mode = "free-ai-draft";
     try {
@@ -258,4 +304,4 @@ export default {
   }
 };
 
-export { canonicalUrl, cleanCatalogCandidate, cleanDirectoryHint, generateUnverifiedDraft, normalizeLookup, verificationLinks };
+export { canonicalUrl, cleanCatalogCandidate, cleanDirectoryHint, directlyMatchesCatalogItem, generateUnverifiedDraft, normalizeLookup, tradeNameAliasForItem, verificationLinks };

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import worker, { cleanCatalogCandidate } from "./src/index.js";
 
 const origin = "https://tinnxq-alt.github.io";
@@ -45,6 +46,10 @@ assert.equal(response.status, 403);
 const realFetch = globalThis.fetch;
 let catalog = {
   schemaVersion: 1, language: "zh-CN",
+  tradeNameAliases: [{
+    tradeName: "测试牌阿司匹林", drugName: "阿司匹林肠溶片", genericName: "阿司匹林",
+    source: { label: "测试商品名来源", url: "https://www.nmpa.gov.cn/example/aspirin-alias.html", checkedAt: "2026-08-17" }
+  }],
   drugs: [{
     drugName: "阿司匹林肠溶片", genericName: "阿司匹林", tradeName: "", specification: "100mg",
     dosageForm: "肠溶片", category: "西药", manufacturer: "某制药企业",
@@ -74,6 +79,41 @@ try {
   assert.equal(payload.candidates[0].verified, true);
   assert.equal(payload.candidates[0].editable, true);
   assert.equal(aiCalls, 0, "有核验资料时不应调用 AI");
+
+  response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
+    method: "POST", headers: { Origin: origin, "Content-Type": "application/json" }, body: JSON.stringify({ query: "测试牌阿司匹林 100mg" })
+  }), baseEnv);
+  assert.equal(response.status, 200);
+  payload = await response.json();
+  assert.equal(payload.mode, "free-verified");
+  assert.equal(payload.candidates.length, 1);
+  assert.equal(payload.candidates[0].drugName, "阿司匹林");
+  assert.equal(payload.candidates[0].tradeName, "测试牌阿司匹林");
+  assert.equal(payload.candidates[0].matchType, "trade-name");
+  assert.equal(payload.candidates[0].specification, "", "商品名只映射通用名，不得套用其他厂家包装规格");
+  assert.equal(payload.candidates[0].tradeNameSourceUrl, "https://www.nmpa.gov.cn/example/aspirin-alias.html");
+  assert.match(payload.warnings.join(""), /商品名.*规格已留空/);
+  assert.equal(aiCalls, 0, "商品名命中核验别名时不应调用 AI");
+
+  catalog = JSON.parse(fs.readFileSync(new URL("../chinese-drug-labels.json", import.meta.url), "utf8"));
+  const realAliasCases = [
+    ["拜唐苹", "阿卡波糖"],
+    ["络活喜 5mg", "苯磺酸氨氯地平"],
+    ["倍他乐克", "酒石酸美托洛尔"],
+    ["百多邦", "莫匹罗星"]
+  ];
+  for (const [query, genericName] of realAliasCases) {
+    response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
+      method: "POST", headers: { Origin: origin, "Content-Type": "application/json" }, body: JSON.stringify({ query })
+    }), baseEnv);
+    payload = await response.json();
+    assert.equal(payload.mode, "free-verified", `${query} 应命中核验别名`);
+    assert.equal(payload.candidates[0]?.drugName, genericName, `${query} 应识别为 ${genericName}`);
+    assert.equal(payload.candidates[0]?.matchType, "trade-name");
+    assert.equal(payload.candidates[0]?.specification, "");
+    assert.ok(payload.candidates[0]?.tradeNameSourceUrl);
+  }
+  assert.equal(aiCalls, 0, "真实商品名别名均不应调用 AI");
 
   const blocked = cleanCatalogCandidate({
     ...catalog.drugs[0],

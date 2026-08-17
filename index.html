@@ -22,7 +22,17 @@
     <button id="homeBtn" class="icon-btn" type="button" aria-label="首页">⌂</button>
   </header>
 
-  <main id="app" class="app-shell" aria-live="polite"></main>
+  <main class="app-shell">
+    <section id="pharmacySwitcher" class="pharmacy-switcher" aria-label="选择药库">
+      <button type="button" data-pharmacy-switch="ward" aria-pressed="true">
+        <span>病房药库</span><strong data-pharmacy-count>167</strong>
+      </button>
+      <button type="button" data-pharmacy-switch="outpatient" aria-pressed="false">
+        <span>门诊药库</span><strong data-pharmacy-count>0</strong>
+      </button>
+    </section>
+    <div id="app" aria-live="polite"></div>
+  </main>
 
   <nav class="bottom-nav" aria-label="主要导航">
     <button type="button" data-route="home"><span>⌂</span>首页</button>
@@ -36,6 +46,9 @@
   <div id="modalRoot"></div>
 
   <script src="drugs.js"></script>
+  <script src="outpatient-drugs.js"></script>
+  <script src="drug-lookup.js"></script>
+  <script src="pharmacy-scope.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

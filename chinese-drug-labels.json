@@ -2,6 +2,138 @@
   "schemaVersion": 1,
   "language": "zh-CN",
   "updatedAt": "2026-08-17",
+  "tradeNameAliases": [
+    {
+      "tradeName": "拜唐苹",
+      "drugName": "阿卡波糖片",
+      "genericName": "阿卡波糖",
+      "source": {
+        "label": "国家人口健康科学数据中心：阿卡波糖片（拜唐苹）注册资料",
+        "url": "https://pharm.ncmi.cn/zysjk/ypjkyp/202312/t20231205_399102.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "络活喜",
+      "drugName": "苯磺酸氨氯地平片",
+      "genericName": "苯磺酸氨氯地平",
+      "source": {
+        "label": "丁香园用药助手：络活喜（苯磺酸氨氯地平片）说明书",
+        "url": "https://drugs.dxy.cn/business/drug/82903.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "倍他乐克",
+      "drugName": "酒石酸美托洛尔片",
+      "genericName": "酒石酸美托洛尔",
+      "source": {
+        "label": "天际健康：倍他乐克（酒石酸美托洛尔片）说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=13536&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "百多邦",
+      "drugName": "莫匹罗星软膏",
+      "genericName": "莫匹罗星",
+      "source": {
+        "label": "天际健康：百多邦（莫匹罗星软膏）说明书",
+        "url": "https://ypsm.yzsbh.com/drugFilter.action?interId=Y00000010477&show_navbar=true",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "切诺",
+      "drugName": "桉柠蒎肠溶胶囊",
+      "genericName": "桉柠蒎",
+      "source": {
+        "label": "远大医药：切诺（桉柠蒎肠溶胶囊）产品说明书",
+        "url": "https://www.grandpharm.com/product/%E6%A1%89%E6%9F%A0%E8%92%8E%E8%82%A0%E6%BA%B6%E8%83%B6%E5%9B%8A%E5%88%87%E8%AF%BA/",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "整肠生",
+      "drugName": "地衣芽孢杆菌活菌颗粒",
+      "genericName": "地衣芽孢杆菌活菌",
+      "source": {
+        "label": "丁香园用药助手：整肠生（地衣芽孢杆菌活菌颗粒）说明书",
+        "url": "https://drugs.dxy.cn/business/drug/150272.htm",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "速福达",
+      "drugName": "玛巴洛沙韦片",
+      "genericName": "玛巴洛沙韦",
+      "source": {
+        "label": "罗氏：速福达（玛巴洛沙韦片）中文说明书",
+        "url": "https://assets.roche.com/f/249469/x/d8977d1f34/mabaluoshaweipian_1_20260328.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "易蒙停",
+      "drugName": "盐酸洛哌丁胺胶囊",
+      "genericName": "盐酸洛哌丁胺",
+      "source": {
+        "label": "西安杨森：易蒙停（盐酸洛哌丁胺胶囊）说明书",
+        "url": "https://www.xian-janssen.com.cn/sites/default/files/PDF/yi_meng_ting_yan_suan_luo_pai_ding_e_xiao_nang_shuo_ming_shu_20201012.pdf",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "优思灵R",
+      "drugName": "人胰岛素注射液",
+      "genericName": "人胰岛素",
+      "source": {
+        "label": "丁香园用药助手：优思灵R（人胰岛素注射液）说明书",
+        "url": "https://drugs.dxy.cn/drug/4jBMzrShheZ2D7CkzmepepmRMMA%3D%3D",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "优甲乐",
+      "drugName": "左甲状腺素钠片",
+      "genericName": "左甲状腺素钠",
+      "source": {
+        "label": "国家人口健康科学数据中心：左甲状腺素钠片（优甲乐）注册资料",
+        "url": "https://pharm.ncmi.cn/zysjk/ypjkyp/202312/t20231205_399878.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "泰诺",
+      "drugName": "酚麻美敏片(泰诺)",
+      "genericName": "酚麻美敏",
+      "source": {
+        "label": "国控恒兴：泰诺（酚麻美敏片）说明书",
+        "url": "https://511yaohx.com/goodsList-api/goodsList/detailGoods?goodscode=0454100",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "舒乐安定",
+      "drugName": "舒乐安定",
+      "genericName": "艾司唑仑",
+      "source": {
+        "label": "常州四药：艾司唑仑片（曾用名舒乐安定）说明书",
+        "url": "https://www.czsiyao-pharm.com/Product/aslp.html",
+        "checkedAt": "2026-08-17"
+      }
+    },
+    {
+      "tradeName": "希舒美",
+      "drugName": "阿奇霉素片",
+      "genericName": "阿奇霉素",
+      "source": {
+        "label": "辉瑞：希舒美（阿奇霉素片）中文说明书",
+        "url": "https://labeling.pfizer.com/ShowLabeling.aspx?id=14475",
+        "checkedAt": "2026-08-17"
+      }
+    }
+  ],
   "drugs": [
     {
       "drugName": "阿卡波糖片",
@@ -859,7 +991,7 @@
     {
       "drugName": "复方氨酚伪麻胶囊",
       "genericName": "复方氨酚伪麻",
-      "specification": "待核验（原始：20粒/盒）",
+      "specification": "规格待核验（20粒/盒）",
       "dosageForm": "胶囊剂",
       "category": "西药",
       "manufacturer": "四川天德制药有限…",
@@ -880,7 +1012,7 @@
     {
       "drugName": "复方甲氧那明胶囊",
       "genericName": "复方甲氧那明",
-      "specification": "待核验（原始：40粒/盒）",
+      "specification": "规格待核验（40粒/盒）",
       "dosageForm": "胶囊剂",
       "category": "西药",
       "manufacturer": "上海上药信谊药厂…",
@@ -920,7 +1052,7 @@
     },
     {
       "drugName": "富马酸比索洛尔片",
-      "genericName": "比索洛尔",
+      "genericName": "富马酸比索洛尔",
       "specification": "5mg×18片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -941,7 +1073,7 @@
     },
     {
       "drugName": "富马酸依美斯汀缓释胶囊",
-      "genericName": "依美斯汀",
+      "genericName": "富马酸依美斯汀",
       "specification": "2mg×4粒/盒",
       "dosageForm": "缓释胶囊剂",
       "category": "西药",
@@ -981,7 +1113,7 @@
     },
     {
       "drugName": "枸橼酸莫沙必利片",
-      "genericName": "莫沙必利",
+      "genericName": "枸橼酸莫沙必利",
       "specification": "5mg×48片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -1141,7 +1273,7 @@
     },
     {
       "drugName": "酒石酸美托洛尔片",
-      "genericName": "美托洛尔",
+      "genericName": "酒石酸美托洛尔",
       "specification": "25mg×30片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -1161,7 +1293,7 @@
     },
     {
       "drugName": "酒石酸唑吡坦片",
-      "genericName": "唑吡坦",
+      "genericName": "酒石酸唑吡坦",
       "specification": "10mg×7片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -1382,7 +1514,7 @@
     },
     {
       "drugName": "磷酸奥司他韦胶囊",
-      "genericName": "奥司他韦",
+      "genericName": "磷酸奥司他韦",
       "specification": "75mg×10粒/盒",
       "dosageForm": "胶囊剂",
       "category": "西药",
@@ -1462,7 +1594,7 @@
     },
     {
       "drugName": "硫酸氢氯吡格雷片",
-      "genericName": "氯吡格雷",
+      "genericName": "硫酸氢氯吡格雷",
       "specification": "75mg×7片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -2084,7 +2216,7 @@
     },
     {
       "drugName": "沙库巴曲阿利沙坦钙片",
-      "genericName": "沙库巴曲/阿利沙坦钙",
+      "genericName": "沙库巴曲阿利沙坦钙",
       "specification": "240mg×7片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -2104,7 +2236,7 @@
     },
     {
       "drugName": "沙库巴曲缬沙坦钠片",
-      "genericName": "沙库巴曲/缬沙坦",
+      "genericName": "沙库巴曲缬沙坦钠",
       "specification": "200mg×28片/盒",
       "dosageForm": "片剂",
       "category": "西药",
@@ -2344,7 +2476,7 @@
     },
     {
       "drugName": "碳酸钙D3片",
-      "genericName": "碳酸钙/维生素D3",
+      "genericName": "碳酸钙D3",
       "specification": "0.6g×60片/盒",
       "dosageForm": "片剂",
       "category": "西药",
