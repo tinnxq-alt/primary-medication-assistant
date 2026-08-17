@@ -1,34 +1,47 @@
-function attrs(item) {
-  return Object.fromEntries((item?.attributes || []).map(entry => [entry.name, entry.value]));
+function decodeEntities(value) {
+  return String(value || "")
+    .replace(/&amp;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
 }
 
-function summarizeScrape(payload) {
-  return (payload?.result || []).map(group => ({
-    selector: group.selector,
-    count: (group.results || []).length,
-    rows: (group.results || []).slice(0, 80).map(item => ({
-      text: String(item.text || "").slice(0, 240),
-      html: String(item.html || "").slice(0, 300),
-      attributes: attrs(item)
-    }))
-  }));
+function stripTags(value) {
+  return decodeEntities(String(value || "").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim();
 }
 
-async function scrape(browser, url, elements, waitForTimeout = 1800) {
-  const response = await browser.quickAction("scrape", {
-    url,
-    elements: elements.map(selector => ({ selector })),
-    rejectResourceTypes: ["image", "media", "font"],
-    gotoOptions: { waitUntil: "domcontentloaded", timeout: 18000 },
-    waitForTimeout
-  });
-  const text = await response.text();
-  if (!response.ok) return { ok: false, status: response.status, body: text.slice(0, 1000) };
-  try { return { ok: true, payload: JSON.parse(text) }; }
-  catch { return { ok: false, status: response.status, body: text.slice(0, 1000) }; }
+function matchingAnchors(html) {
+  const rows = [];
+  const re = /<a\b([^>]*?)href\s*=\s*(?:"([^"]+)"|'([^']+)'|([^\s>]+))([^>]*)>([\s\S]*?)<\/a>/gi;
+  let match;
+  while ((match = re.exec(String(html || "")))) {
+    const href = decodeEntities(match[2] || match[3] || match[4] || "");
+    const text = stripTags(match[6]);
+    const raw = match[0];
+    if (!/司美|格鲁肽|诺和泰/i.test(`${text} ${href} ${raw}`)) continue;
+    rows.push({ href, text: text.slice(0, 260), html: raw.slice(0, 500) });
+    if (rows.length >= 80) break;
+  }
+  return rows;
 }
 
-async function content(browser, url) {
+function querySnippets(html, term) {
+  const source = String(html || "");
+  const snippets = [];
+  let from = 0;
+  while (snippets.length < 30) {
+    const index = source.indexOf(term, from);
+    if (index < 0) break;
+    const start = Math.max(0, index - 450);
+    const end = Math.min(source.length, index + term.length + 650);
+    snippets.push(source.slice(start, end).replace(/\s+/g, " "));
+    from = index + term.length;
+  }
+  return snippets;
+}
+
+async function browserContent(browser, url) {
   const response = await browser.quickAction("content", {
     url,
     rejectResourceTypes: ["image", "media", "font"],
@@ -36,24 +49,32 @@ async function content(browser, url) {
     waitForTimeout: 2200
   });
   const text = await response.text();
-  if (!response.ok) return { ok: false, status: response.status, body: text.slice(0, 1000) };
+  if (!response.ok) return { ok: false, status: response.status, body: text.slice(0, 1500) };
   try {
     const payload = JSON.parse(text);
     const html = typeof payload?.result === "string" ? payload.result : "";
-    const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<[^>]+>/g, " ").trim() || "";
-    const hrefs = [...html.matchAll(/href\s*=\s*["']([^"']+)["']/gi)].map(match => match[1]);
-    const numeric = [...new Set(hrefs.filter(href => /\/(?:\d{5,})(?:\/|$|[?#])/.test(href)))].slice(0, 80);
+    const title = stripTags(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] || "");
+    const forms = [...html.matchAll(/<form\b[^>]*>[\s\S]*?<\/form>/gi)]
+      .map(match => match[0])
+      .filter(form => /search|搜索|药品|keyword|key|query/i.test(form))
+      .slice(0, 20)
+      .map(form => form.slice(0, 1800).replace(/\s+/g, " "));
+    const hrefs = [...html.matchAll(/href\s*=\s*["']([^"']+)["']/gi)].map(match => decodeEntities(match[1]));
     return {
       ok: true,
       success: payload?.success,
       htmlLength: html.length,
       title,
       containsQuery: html.includes("司美"),
-      numericHrefs: numeric,
-      searchHrefs: [...new Set(hrefs.filter(href => href.includes("search")))].slice(0, 40)
+      matchingAnchors: matchingAnchors(html),
+      querySnippets: querySnippets(html, "司美"),
+      semaglutideSnippets: querySnippets(html, "司美格鲁肽"),
+      novoNordiskSnippets: querySnippets(html, "诺和泰"),
+      forms,
+      interestingHrefs: [...new Set(hrefs.filter(href => /司美|格鲁肽|manual|drug|med|ypk|tcm|western|medicine/i.test(href)))].slice(0, 120)
     };
   } catch {
-    return { ok: false, status: response.status, body: text.slice(0, 1000) };
+    return { ok: false, status: response.status, body: text.slice(0, 1500) };
   }
 }
 
@@ -63,35 +84,15 @@ export default {
       return Response.json({ error: "browser binding missing" }, { status: 500 });
     }
 
-    const homeUrl = "https://ypk.39.net/";
     const searchUrl = "https://ypk.39.net/search/%E5%8F%B8%E7%BE%8E";
-    const [home, search, searchContent] = await Promise.all([
-      scrape(env.BROWSER, homeUrl, ["form", "input", "button", "a[href*='search']"], 1500),
-      scrape(env.BROWSER, searchUrl, ["a[href]", "form", "input", "button"], 2500),
-      content(env.BROWSER, searchUrl)
-    ]);
-
-    const homeSummary = home.ok ? summarizeScrape(home.payload) : home;
-    let searchSummary = search;
-    if (search.ok) {
-      searchSummary = summarizeScrape(search.payload).map(group => ({
-        ...group,
-        rows: group.selector === "a[href]"
-          ? group.rows.filter(row => {
-              const href = String(row.attributes?.href || "");
-              return row.text.includes("司美") || /\/(?:\d{5,})(?:\/|$|[?#])/.test(href) || href.includes("search");
-            }).slice(0, 80)
-          : group.rows
-      }));
-    }
+    const searchContent = await browserContent(env.BROWSER, searchUrl);
 
     return Response.json({
       generatedAt: new Date().toISOString(),
-      homeUrl,
       searchUrl,
-      home: homeSummary,
-      search: searchSummary,
       searchContent
     }, { headers: { "Cache-Control": "no-store" } });
   }
 };
+
+export { matchingAnchors, querySnippets };
