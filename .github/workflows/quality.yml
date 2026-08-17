@@ -34,6 +34,7 @@ jobs:
         run: |
           node --check app.js
           node --check text-mark-fix.js
+          node --check header-brand.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -52,6 +53,9 @@ jobs:
 
       - name: Text mark and notebook tests
         run: node scripts/test-text-mark-fix.mjs
+
+      - name: Header layout tests
+        run: node scripts/test-header-layout.mjs
 
       - name: Worker tests
         run: node worker/test.mjs
