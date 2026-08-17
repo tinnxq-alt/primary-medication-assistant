@@ -33,6 +33,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
+          node --check fast-search-ui.js
           node --check smart-add-fix.js
           node --check notebook-scroll-fix.js
           node --check mark-notebook-ui.js
@@ -54,6 +55,9 @@ jobs:
 
       - name: Drug name lookup tests
         run: node scripts/test-drug-lookup.mjs
+
+      - name: Fast partial-name search tests
+        run: node scripts/test-fast-search.mjs
 
       - name: Smart add autofill tests
         run: node scripts/test-smart-add-fix.mjs

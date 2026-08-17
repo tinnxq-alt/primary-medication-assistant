@@ -10,6 +10,7 @@
   let aliasPromise = null;
   let candidateMap = new Map();
   let requestId = 0;
+  let detailRequestId = 0;
   let lastWarmAt = 0;
 
   const esc = value => String(value ?? "")
@@ -19,6 +20,7 @@
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
   const hasChinese = value => /[\u3400-\u9fff]/.test(String(value || ""));
+  const chineseCount = value => (String(value || "").match(/[\u3400-\u9fff]/g) || []).length;
 
   function read(key, fallback) {
     try {
@@ -127,57 +129,85 @@
     }
   }
 
-  async function remoteNewDrugCandidates(query) {
+  async function postJson(path, body, timeoutMs, timeoutMessage) {
     const base = endpoint();
     if (!base) throw new Error("智能识别服务未配置");
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 25_000);
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetch(`${base}/v1/drugs/search`, {
+      const response = await fetch(`${base}${path}`, {
         method: "POST",
         cache: "no-store",
         signal: controller.signal,
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query, newDrugOnly: true, candidateCount: 3 })
+        body: JSON.stringify(body)
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || `智能识别服务返回 ${response.status}`);
-      const candidates = (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => ({
-        drugName: item.drugName || "",
-        tradeName: item.tradeName || "",
-        specification: item.specification || "",
-        category: normalizeCategory(item.category, item.drugName),
-        clinical: {
-          indication: item.indications || item.clinical?.indication || "",
-          dosage: item.dosage || item.clinical?.dosage || "",
-          adverseReactions: item.adverseReactions || item.clinical?.adverseReactions || "",
-          precautions: item.precautions || item.clinical?.precautions || ""
-        },
-        source: {
-          status: "unverified-draft",
-          label: item.sourceTitle || "Cloudflare Workers AI（模型生成，未核验）",
-          url: item.sourceUrl || "",
-          checkedAt: item.sourceCheckedAt || new Date().toISOString().slice(0, 10)
-        },
-        smartMeta: {
-          confidence: item.confidence || "low",
-          approvalNumber: item.approvalNumber || "",
-          draft: true,
-          verified: false
-        }
-      })).filter(item => hasChinese(item.drugName) && hasChinese(item.clinical.indication) && hasChinese(item.clinical.dosage)).slice(0, 5);
-      return {
-        candidates,
-        warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
-        mode: payload.mode || "",
-        elapsedMs: Number(payload.elapsedMs) || 0
-      };
+      return payload;
     } catch (error) {
-      if (error.name === "AbortError") throw new Error("智能识别超过 25 秒，请重试或手动录入");
+      if (error.name === "AbortError") throw new Error(timeoutMessage);
       throw error;
     } finally {
       clearTimeout(timer);
     }
+  }
+
+  async function remoteNewDrugCandidates(query) {
+    const payload = await postJson("/v1/drugs/search", { query, newDrugOnly: true, candidateCount: 3 }, 15_000, "候选识别超过 15 秒，请重试");
+    const candidates = (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => ({
+      drugName: item.drugName || "",
+      tradeName: item.tradeName || "",
+      specification: item.specification || "",
+      category: normalizeCategory(item.category, item.drugName),
+      clinical: null,
+      originalQuery: query,
+      source: {
+        status: "unverified-draft",
+        label: item.sourceTitle || "Cloudflare Workers AI（AI 生成）",
+        url: "",
+        checkedAt: item.sourceCheckedAt || new Date().toISOString().slice(0, 10)
+      },
+      smartMeta: { draft: true, verified: false }
+    })).filter(item => hasChinese(item.drugName)).slice(0, 5);
+    return {
+      candidates,
+      warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
+      mode: payload.mode || "",
+      elapsedMs: Number(payload.elapsedMs) || 0
+    };
+  }
+
+  async function remoteCandidateDetail(candidate) {
+    const payload = await postJson("/v1/drugs/detail", {
+      query: candidate.originalQuery || candidate.drugName,
+      candidate: {
+        drugName: candidate.drugName,
+        tradeName: candidate.tradeName,
+        category: candidate.category,
+        specification: candidate.specification
+      }
+    }, 18_000, "资料生成超过 18 秒，请重试");
+    const detail = payload.candidate || {};
+    return {
+      ...candidate,
+      drugName: detail.drugName || candidate.drugName,
+      tradeName: detail.tradeName ?? candidate.tradeName,
+      specification: detail.specification ?? candidate.specification,
+      category: normalizeCategory(detail.category || candidate.category, detail.drugName || candidate.drugName),
+      clinical: {
+        indication: detail.indications || "",
+        dosage: detail.dosage || "",
+        adverseReactions: detail.adverseReactions || "",
+        precautions: detail.precautions || ""
+      },
+      source: {
+        status: "unverified-draft",
+        label: detail.sourceTitle || candidate.source?.label || "Cloudflare Workers AI（AI 生成）",
+        url: "",
+        checkedAt: detail.sourceCheckedAt || candidate.source?.checkedAt || new Date().toISOString().slice(0, 10)
+      }
+    };
   }
 
   function currentForm() {
@@ -195,12 +225,12 @@
     ["drugName", "tradeName", "specification"].forEach(name => setField(node, name, candidate[name] || ""));
     setField(node, "category", normalizeCategory(candidate.category, candidate.drugName));
     ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(node, name, candidate.clinical?.[name] || ""));
-    setField(node, "sourceLabel", candidate.source?.label || "Cloudflare Workers AI（模型生成，未核验）");
-    setField(node, "sourceUrl", candidate.source?.url || "");
+    setField(node, "sourceLabel", candidate.source?.label || "Cloudflare Workers AI（AI 生成）");
+    setField(node, "sourceUrl", "");
     setField(node, "sourceCheckedAt", candidate.source?.checkedAt || "");
     setField(node, "sourceStatus", "unverified-draft");
     const source = document.getElementById("selectedSource");
-    if (source) source.textContent = `来源：${candidate.source?.label || "Cloudflare Workers AI（模型生成，未核验）"}`;
+    if (source) source.textContent = `来源：${candidate.source?.label || "Cloudflare Workers AI（AI 生成）"}`;
     toast(`已选择：${candidate.drugName}`);
   }
 
@@ -214,7 +244,7 @@
       candidateMap.set(candidate.lookupId, candidate);
     });
     results.innerHTML = candidates.length ? candidates.map((candidate, index) =>
-      `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge warn">AI 生成</span> 来源：${esc(candidate.source?.label || "Cloudflare Workers AI（模型生成，未核验）")}</p><div class="toolbar"><button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并填充</button></div></div></article>`
+      `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge info">AI 生成</span> 来源：${esc(candidate.source?.label || "Cloudflare Workers AI（AI 生成）")}</p><div class="toolbar"><button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并自动填充</button></div></div></article>`
     ).join("") : '<div class="empty"><p>暂未生成候选，可重试或直接手动填写。</p></div>';
   }
 
@@ -231,26 +261,29 @@
     const panel = document.querySelector("#drugForm")?.closest(".panel");
     if (!panel) return;
     const heading = [...panel.querySelectorAll("h3")].find(node => node.textContent.includes("智能识别"));
-    if (heading) heading.textContent = "1. 新药智能识别（多候选）";
+    if (heading) heading.textContent = "1. 新药智能识别（片段检索）";
     const notice = heading?.nextElementSibling;
     if (notice?.classList.contains("notice")) {
-      notice.textContent = "用于添加当前药库尚未收录的新药。输入药名后一次生成多个 AI 候选，选择对应药物即可自动填充；每个候选都会标注生成来源。";
+      notice.textContent = "无需输入药物全称：输入 2 个及以上汉字片段即可先快速生成多个候选；选择对应药物后再自动生成完整资料并填入表单。候选和填充资料均标注 AI 来源。";
     }
+    const input = document.getElementById("drugNameInput");
+    if (input) input.placeholder = "输入药名片段，如“司美”“孟鲁”“阿奇”";
   }
 
   async function run() {
     const node = currentForm();
     if (!node) return;
     const query = String(node.elements.namedItem("drugName")?.value || "").trim();
-    if (!query) return toast("请先输入新药名称");
+    if (!query) return toast("请先输入药名片段");
     if (!hasChinese(query)) return toast("请输入中文药品名称");
+    if (chineseCount(query) < 2) return toast("再输入 1 个汉字，2 个字即可识别");
 
     const id = ++requestId;
     const button = document.getElementById("lookupDrugBtn");
     const status = document.getElementById("lookupStatus");
-    if (button) { button.disabled = true; button.textContent = "生成候选中…"; }
+    if (button) { button.disabled = true; button.textContent = "快速找候选…"; }
     clearResults();
-    if (status) status.textContent = "正在检查药库是否已经收录…";
+    if (status) status.textContent = "正在本机快速检查重复…";
 
     try {
       const aliases = await loadAliases();
@@ -264,15 +297,15 @@
 
       const similar = similarKnownDrug(query);
       if (status) status.textContent = similar
-        ? `发现相似条目“${similar.drugName}”，正在继续生成新药候选…`
-        : "确认药库未收录，正在生成多个候选…";
+        ? `片段匹配到相似条目“${similar.drugName}”，同时继续识别其他可能候选…`
+        : "正在按药名片段快速生成候选…";
 
       const result = await remoteNewDrugCandidates(query);
       if (id !== requestId) return;
       renderCandidates(result.candidates);
       if (result.candidates.length) {
         const timing = result.elapsedMs ? `（${(result.elapsedMs / 1000).toFixed(1)} 秒）` : "";
-        if (status) status.textContent = `已生成 ${result.candidates.length} 个候选${timing}，请选择对应药物后自动填充。${similar ? ` 请注意与相似条目“${similar.drugName}”区分。` : ""}`;
+        if (status) status.textContent = `已生成 ${result.candidates.length} 个候选${timing}。请选择对应药物，选中后再生成这一项的完整资料并自动填充。`;
       } else if (status) {
         status.textContent = `暂未生成候选。${result.warnings.length ? result.warnings.join("；") : "可直接使用下方表单手动录入。"}`;
       }
@@ -283,6 +316,34 @@
       toast("智能识别暂不可用，可手动录入");
     } finally {
       if (id === requestId && button) { button.disabled = false; button.textContent = "智能识别"; }
+    }
+  }
+
+  async function chooseCandidate(use) {
+    const candidate = candidateMap.get(use.dataset.newDrugUse);
+    if (!candidate) return;
+    const id = ++detailRequestId;
+    const status = document.getElementById("lookupStatus");
+    const originalText = use.textContent;
+    use.disabled = true;
+    use.textContent = "生成资料中…";
+    if (status) status.textContent = `已选择“${candidate.drugName}”，正在生成这一项的完整资料…`;
+    try {
+      const completed = await remoteCandidateDetail(candidate);
+      if (id !== detailRequestId) return;
+      candidateMap.set(candidate.lookupId, completed);
+      fill(completed);
+      document.querySelectorAll("[data-candidate-card]").forEach(card => card.removeAttribute("data-selected"));
+      use.closest("[data-candidate-card]")?.setAttribute("data-selected", "true");
+      if (status) status.textContent = `已选择“${completed.drugName}”，完整资料已自动填入下方表单。来源：${completed.source?.label || "Cloudflare Workers AI"}。`;
+      use.textContent = "已选择并填充";
+    } catch (error) {
+      if (id !== detailRequestId) return;
+      fill(candidate);
+      if (status) status.textContent = `“${candidate.drugName}”基础信息已填入；完整资料生成失败：${error.message || "网络异常"}。`;
+      toast("完整资料生成失败，已填入基础信息");
+      use.disabled = false;
+      use.textContent = originalText;
     }
   }
 
@@ -297,13 +358,7 @@
     if (use) {
       event.preventDefault();
       event.stopImmediatePropagation();
-      const candidate = candidateMap.get(use.dataset.newDrugUse);
-      if (!candidate) return;
-      fill(candidate);
-      document.querySelectorAll("[data-candidate-card]").forEach(card => card.removeAttribute("data-selected"));
-      use.closest("[data-candidate-card]")?.setAttribute("data-selected", "true");
-      const status = document.getElementById("lookupStatus");
-      if (status) status.textContent = `已选择“${candidate.drugName}”，资料已自动填入下方表单。`;
+      chooseCandidate(use);
     }
   }, true);
 
@@ -318,7 +373,15 @@
     if (!location.hash.startsWith("#/add")) return;
     loadAliases();
     warmWorker();
-    requestAnimationFrame(enhanceAddCopy);
+    requestAnimationFrame(() => {
+      enhanceAddCopy();
+      const savedQuery = sessionStorage.getItem("drug-add-query");
+      const input = document.getElementById("drugNameInput");
+      if (savedQuery && input && !input.value) {
+        input.value = savedQuery;
+        sessionStorage.removeItem("drug-add-query");
+      }
+    });
     setTimeout(enhanceAddCopy, 50);
   }
 
