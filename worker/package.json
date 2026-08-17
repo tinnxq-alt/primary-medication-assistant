@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "node test.mjs",
-    "check": "node --check src/index.js && node --check src/index-v2.js && node --check src/index-v3.js && node --check src/index-v4.js && node --check src/index-v5.js && node --check src/index-v6.js && node --check test.mjs",
+    "check": "node --check src/index.js && node --check src/index-v2.js && node --check src/index-v3.js && node --check src/index-v4.js && node --check src/index-v5.js && node --check src/index-v6.js && node --check src/index-v7.js && node --check test.mjs",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"
   },
