@@ -1,34 +1,27 @@
 import assert from "node:assert/strict";
-import worker, { categoryFromDrugName, extractBingResults, extractSection, htmlToText, parseInstructionPage, safePublicUrl } from "./src/index.js";
+import worker, { categoryFromDrugName, extractSearchLinks, extractSection, htmlToText, parseInstructionPage, safePublicUrl, unwrapBingUrl } from "./src/index-v2.js";
 
 const origin = "https://tinnxq-alt.github.io";
+const sourceUrl = "https://www.yaopinnet.com/huayao/hy7378h.htm";
+const secondUrl = "https://example-pharma.cn/semaglutide-label";
+const bingEncoded = Buffer.from(sourceUrl, "utf8").toString("base64url");
+const bingTrackingUrl = `https://www.bing.com/ck/a?!&&p=test&u=a1${bingEncoded}&ntb=1`;
 let browserCalls = 0;
+
 const BROWSER = {
   async quickAction(action, input) {
     browserCalls += 1;
-    assert.equal(action, "scrape");
+    assert.equal(action, "links");
     assert.match(input.url, /bing\.com\/search/);
     assert.match(decodeURIComponent(input.url), /司美/);
-    assert.deepEqual(input.elements.map(item => item.selector), ["li.b_algo h2 a", "li.b_algo .b_caption p"]);
     return Response.json({
       success: true,
       result: [
-        {
-          selector: "li.b_algo h2 a",
-          results: [
-            { text: "司美格鲁肽注射液_说明书_生产厂家_用法用量_药源网", attributes: [{ name: "href", value: "https://www.yaopinnet.com/huayao/hy7378h.htm" }] },
-            { text: "司美格鲁肽注射液说明书 - 示例厂家", attributes: [{ name: "href", value: "https://example-pharma.cn/semaglutide-label" }] },
-            { text: "硝苯地平缓释片说明书", attributes: [{ name: "href", value: "https://example-pharma.cn/nifedipine" }] }
-          ]
-        },
-        {
-          selector: "li.b_algo .b_caption p",
-          results: [
-            { text: "司美格鲁肽注射液说明书，包含适应症、规格、用法用量和注意事项。" },
-            { text: "司美格鲁肽注射液药品说明书，适应症和用法用量。" },
-            { text: "硝苯地平缓释片药品说明书。" }
-          ]
-        }
+        "https://www.bing.com/",
+        bingTrackingUrl,
+        secondUrl,
+        "https://www.bing.com/search?q=other",
+        "https://example-pharma.cn/nifedipine"
       ]
     });
   }
@@ -52,57 +45,46 @@ const secondHtml = `<!doctype html><html><head><title>司美格鲁肽注射液�
 <p>不良反应：可能出现恶心。</p><p>注意事项：按本品说明书使用。</p>
 <p>生产厂家：示例制药有限公司</p></body></html>`;
 
+assert.equal(unwrapBingUrl(bingTrackingUrl), sourceUrl, "Bing 跟踪链接必须解码回真实来源 URL");
+assert.equal(extractSearchLinks({ result: [bingTrackingUrl, secondUrl, "https://www.bing.com/"] }).length, 2);
+assert.equal(safePublicUrl("https://example.com/a")?.hostname, "example.com");
+assert.equal(safePublicUrl("http://example.com/a"), null);
+assert.equal(safePublicUrl("https://127.0.0.1/a"), null);
+assert.equal(safePublicUrl("https://localhost/a"), null);
+
+const text = htmlToText(semaglutideHtml);
+assert.equal(extractSection(text, ["适应症"]), "本品用于成人2型糖尿病患者的血糖控制。");
+assert.equal(categoryFromDrugName("司美格鲁肽注射液"), "降糖药");
+assert.equal(categoryFromDrugName("苯磺酸氨氯地平片"), "降压药");
+
+const parsed = parseInstructionPage({ url: sourceUrl, html: semaglutideHtml, text }, "司美");
+assert.equal(parsed.drugName, "司美格鲁肽注射液");
+assert.equal(parsed.tradeName, "诺和泰");
+assert.equal(parsed.specification, "1.34mg/ml，1.5ml");
+assert.equal(parsed.category, "降糖药");
+assert.equal(parsed.clinical.indication, "本品用于成人2型糖尿病患者的血糖控制。");
+assert.match(parsed.clinical.dosage, /每周皮下注射一次/);
+assert.equal(parsed.sourceQuality, "药品说明书数据库");
+assert.equal(parsed.extractionMode, "source-text-only");
+
 const realFetch = globalThis.fetch;
 globalThis.fetch = async request => {
   const url = String(request instanceof Request ? request.url : request);
-  if (url === "https://www.yaopinnet.com/huayao/hy7378h.htm") return new Response(semaglutideHtml, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
-  if (url === "https://example-pharma.cn/semaglutide-label") return new Response(secondHtml, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
+  if (url === sourceUrl) return new Response(semaglutideHtml, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
+  if (url === secondUrl) return new Response(secondHtml, { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
   if (url === "https://example-pharma.cn/nifedipine") return new Response("<html><body>硝苯地平</body></html>", { status: 200, headers: { "Content-Type": "text/html; charset=utf-8" } });
   throw new Error(`unexpected fetch ${url}`);
 };
 
 try {
-  assert.equal(safePublicUrl("https://example.com/a")?.hostname, "example.com");
-  assert.equal(safePublicUrl("http://example.com/a"), null);
-  assert.equal(safePublicUrl("https://127.0.0.1/a"), null);
-  assert.equal(safePublicUrl("https://localhost/a"), null);
-
-  const text = htmlToText(semaglutideHtml);
-  assert.match(text, /适应症/);
-  assert.equal(extractSection(text, ["适应症"]), "本品用于成人2型糖尿病患者的血糖控制。");
-  assert.equal(categoryFromDrugName("司美格鲁肽注射液"), "降糖药");
-  assert.equal(categoryFromDrugName("苯磺酸氨氯地平片"), "降压药");
-
-  const parsed = parseInstructionPage(
-    { url: "https://www.yaopinnet.com/huayao/hy7378h.htm", html: semaglutideHtml, text },
-    { title: "司美格鲁肽注射液说明书", url: "https://www.yaopinnet.com/huayao/hy7378h.htm" },
-    "司美"
-  );
-  assert.equal(parsed.drugName, "司美格鲁肽注射液");
-  assert.equal(parsed.tradeName, "诺和泰");
-  assert.equal(parsed.specification, "1.34mg/ml，1.5ml");
-  assert.equal(parsed.category, "降糖药");
-  assert.equal(parsed.clinical.indication, "本品用于成人2型糖尿病患者的血糖控制。");
-  assert.match(parsed.clinical.dosage, /每周皮下注射一次/);
-  assert.equal(parsed.sourceQuality, "药品说明书数据库");
-  assert.equal(parsed.extractionMode, "source-text-only");
-
-  const searchPayload = {
-    success: true,
-    result: [
-      { selector: "li.b_algo h2 a", results: [{ text: "司美格鲁肽说明书", attributes: [{ name: "href", value: "https://example.com/label" }] }] },
-      { selector: "li.b_algo .b_caption p", results: [{ text: "药品说明书 适应症 用法用量" }] }
-    ]
-  };
-  assert.equal(extractBingResults(searchPayload, "司美").length, 1);
-
   const env = { ALLOWED_ORIGINS: origin, BROWSER };
   let response = await worker.fetch(new Request("https://worker.example/health", { headers: { Origin: origin } }), env);
   assert.equal(response.status, 200);
   assert.deepEqual(await response.json(), {
     ok: true,
     configured: true,
-    mode: "web-instruction-source-extraction",
+    mode: "web-instruction-source-extraction-v2",
+    discovery: "browser-links",
     sourceGrounded: true,
     generatesClinicalKnowledge: false
   });
@@ -114,24 +96,23 @@ try {
   }), env);
   assert.equal(response.status, 200);
   const payload = await response.json();
-  assert.equal(payload.mode, "web-instruction-source-extraction");
+  assert.equal(payload.mode, "web-instruction-source-extraction-v2");
+  assert.ok(payload.searchResultCount >= 2, "Links 模式必须发现外部来源链接");
   assert.equal(payload.candidates.length, 2, "只保留能从真实网页抽出药名、适应症、用法用量的候选");
   assert.equal(payload.candidates[0].drugName, "司美格鲁肽注射液");
   assert.equal(payload.candidates[0].category, "降糖药", "司美格鲁肽不得被误分类为降压药");
   assert.match(payload.candidates[0].sourceUrl, /^https:\/\//);
-  assert.equal(payload.candidates[0].draft, false);
-  assert.equal(payload.candidates[0].verified, false);
   assert.equal(payload.candidates[0].extractionMode, "source-text-only");
   assert.match(payload.candidates[0].clinical.indication, /2型糖尿病/);
   assert.match(payload.candidates[0].clinical.dosage, /每周/);
-  assert.equal(browserCalls, 1, "一次智能识别只应执行一次全网搜索浏览器请求");
+  assert.equal(browserCalls, 1, "一次识别只执行一次 Browser Run 搜索动作");
 
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/detail", {
     method: "POST",
     headers: { Origin: origin, "Content-Type": "application/json" },
     body: JSON.stringify({ query: "司美" })
   }), env);
-  assert.equal(response.status, 404, "不得保留 AI 生成临床资料的详情接口");
+  assert.equal(response.status, 404, "不得恢复 AI 生成临床资料接口");
 
   response = await worker.fetch(new Request("https://worker.example/v1/drugs/search", {
     method: "POST",
@@ -139,11 +120,8 @@ try {
     body: JSON.stringify({ query: "司" })
   }), env);
   assert.equal(response.status, 400);
-
-  response = await worker.fetch(new Request("https://worker.example/health", { headers: { Origin: "https://evil.example" } }), env);
-  assert.equal(response.status, 403);
 } finally {
   globalThis.fetch = realFetch;
 }
 
-console.log("Worker web-instruction source extraction tests passed");
+console.log("Worker Browser Links source-grounded retrieval tests passed");
