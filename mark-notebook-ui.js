@@ -4,12 +4,12 @@
   const STORAGE_PREFIX = "primary-medication-pro:v1:";
   const RESTORE_KEY = "primary-medication:view-restore";
   const TYPE_LABELS = { underline: "划线", bold: "加粗", highlight: "荧光笔" };
-  const FIELD_LABELS = { indication: "适应症", dosage: "用法用量", adverseReactions: "不良反应", precautions: "注意事项" };
   const app = document.getElementById("app");
-  const modalRoot = document.getElementById("modalRoot");
   let activeSelection = null;
   let enhanceQueued = false;
   let selectionTimer = null;
+  let pendingRestore = null;
+  let restoreAttempts = 0;
 
   const esc = value => String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -31,14 +31,7 @@
   const routeParts = () => location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
   const currentRoute = () => routeParts()[0] || "home";
   const currentDrugId = () => currentRoute() === "detail" ? decodeURIComponent(routeParts().slice(1).join("/")) : "";
-
-  function toast(message) {
-    const node = document.getElementById("toast");
-    if (!node) return;
-    node.textContent = message;
-    node.classList.add("show");
-    setTimeout(() => node.classList.remove("show"), 1800);
-  }
+  const fieldSelector = fieldName => `.markable[data-mark-field="${String(fieldName || "").replaceAll('"', '\\"')}"]`;
 
   function drugNameById(drugId) {
     const custom = readList("customDrugs");
@@ -143,8 +136,7 @@
       field: field.dataset.markField,
       text,
       start,
-      end,
-      fieldElement: field
+      end
     };
   }
 
@@ -177,7 +169,7 @@
   }
 
   function makeRestorePayload(fieldName = "") {
-    const field = fieldName ? document.querySelector(`.markable[data-mark-field="${CSS.escape(fieldName)}"]`) : null;
+    const field = fieldName ? document.querySelector(fieldSelector(fieldName)) : null;
     return {
       hash: location.hash,
       scrollY: Math.max(0, window.scrollY || window.pageYOffset || 0),
@@ -298,19 +290,33 @@
     groupNotebookSection("文本标记", "marks");
   }
 
-  function restoreViewIfNeeded() {
-    let payload = null;
-    try { payload = JSON.parse(sessionStorage.getItem(RESTORE_KEY) || "null"); } catch {}
-    if (!payload || payload.hash !== location.hash || Date.now() - Number(payload.createdAt || 0) > 10000) {
+  function loadRestorePayload() {
+    try { pendingRestore = JSON.parse(sessionStorage.getItem(RESTORE_KEY) || "null"); } catch { pendingRestore = null; }
+    if (!pendingRestore || pendingRestore.hash !== location.hash || Date.now() - Number(pendingRestore.createdAt || 0) > 10000) {
+      pendingRestore = null;
       sessionStorage.removeItem(RESTORE_KEY);
       document.documentElement.classList.remove("restoring-view");
+    }
+  }
+
+  function tryRestoreView() {
+    if (!pendingRestore) return;
+    const route = currentRoute();
+    const detailReady = route !== "detail" || Boolean(document.querySelector(".markable[data-mark-field]"));
+    const notebookReady = route !== "notebook" || Boolean(app?.querySelector(".section-title"));
+    if ((!detailReady || !notebookReady) && restoreAttempts < 80) {
+      restoreAttempts += 1;
+      setTimeout(tryRestoreView, 40);
       return;
     }
+
+    const payload = pendingRestore;
+    pendingRestore = null;
     sessionStorage.removeItem(RESTORE_KEY);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       let top = Number(payload.scrollY || 0);
       if (payload.field && Number.isFinite(payload.fieldViewportTop)) {
-        const field = document.querySelector(`.markable[data-mark-field="${CSS.escape(payload.field)}"]`);
+        const field = document.querySelector(fieldSelector(payload.field));
         if (field) top = Math.max(0, window.scrollY + field.getBoundingClientRect().top - payload.fieldViewportTop);
       }
       window.scrollTo({ top, left: 0, behavior: "auto" });
@@ -322,6 +328,7 @@
     enhanceQueued = false;
     if (currentRoute() === "detail") renderDetailMarks();
     if (currentRoute() === "notebook") groupNotebook();
+    tryRestoreView();
   }
 
   function queueEnhance() {
@@ -385,6 +392,7 @@
   });
   window.addEventListener("resize", () => document.querySelector(".mark-delete-menu")?.remove());
 
+  loadRestorePayload();
   queueEnhance();
-  restoreViewIfNeeded();
+  tryRestoreView();
 })();
