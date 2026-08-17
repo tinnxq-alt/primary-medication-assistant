@@ -13,7 +13,8 @@ assert.match(source, /note-group-card/);
 assert.match(source, /data-note-group-count/);
 assert.match(html, /text-mark-fix\.css/);
 assert.match(html, /text-mark-fix\.js/);
-assert.match(serviceWorker, /primary-medication-pro-v28/);
+const cacheVersion = serviceWorker.match(/primary-medication(?:-pro)?-v(\d+)/);
+assert.ok(cacheVersion && Number(cacheVersion[1]) >= 28, "PWA 缓存版本不得低于 v28");
 assert.match(serviceWorker, /text-mark-fix\.js/);
 assert.match(serviceWorker, /text-mark-fix\.css/);
 
