@@ -1,5 +1,5 @@
-const CACHE_NAME = "primary-medication-v30";
-const APP_SHELL = ["./", "./index.html", "./style.css", "./header-layout.css", "./text-mark-fix.css", "./drugs.js", "./outpatient-drugs.js", "./drug-lookup.js", "./pharmacy-scope.js", "./chinese-drug-labels.json?v=12", "./app.js", "./text-mark-fix.js", "./notebook-delete-fix.js", "./header-brand.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
+const CACHE_NAME = "primary-medication-v31";
+const APP_SHELL = ["./", "./index.html", "./style.css", "./header-layout.css", "./text-mark-fix.css", "./drugs.js", "./catalog-retirements.js", "./outpatient-drugs.js", "./drug-lookup.js", "./pharmacy-scope.js", "./chinese-drug-labels.json?v=12", "./app.js", "./text-mark-fix.js", "./notebook-delete-fix.js", "./header-brand.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL)));

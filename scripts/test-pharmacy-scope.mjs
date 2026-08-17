@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const context = { window: {} };
 vm.createContext(context);
-for (const file of ["pharmacy-scope.js", "drugs.js", "outpatient-drugs.js"]) {
+for (const file of ["pharmacy-scope.js", "drugs.js", "catalog-retirements.js", "outpatient-drugs.js"]) {
   vm.runInContext(fs.readFileSync(path.join(root, file), "utf8"), context);
 }
 
@@ -33,8 +33,9 @@ assert.equal(drugBelongsToPharmacy(shared, "outpatient"), true);
 assert.deepEqual(filterDrugsByPharmacy([shared, outpatient], "ward").map(drug => drug.id), ["shared"]);
 assert.deepEqual(filterDrugsByPharmacy([shared, outpatient], "outpatient").map(drug => drug.id), ["shared", "outpatient"]);
 
-assert.equal(wardCatalog.length, 167);
-assert.ok(wardCatalog.every(drug => drug.pharmacyScopes?.length === 1 && drug.pharmacyScopes[0] === "ward"), "现有 167 条必须全部属于病房药库");
+assert.equal(wardCatalog.length, 166);
+assert.ok(!wardCatalog.some(drug => drug.drugName === "丹七片"), "丹七片必须从病房药库移除");
+assert.ok(wardCatalog.every(drug => drug.pharmacyScopes?.length === 1 && drug.pharmacyScopes[0] === "ward"), "现有 166 条必须全部属于病房药库");
 assert.ok(Array.isArray(outpatientCatalog));
 assert.ok(outpatientCatalog.every(drug => drug.pharmacyScopes?.includes("outpatient")), "门诊目录条目必须属于门诊药库");
 
