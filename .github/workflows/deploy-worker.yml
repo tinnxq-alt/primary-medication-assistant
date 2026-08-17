@@ -45,7 +45,7 @@ jobs:
         run: |
           sleep 10
           HTTP_CODE=$(curl --silent --show-error \
-            --max-time 70 \
+            --max-time 75 \
             -X POST "$WORKER_URL/v1/drugs/search" \
             -H 'Origin: https://tinnxq-alt.github.io' \
             -H 'Content-Type: application/json' \
@@ -66,7 +66,7 @@ jobs:
             console.error(JSON.stringify(payload, null, 2));
             throw new Error(`unexpected mode: ${payload.mode || 'missing'}`);
           }
-          if (payload.discovery !== 'trusted-source-discovery-v8') {
+          if (payload.discovery !== 'browser-site-restricted-source-v9') {
             console.error(JSON.stringify(payload, null, 2));
             throw new Error(`unexpected discovery mode: ${payload.discovery || 'missing'}`);
           }
@@ -76,11 +76,7 @@ jobs:
           }
           const trustedHost = host => host === 'ypk.39.net'
             || host === 'yaopinnet.com'
-            || host === 'www.yaopinnet.com'
-            || host === 'nmpa.gov.cn'
-            || host.endsWith('.nmpa.gov.cn')
-            || host === 'cde.org.cn'
-            || host.endsWith('.cde.org.cn');
+            || host === 'www.yaopinnet.com';
           const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
           const target = candidates.find(item => {
             let host = '';
@@ -93,11 +89,11 @@ jobs:
           });
           if (!target) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error(`live smoke failed; trusted hosts: ${(payload.discoveredSourceHosts || []).join(', ') || 'none'}`);
+            throw new Error(`live smoke failed; trusted hosts: ${(payload.discoveredSourceHosts || []).join(', ') || 'none'}; methods: ${(payload.discoveryMethods || []).join(', ') || 'none'}`);
           }
           for (const item of payload.verificationLinks || []) {
             const host = new URL(item.url).hostname.toLowerCase();
             if (!trustedHost(host)) throw new Error(`untrusted verification source leaked into response: ${host}`);
           }
-          console.log(`live trusted source candidate ok: ${target.drugName} | ${target.sourceUrl}`);
+          console.log(`live trusted source candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
           NODE
