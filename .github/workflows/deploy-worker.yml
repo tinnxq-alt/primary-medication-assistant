@@ -39,11 +39,44 @@ jobs:
           workingDirectory: worker
           command: deploy
 
+      - name: Wait for deployed Worker version
+        env:
+          WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 24); do
+            HTTP_CODE=$(curl --silent --show-error \
+              --max-time 10 \
+              -H 'Origin: https://tinnxq-alt.github.io' \
+              "$WORKER_URL/health" \
+              --output /tmp/worker-health.json \
+              --write-out '%{http_code}' || true)
+            echo "health attempt $attempt: HTTP ${HTTP_CODE:-curl-error}"
+            cat /tmp/worker-health.json 2>/dev/null || true
+            echo
+            if [ "$HTTP_CODE" = "200" ] && node - <<'NODE'
+          const fs = require('fs');
+          try {
+            const payload = JSON.parse(fs.readFileSync('/tmp/worker-health.json', 'utf8'));
+            process.exit(payload.discovery === 'browser-site-restricted-source-v9' ? 0 : 1);
+          } catch {
+            process.exit(1);
+          }
+          NODE
+            then
+              echo "v9 Worker is active"
+              exit 0
+            fi
+            sleep 4
+          done
+          echo "Timed out waiting for v9 Worker propagation" >&2
+          exit 1
+
       - name: Smoke test live instruction retrieval
         env:
           WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
         run: |
-          sleep 10
           HTTP_CODE=$(curl --silent --show-error \
             --max-time 75 \
             -X POST "$WORKER_URL/v1/drugs/search" \
