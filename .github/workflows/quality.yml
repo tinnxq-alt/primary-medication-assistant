@@ -53,6 +53,7 @@ jobs:
           node --check worker/src/index-v6.js
           node --check worker/src/index-v7.js
           node --check worker/src/index-v8.js
+          node --check worker/src/index-v9.js
 
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
