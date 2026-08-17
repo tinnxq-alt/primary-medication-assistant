@@ -6,7 +6,7 @@
 
 - 已接通 13 个页面入口：首页、分类、搜索、详情、收藏、添加药物、相互作用、症状搜索、记忆卡片、缓存管理、全部药物、用药禁忌、笔记本。
 - 内置用户提供的药品目录，并将“院内目录字段”与“说明书临床字段”分开保存。
-- 已建立病房/门诊双药库：现有 167 个品规全部属于病房药库，门诊药库使用独立目录文件，等待后续批量导入。
+- 已建立病房/门诊双药库：原始病房清单 167 个品规，当前启用 166 个品规；丹七片已从运行时病房药库移除。门诊药库使用独立目录文件，等待后续批量导入。
 - 顶部药库切换会独立过滤首页、分类、全部药物、闪卡和缓存；搜索默认限于当前药库，也可切换为搜索全部药库。
 - 支持模糊搜索、分类/剂型筛选、收藏分组、药品笔记、自定义药品、自定义禁忌、闪卡、JSON 导出和离线应用外壳。
 - 药品列表支持左滑显示收藏、缓存或删除操作。
@@ -55,7 +55,7 @@ Worker 使用 Cloudflare Workers Free 计划及 Workers AI 免费额度，不调
 
 ## 数据维护规则
 
-- `drugs.js` 中的 167 条基础字段来自病房药品清单，全部固定标记为 `pharmacyScopes: ["ward"]`；清单中的省略号表示原始厂家字段不完整。
+- `drugs.js` 保留原始 167 条病房清单及其历史 ID；`catalog-retirements.js` 在运行时排除停用品种。当前病房药库启用 166 条，丹七片已移除，后续药品 ID 不前移。
 - `outpatient-drugs.js` 是独立门诊目录；后续导入条目必须使用唯一 ID 并包含 `pharmacyScopes: ["outpatient"]`。完全相同且需要跨库复用的品规可同时包含 `ward` 与 `outpatient`。
 - 收藏、笔记、标记、禁忌与相互作用选择器跨药库共用；药品列表和缓存仍按当前药库隔离。
 - 只有带 `source.status: "verified-template"` 的临床字段可以展示为“范本已核验”。
@@ -64,18 +64,20 @@ Worker 使用 Cloudflare Workers Free 计划及 Workers AI 免费额度，不调
 
 ## 自动质量检查
 
-每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括病房 167 个目录品规与核验库的一一对应、双药库归属及跨库 ID 唯一性、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
+每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括原始病房 167 个目录品规与核验库的一一对应、运行时停用品种检查（当前病房药库 166 条）、双药库归属及跨库 ID 唯一性、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
 
 本地可执行：
 
 ```bash
 node --check app.js
+node --check catalog-retirements.js
 node --check pharmacy-scope.js
 node --check drugs.js
 node --check outpatient-drugs.js
 node --check service-worker.js
 node --check worker/src/index.js
 node scripts/audit-catalog.mjs
+node scripts/test-catalog-retirements.mjs
 node scripts/test-drug-lookup.mjs
 node scripts/test-pharmacy-scope.mjs
 node worker/test.mjs
