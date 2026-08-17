@@ -5,7 +5,7 @@ const source = fs.readFileSync("smart-add-fix.js", "utf8");
 const html = fs.readFileSync("index.html", "utf8");
 const serviceWorker = fs.readFileSync("service-worker.js", "utf8");
 const workerCore = fs.readFileSync("worker/src/index-v3.js", "utf8");
-const workerAdapter = fs.readFileSync("worker/src/index-v5.js", "utf8");
+const workerAdapter = fs.readFileSync("worker/src/index-v6.js", "utf8");
 const wrangler = fs.readFileSync("worker/wrangler.jsonc", "utf8");
 
 assert.match(source, /function exactDuplicate\(/, "添加药物必须保留本地重复检测");
@@ -25,20 +25,17 @@ assert.ok(html.includes('src="smart-add-fix.js"'), "页面必须加载联网说�
 assert.ok(serviceWorker.includes('"./smart-add-fix.js"'), "PWA 必须缓存智能识别脚本");
 assert.ok(Number(serviceWorker.match(/primary-medication-v(\d+)/)?.[1] || 0) >= 40, "联网说明书版本 PWA 缓存不得低于 v40");
 
-assert.match(wrangler, /"main"\s*:\s*"src\/index-v5\.js"/, "Wrangler 必须部署多通道搜索适配层");
-assert.match(workerAdapter, /quickAction\("scrape"/, "第一通道使用 Browser scrape 抓 a[href]");
-assert.match(workerAdapter, /quickAction\("content"/, "Browser scrape 失败后必须降级到完整 HTML 内容");
-assert.match(workerAdapter, /html\.duckduckgo\.com/, "Browser 通道失效后应有独立网页搜索降级通道");
-assert.match(workerAdapter, /format", "rss"/, "独立网页搜索仍失败时应保留 Bing RSS 兜底");
-assert.match(workerAdapter, /messenger\.com/, "搜索结果必须过滤真实线上出现过的 Messenger 噪声");
-assert.match(workerAdapter, /workerV3\.fetch/, "多通道发现后必须复用严格的说明书正文校验核心");
+assert.match(wrangler, /"main"\s*:\s*"src\/index-v6\.js"/, "Wrangler 必须部署医药来源直连适配层");
+assert.match(workerAdapter, /https:\/\/ypk\.39\.net\/search\//, "第一通道必须直接访问 39 药品通药名搜索页");
+assert.match(workerAdapter, /\/manual\//, "39 搜索结果必须转换为真实详细说明书 URL");
+assert.match(workerAdapter, /sourceFirstBrowser/, "直连来源必须优先于通用搜索引擎发现");
+assert.match(workerAdapter, /workerV3\.fetch/, "直连发现后必须复用严格的说明书正文校验核心");
 
-assert.match(workerCore, /药源网 39药品通 丁香园/, "全网搜索继续对常见医药说明书来源加权");
-assert.match(workerCore, /fetchSourcePage/, "发现链接后必须读取实际来源网页");
+assert.match(workerCore, /fetchSourcePage/, "发现说明书 URL 后必须读取实际来源网页");
 assert.match(workerCore, /parseInstructionPage/, "候选字段必须从来源网页解析");
 assert.match(workerCore, /!candidate\.drugName \|\| !candidate\.clinical\.indication \|\| !candidate\.clinical\.dosage/, "缺少药名、适应症或用法用量的网页不得成为候选");
 assert.match(workerCore, /generatesClinicalKnowledge:\s*false/, "必须明确不生成临床知识");
 assert.doesNotMatch(workerCore, /env\.AI\.run|generateCandidateDetail|selected-candidate-detail/, "不得让语言模型凭药名生成临床资料");
 assert.match(workerCore, /格鲁肽/, "GLP-1 类名称必须归入降糖药规则");
 
-console.log("添加药物：多通道全网发现 + 真实说明书原文抽取 + 自动填充检查通过");
+console.log("添加药物：39药品通直连检索 + 真实说明书原文抽取 + 自动填充检查通过");
