@@ -23,7 +23,6 @@ jobs:
     timeout-minutes: 15
     env:
       WORKER_URL: https://primary-medication-smart-search.tinnxq.workers.dev
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -43,21 +42,6 @@ jobs:
           workingDirectory: worker
           command: deploy
 
-      - name: Configure OpenAI Web Search secret when available
-        working-directory: worker
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "${OPENAI_API_KEY:-}" ]; then
-            echo "OPENAI_API_KEY is not configured in GitHub Actions; reliable Web Search remains disabled."
-            exit 0
-          fi
-          printf '%s' "$OPENAI_API_KEY" | npx wrangler secret put OPENAI_API_KEY --config wrangler.jsonc
-          echo "OpenAI API key synced to Worker secret storage."
-
       - name: Wait for deployed Worker version
         shell: bash
         run: |
@@ -76,38 +60,29 @@ jobs:
           const fs = require('fs');
           try {
             const payload = JSON.parse(fs.readFileSync('/tmp/worker-health.json', 'utf8'));
-            const valid = payload.discovery === 'openai-web-search-source-v10'
-              || payload.discovery === 'browser-site-restricted-source-v9';
+            const valid = payload.discovery === 'local-source-index-v11'
+              && payload.mode === 'free-verified'
+              && payload.requiresPaidApi === false
+              && payload.usesOpenAI === false
+              && payload.sourceGrounded === true
+              && payload.generatesClinicalKnowledge === false;
             process.exit(valid ? 0 : 1);
           } catch {
             process.exit(1);
           }
           NODE
             then
-              node - <<'NODE'
-          const fs = require('fs');
-          const payload = JSON.parse(fs.readFileSync('/tmp/worker-health.json', 'utf8'));
-          fs.appendFileSync(process.env.GITHUB_ENV, `SMART_SEARCH_DISCOVERY=${payload.discovery}\n`);
-          fs.appendFileSync(process.env.GITHUB_ENV, `SMART_SEARCH_CONFIGURED=${payload.searchProviderConfigured ? 'true' : 'false'}\n`);
-          console.log(`active discovery: ${payload.discovery}; configured=${payload.searchProviderConfigured}`);
-          NODE
               exit 0
             fi
             sleep 4
           done
-          echo "Timed out waiting for Worker propagation" >&2
+          echo "Timed out waiting for zero-cost Worker v11" >&2
           exit 1
 
-      - name: Smoke test live instruction retrieval
+      - name: Smoke test free indexed instruction retrieval
         shell: bash
         run: |
           set -euo pipefail
-          if [ "${SMART_SEARCH_DISCOVERY:-}" != "openai-web-search-source-v10" ]; then
-            echo "Reliable OpenAI Web Search is not configured; skip source-discovery smoke test."
-            echo "Add repository secret OPENAI_API_KEY and rerun this workflow to activate and verify v10."
-            exit 0
-          fi
-
           HTTP_CODE=$(curl --silent --show-error \
             --max-time 75 \
             -X POST "$WORKER_URL/v1/drugs/search" \
@@ -127,9 +102,9 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
-          if (payload.discovery !== 'openai-web-search-source-v10') {
+          if (payload.discovery !== 'local-source-index-v11' || payload.requiresPaidApi !== false || payload.usesOpenAI !== false) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error(`unexpected discovery mode: ${payload.discovery || 'missing'}`);
+            throw new Error('zero-cost v11 mode is not active');
           }
           if (payload.generatesClinicalKnowledge !== false || payload.sourceGrounded !== true) {
             throw new Error('Worker must remain source-grounded and must not generate clinical knowledge');
@@ -149,13 +124,9 @@ jobs:
           });
           if (!target) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error('live OpenAI Web Search smoke did not produce a source-grounded semaglutide candidate');
+            throw new Error('free v11 smoke did not produce a source-grounded semaglutide candidate');
           }
-          for (const item of payload.verificationLinks || []) {
-            const host = new URL(item.url).hostname.toLowerCase();
-            if (!trustedHost(host)) throw new Error(`untrusted verification source leaked: ${host}`);
-          }
-          console.log(`live source-grounded candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
+          console.log(`free indexed candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
           NODE
 
       - name: Report live verification to tracking issue
@@ -171,22 +142,17 @@ jobs:
             "$WORKER_URL/health" \
             --output /tmp/report-health.json \
             --write-out '%{http_code}' || true)
-
-          DISCOVERY=$(node -e "try{const p=require('/tmp/report-health.json');process.stdout.write(String(p.discovery||''))}catch{}" 2>/dev/null)
-          SEARCH_CODE="not-run"
-          if [ "$DISCOVERY" = "openai-web-search-source-v10" ]; then
-            SEARCH_CODE=$(curl --silent --show-error \
-              --max-time 75 \
-              -X POST "$WORKER_URL/v1/drugs/search" \
-              -H 'Origin: https://tinnxq-alt.github.io' \
-              -H 'Content-Type: application/json' \
-              --data '{"query":"司美"}' \
-              --output /tmp/report-search.json \
-              --write-out '%{http_code}' || true)
-          fi
+          SEARCH_CODE=$(curl --silent --show-error \
+            --max-time 75 \
+            -X POST "$WORKER_URL/v1/drugs/search" \
+            -H 'Origin: https://tinnxq-alt.github.io' \
+            -H 'Content-Type: application/json' \
+            --data '{"query":"司美"}' \
+            --output /tmp/report-search.json \
+            --write-out '%{http_code}' || true)
 
           {
-            echo "### Worker 自动部署验收"
+            echo "### Worker v11 免费模式自动部署验收"
             echo
             echo "- Commit: \`$GITHUB_SHA\`"
             echo "- Health HTTP: \`${HEALTH_CODE:-curl-error}\`"
@@ -217,7 +183,8 @@ jobs:
             try { targetHost = new URL(String(target.sourceUrl || '')).hostname.toLowerCase(); } catch {}
           }
           console.log(`- discovery: \`${String(health.discovery || 'unknown')}\``);
-          console.log(`- searchProviderConfigured: \`${health.searchProviderConfigured === true}\``);
+          console.log(`- requiresPaidApi: \`${health.requiresPaidApi === true}\``);
+          console.log(`- usesOpenAI: \`${health.usesOpenAI === true}\``);
           console.log(`- sourceGrounded: \`${payload.sourceGrounded === true}\``);
           console.log(`- generatesClinicalKnowledge: \`${payload.generatesClinicalKnowledge === true}\``);
           console.log(`- 司美格鲁肽可信候选: **${target ? '通过' : '未通过'}**`);
