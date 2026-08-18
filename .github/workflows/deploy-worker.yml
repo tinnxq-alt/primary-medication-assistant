@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: deploy-primary-medication-smart-search
@@ -156,3 +157,76 @@ jobs:
           }
           console.log(`live source-grounded candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
           NODE
+
+      - name: Report live verification to tracking issue
+        if: always()
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          HEALTH_CODE=$(curl --silent --show-error \
+            --max-time 15 \
+            -H 'Origin: https://tinnxq-alt.github.io' \
+            "$WORKER_URL/health" \
+            --output /tmp/report-health.json \
+            --write-out '%{http_code}' || true)
+
+          DISCOVERY=$(node -e "try{const p=require('/tmp/report-health.json');process.stdout.write(String(p.discovery||''))}catch{}" 2>/dev/null)
+          SEARCH_CODE="not-run"
+          if [ "$DISCOVERY" = "openai-web-search-source-v10" ]; then
+            SEARCH_CODE=$(curl --silent --show-error \
+              --max-time 75 \
+              -X POST "$WORKER_URL/v1/drugs/search" \
+              -H 'Origin: https://tinnxq-alt.github.io' \
+              -H 'Content-Type: application/json' \
+              --data '{"query":"司美"}' \
+              --output /tmp/report-search.json \
+              --write-out '%{http_code}' || true)
+          fi
+
+          {
+            echo "### Worker 自动部署验收"
+            echo
+            echo "- Commit: \`$GITHUB_SHA\`"
+            echo "- Health HTTP: \`${HEALTH_CODE:-curl-error}\`"
+            echo "- Search HTTP: \`${SEARCH_CODE:-curl-error}\`"
+            echo "- Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          } > /tmp/report-body.md
+
+          node - <<'NODE' >> /tmp/report-body.md
+          const fs = require('fs');
+          function read(path) {
+            try { return JSON.parse(fs.readFileSync(path, 'utf8')); } catch { return {}; }
+          }
+          const health = read('/tmp/report-health.json');
+          const payload = read('/tmp/report-search.json');
+          const trusted = new Set(['ypk.39.net', 'yaopinnet.com', 'www.yaopinnet.com']);
+          const candidates = Array.isArray(payload.candidates) ? payload.candidates : [];
+          const target = candidates.find(item => {
+            let host = '';
+            try { host = new URL(String(item.sourceUrl || '')).hostname.toLowerCase(); } catch {}
+            return String(item.drugName || '').includes('司美格鲁肽')
+              && item.category === '降糖药'
+              && trusted.has(host)
+              && String(item.clinical?.indication || '').trim()
+              && String(item.clinical?.dosage || '').trim();
+          });
+          let targetHost = '';
+          if (target) {
+            try { targetHost = new URL(String(target.sourceUrl || '')).hostname.toLowerCase(); } catch {}
+          }
+          console.log(`- discovery: \`${String(health.discovery || 'unknown')}\``);
+          console.log(`- searchProviderConfigured: \`${health.searchProviderConfigured === true}\``);
+          console.log(`- sourceGrounded: \`${payload.sourceGrounded === true}\``);
+          console.log(`- generatesClinicalKnowledge: \`${payload.generatesClinicalKnowledge === true}\``);
+          console.log(`- 司美格鲁肽可信候选: **${target ? '通过' : '未通过'}**`);
+          if (target) {
+            console.log(`- 命中: ${String(target.drugName || '').slice(0, 80)} / ${String(target.category || '').slice(0, 40)} / \`${targetHost}\``);
+            console.log(`- elapsedMs: \`${Number(payload.elapsedMs) || 0}\``);
+          }
+          NODE
+
+          gh api --method POST \
+            "repos/$GITHUB_REPOSITORY/issues/45/comments" \
+            -f body="$(cat /tmp/report-body.md)" >/dev/null 2>&1 || true
