@@ -1,34 +1,50 @@
 # 新药智能识别 Worker
 
-此 Cloudflare Worker 运行在 Workers Free 计划，使用 Workers AI 免费额度，不调用 OpenAI 或其他收费 API，也不需要 OpenAI 密钥。
+此 Cloudflare Worker 为“基层用药助手 Pro”的联网说明书检索服务。当前生产入口为 `src/index-v10.js`。
 
-当前职责已经收敛为：**只为“药库尚未收录的新药”生成可编辑录入草稿**。现有药物是否已经收录，由网页在手机本地先完成重复检测；Worker 不再下载或扫描整份 `chinese-drug-labels.json`，从而减少网络请求和等待时间。
+## 当前工作方式
 
-输入中文新药名称后，服务会：
+“添加药物”仍只用于药库尚未收录的新药；网页端先在本机病房药库、门诊药库、自定义药和商品名别名中做重复检测。确认未收录后，Worker 才联网寻找真实药品说明书来源。
 
-- 直接使用 `@cf/meta/llama-3.1-8b-instruct-fast` 生成 1 个中文未核验录入草稿；
-- 固定返回 8 个字段：`drugName`、`tradeName`、`category`、`indications`、`specification`、`dosage`、`adverseReactions`、`precautions`；
-- `category` 只能使用项目定义的分类 ID；
-- 临床字段要求简洁输出，以降低生成时间；不确定的信息要求提示核对现行说明书，而不是伪造细节；
-- 所有 AI 内容始终标记为“未核验草稿”，自动填入后仍可修改；
-- 返回国家药监局和全网中文搜索入口，供保存前人工核验；
-- 返回 `elapsedMs`，便于后续观察生成性能；
-- 仅允许网站域名和本地开发地址跨域调用。
+v10 的流程为：
 
-网页端的快速流程为：**本地重复检测 → Worker 预热/预连接 → AI 生成新药草稿 → 自动填充表单**。如果完全同名或已知商品名已经存在于药库，则不会调用 AI；相似名称只做提醒，不会直接阻止添加，以免误伤不同剂型或不同品规。
+1. OpenAI Responses API 的 `web_search` **只负责发现真实药品页面 URL**；当前仅允许 39 药品通（`ypk.39.net`）和药源网（`yaopinnet.com`）。
+2. 搜索模型输出的医学正文不会进入药库。
+3. Worker 再通过 Cloudflare Browser 读取具体说明书网页原文。
+4. 适应症、用法用量、不良反应、注意事项、规格、厂家等字段只从真实来源网页解析。
+5. 候选必须至少包含药名、适应症和用法用量；缺失字段不猜测、不由模型补写。
+6. 39 药品通产品页会规范化到详细说明书 `/manual/` 页面；非可信域名和评论、购买、资讯等页面会被过滤。
+7. 返回结果保持 `sourceGrounded: true`、`generatesClinicalKnowledge: false`，并提供原说明书来源 URL 供人工核对。
 
-AI 草稿不能视为现行说明书、处方依据或用药决策依据。Workers AI 免费额度用完时，生成会暂时停止，不会自动产生费用；此时仍可直接手动填写表单。
+如果没有配置 `OPENAI_API_KEY`，Worker 会安全降级到 v9 的 Browser 站点限定来源发现方案；不会因为缺少 Key 而让 AI 直接生成临床资料。
 
 ## GitHub Actions 自动部署
 
-仓库只需要两个 GitHub Actions secrets：
+仓库使用以下 GitHub Actions secrets：
 
 - `CLOUDFLARE_API_TOKEN`
 - `CLOUDFLARE_ACCOUNT_ID`
+- `OPENAI_API_KEY`（启用 v10 OpenAI Web Search 来源发现）
 
-只要 `worker/` 发生修改，GitHub Actions 会检查并部署 Worker。无需创建 `OPENAI_API_KEY`。
+只要 `worker/` 或部署工作流发生修改，`Deploy source-grounded medication Worker` 会自动：
 
-`wrangler.jsonc` 已配置 `AI` binding。网站默认使用 `https://primary-medication-smart-search.tinnxq.workers.dev`，也可在“缓存管理” → “免费中文检索服务”中更换或测试地址。
+1. 安装依赖并运行 Worker 检查与测试；
+2. 部署到 Cloudflare Workers；
+3. 若存在 `OPENAI_API_KEY`，将其同步到 Worker secret storage；
+4. 等待新 Worker 版本生效并检查 `/health`；
+5. v10 激活后用“司美”执行真实 smoke test。
+
+真实 smoke 只有在同时满足以下条件时才通过：
+
+- `discovery = openai-web-search-source-v10`；
+- 候选药名包含“司美格鲁肽”；
+- 分类为“降糖药”；
+- 来源来自 39 药品通或药源网真实 HTTPS 页面；
+- 适应症与用法用量均从来源网页原文解析且非空；
+- `sourceGrounded = true`；
+- `generatesClinicalKnowledge = false`。
+
+网站默认使用 `https://primary-medication-smart-search.tinnxq.workers.dev`。
 
 ## 本地检查
 
@@ -43,6 +59,7 @@ npm run dev
 
 ## 安全边界
 
-- 只用于新药资料录入辅助，不用于诊断、处方推荐、相互作用判断或用药决策。
-- AI 不伪造批准文号、厂家或来源链接。
-- 保存前应按药盒、批准文号和对应品种现行说明书复核。
+- 本服务只用于药品资料录入与查询辅助，不用于诊断、处方推荐、相互作用判断或自动用药决策。
+- Web Search 只承担来源发现，不承担临床知识生成。
+- 临床字段必须来自可追溯的具体说明书网页；缺失字段保持缺失，不按常识补写。
+- 保存或用于临床参考前，仍应按药盒、批准文号和对应品种现行说明书复核。
