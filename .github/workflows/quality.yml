@@ -33,6 +33,7 @@ jobs:
           node --check app.js
           node --check fast-search-ui.js
           node --check smart-add-fix.js
+          node --check free-smart-source-v11.js
           node --check notebook-scroll-fix.js
           node --check mark-notebook-ui.js
           node --check mark-menu-below-selection.js
@@ -53,6 +54,9 @@ jobs:
           node --check worker/src/index-v8.js
           node --check worker/src/index-v9.js
           node --check worker/src/index-v10.js
+          node --check worker/src/index-v11.js
+          node --check worker/src/free-source-index.js
+          node --check worker/test-v11.mjs
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
       - name: Catalog retirements tests
@@ -74,4 +78,5 @@ jobs:
       - name: Header layout tests
         run: node scripts/test-header-layout.mjs
       - name: Worker tests
-        run: node worker/test.mjs
+        working-directory: worker
+        run: npm test
