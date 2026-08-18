@@ -63,6 +63,7 @@ function openAIWebSearchRequest(query, env) {
     model: String(env.OPENAI_SEARCH_MODEL || "gpt-5-mini"),
     store: false,
     max_output_tokens: 220,
+    tool_choice: "required",
     tools: [{ type: "web_search", filters: { allowed_domains: OPENAI_ALLOWED_DOMAINS }, search_context_size: "low" }],
     input: [
       { role: "system", content: [{ type: "input_text", text: "你只负责检索真实药品说明书网页，不负责生成医学知识。必须使用 web_search。只寻找与用户药名片段直接相关的具体药品说明书或药品详情页面，优先详细说明书。不要根据药名编写适应症、用法用量、不良反应或注意事项；这些字段由后续程序从来源网页原文解析。" }] },
