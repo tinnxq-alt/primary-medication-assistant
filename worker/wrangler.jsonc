@@ -1,21 +1,16 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "primary-medication-smart-search",
-  "main": "src/index-v10.js",
-  "compatibility_date": "2026-08-16",
+  "main": "src/index-v11.js",
+  "compatibility_date": "2026-08-18",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
-  "ai": {
-    "binding": "AI"
-  },
   "browser": {
     "binding": "BROWSER",
     "remote": true
   },
   "vars": {
-    "ALLOWED_ORIGINS": "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000",
-    "AI_MODEL": "@cf/meta/llama-3.1-8b-instruct-fast",
-    "OPENAI_SEARCH_MODEL": "gpt-5-mini"
+    "ALLOWED_ORIGINS": "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000"
   },
   "observability": {
     "enabled": true,
