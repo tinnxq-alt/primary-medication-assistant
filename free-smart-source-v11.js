@@ -28,6 +28,15 @@
     toast.timer = setTimeout(() => node.classList.remove("show"), 1800);
   }
 
+  function esc(value) {
+    return String(value ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function hasEnoughChinese(value) {
     return (String(value || "").match(/[\u3400-\u9fff]/g) || []).length >= 2;
   }
@@ -72,7 +81,7 @@
     const results = document.getElementById("lookupResults");
     if (!results || !candidate) return;
     const link = trustedHttpsUrl(candidate.sourceUrl);
-    results.innerHTML = `<article class="card lookup-card"><div><p class="drug-sub">粘贴链接解析结果</p><h3>${String(candidate.drugName || "已识别药品")}</h3><p class="drug-sub"><span class="badge ok">说明书网页原文</span> ${String(candidate.sourceHost || "可信来源")}</p>${link ? `<div class="toolbar"><a class="btn ghost small link-btn" href="${link}" target="_blank" rel="noopener">查看原说明书</a></div>` : ""}</div></article>`;
+    results.innerHTML = `<article class="card lookup-card"><div><p class="drug-sub">粘贴链接解析结果</p><h3>${esc(candidate.drugName || "已识别药品")}</h3><p class="drug-sub"><span class="badge ok">说明书网页原文</span> ${esc(candidate.sourceHost || "可信来源")}</p>${link ? `<div class="toolbar"><a class="btn ghost small link-btn" href="${esc(link)}" target="_blank" rel="noopener">查看原说明书</a></div>` : ""}</div></article>`;
   }
 
   async function parseManualSource() {
