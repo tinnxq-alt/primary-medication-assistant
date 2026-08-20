@@ -1,7 +1,11 @@
 (() => {
   "use strict";
 
-  const retiredDrugNames = Object.freeze(["丹七片"]);
+  const retiredDrugNames = Object.freeze([
+    "丹七片",
+    "格列吡嗪片",
+    "格列齐特片(II)"
+  ]);
   const retiredSet = new Set(retiredDrugNames);
   const catalog = Array.isArray(window.DRUG_CATALOG) ? window.DRUG_CATALOG : [];
 
