@@ -19,39 +19,24 @@
   <div id="offlineBanner" class="offline-banner" hidden>当前离线：仅可查看本机已缓存资料</div>
   <header class="app-header">
     <button id="backBtn" class="icon-btn" type="button" aria-label="返回" hidden>←</button>
-    <div>
-      <p class="eyebrow">PRIMARY CARE</p>
-      <h1 id="pageTitle">基层用药助手</h1>
-    </div>
+    <div><p class="eyebrow">PRIMARY CARE</p><h1 id="pageTitle">基层用药助手</h1></div>
     <button id="homeBtn" class="icon-btn" type="button" aria-label="首页">⌂</button>
   </header>
-
   <main class="app-shell">
     <section id="pharmacySwitcher" class="pharmacy-switcher" aria-label="选择药库">
-      <button type="button" data-pharmacy-switch="ward" aria-pressed="true">
-        <span>病房药库</span><strong data-pharmacy-count>166</strong>
-      </button>
-      <button type="button" data-pharmacy-switch="outpatient" aria-pressed="false">
-        <span>门诊药库</span><strong data-pharmacy-count>0</strong>
-      </button>
+      <button type="button" data-pharmacy-switch="ward" aria-pressed="true"><span>病房药库</span><strong data-pharmacy-count>166</strong></button>
+      <button type="button" data-pharmacy-switch="outpatient" aria-pressed="false"><span>门诊药库</span><strong data-pharmacy-count>0</strong></button>
     </section>
     <div id="app" aria-live="polite"></div>
   </main>
-
   <nav class="bottom-nav" aria-label="主要导航">
-    <button type="button" data-route="home"><span>⌂</span>首页</button>
-    <button type="button" data-route="categories"><span>▦</span>分类</button>
-    <button type="button" data-route="search"><span>⌕</span>搜索</button>
-    <button type="button" data-route="favorites"><span>★</span>收藏</button>
-    <button type="button" data-route="notebook"><span>✎</span>笔记</button>
+    <button type="button" data-route="home"><span>⌂</span>首页</button><button type="button" data-route="categories"><span>▦</span>分类</button><button type="button" data-route="search"><span>⌕</span>搜索</button><button type="button" data-route="favorites"><span>★</span>收藏</button><button type="button" data-route="notebook"><span>✎</span>笔记</button>
   </nav>
-
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="modalRoot"></div>
-
   <script src="drugs.js"></script>
   <script src="catalog-retirements.js"></script>
-  <script src="outpatient-drugs.js"></script>
+  <script src="outpatient-loader.js"></script>
   <script src="outpatient-web-verification.js"></script>
   <script src="drug-lookup.js"></script>
   <script src="pharmacy-scope.js"></script>
