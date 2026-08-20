@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#c9363c" />
+  <title>急救诊疗助手 v0.2</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">✚</div>
+        <div><h1>急救诊疗助手</h1><p>基层急诊 · 抢救 · 值班工作台</p></div>
+      </div>
+      <span class="version">v0.2 原型</span>
+    </header>
+    <div class="safety-banner">⚠ 当前为产品原型。诊疗流程、药物剂量、评分与计算结果必须在正式上线前由权威指南和本机构规范逐项核验，不可直接替代临床判断。</div>
+    <section class="hero">
+      <div class="search-box"><span>⌕</span><input id="globalSearch" placeholder="搜索主诉、急症、药物、流程、工具…" autocomplete="off" /><button id="searchBtn">搜索</button></div>
+      <button class="red-action" data-action="open-critical">立即抢救</button>
+    </section>
+    <main>
+      <section class="section"><div class="section-head"><div><h2>急救工作台</h2><p>从值班任务进入，而不是从百科目录进入</p></div></div><div id="workspaceGrid" class="workspace-grid"></div></section>
+      <section class="section"><div class="section-head"><div><h2>红旗入口</h2><p>高危表现优先，点击进入快速评估卡</p></div></div><div id="criticalGrid" class="critical-grid"></div></section>
+      <section class="section"><div class="section-head split"><div><h2>常见急症</h2><p>主诉与明确诊断并列</p></div><div class="tabs" id="topicTabs"><button class="tab active" data-topic-tab="complaint">按主诉</button><button class="tab" data-topic-tab="diagnosis">按诊断</button></div></div><div id="topicGrid" class="topic-grid"></div></section>
+      <section class="section two-col">
+        <article class="panel"><div class="panel-head"><h2>急诊处理骨架</h2><span>固定 5 步</span></div><div class="flow-grid"><div class="flow-step"><b>1</b><h3>快速评估</h3><p>意识、气道、呼吸、循环、生命体征与现场安全。</p></div><div class="flow-step"><b>2</b><h3>识别红旗</h3><p>判断是否需要立即抢救、升级监护或紧急转诊。</p></div><div class="flow-step"><b>3</b><h3>首要处置</h3><p>优先处理威胁生命的问题，再进入病因判断。</p></div><div class="flow-step"><b>4</b><h3>检查复评</h3><p>必要检查、动态复评、疗效与不良反应观察。</p></div><div class="flow-step"><b>5</b><h3>去向记录</h3><p>留观、转诊、住院、离院与抢救记录形成闭环。</p></div></div></article>
+        <aside class="panel"><div class="panel-head"><h2>值班待办</h2><span id="todoCount">0 项</span></div><div class="todo-add"><input id="todoInput" placeholder="新增待办…" /><button id="addTodoBtn">添加</button></div><ul id="todoList" class="todo-list"></ul></aside>
+      </section>
+      <section class="section"><div class="section-head"><div><h2>内容安全状态</h2><p>把“是否核验”做成产品字段，而不是藏在说明里</p></div></div><div class="status-grid"><div class="status-card"><strong>急症流程</strong><span class="status pending">待临床核验</span><p>页面结构与字段已完成，正式医学内容待指南绑定。</p></div><div class="status-card"><strong>抢救用药</strong><span class="status pending">待临床核验</span><p>已设计适应证、剂量、途径、稀释、禁忌、来源字段。</p></div><div class="status-card"><strong>计算工具</strong><span class="status partial">部分可用</span><p>仅开放通用演示工具，高风险计算默认锁定。</p></div><div class="status-card"><strong>病历模板</strong><span class="status ready">原型可用</span><p>结构化记录模板可直接体验，正式版再做导出。</p></div></div></section>
+    </main>
+  </div>
+  <nav class="mobile-nav"><button data-scroll="top"><b>⌂</b><span>首页</span></button><button data-open="急症处置"><b>🚑</b><span>急症</span></button><button data-open="抢救用药"><b>💉</b><span>用药</span></button><button data-open="待办"><b>✓</b><span>待办</span></button></nav>
+  <div id="overlay" class="overlay" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true"><div class="modal-head"><div><h2 id="modalTitle"></h2><p id="modalSubtitle"></p></div><button id="closeModalBtn" class="icon-btn">关闭</button></div><div id="modalContent"></div></div></div>
+  <script src="./data.js"></script><script src="./app.js"></script>
+</body>
+</html>
