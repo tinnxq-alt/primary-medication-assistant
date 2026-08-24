@@ -52,6 +52,13 @@ const BROWSER = {
     throw new Error(`unexpected browser url ${input.url}`);
   }
 };
+const nativeFetch = globalThis.fetch;
+globalThis.fetch = async (input, init) => {
+  const url = String(input instanceof Request ? input.url : input);
+  if (url === semaglutide39) return new Response(semaglutideHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  if (onlineClomipramine.includes(url)) return new Response(clomipramineHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  return nativeFetch(input, init);
+};
 const env = { ALLOWED_ORIGINS: origin, BROWSER };
 const request = (path, body, headers = {}) => new Request(`https://worker.example${path}`, {
   method: "POST",
@@ -72,6 +79,7 @@ const indexedPayload = await indexed.json();
 assert.equal(indexedPayload.discovery, "local-source-index-v12");
 assert.equal(indexedPayload.candidates[0].drugName, "司美格鲁肽注射液");
 assert.match(indexedPayload.candidates[0].clinical.indication, /2型糖尿病/);
+assert.ok(indexedPayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
 
 const online = await worker.fetch(request("/v1/drugs/search", { query: "氯米帕明" }), env);
 assert.equal(online.status, 200);
@@ -80,6 +88,8 @@ assert.equal(onlinePayload.discovery, "trusted-online-discovery-v12");
 assert.ok(onlinePayload.discoveryMethods.includes("39-site-search"));
 assert.equal(onlinePayload.candidates[0].drugName, "盐酸氯米帕明片");
 assert.match(onlinePayload.candidates[0].clinical.dosage, /遵医嘱/);
+assert.ok(onlinePayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
+assert.ok(onlinePayload.fetchedSourceCount <= 5, "单次检索不得读取过多来源页面");
 
 const parsed = await worker.fetch(request("/v1/drugs/parse-source", {
   query: "司美", sourceUrl: "https://ypk.39.net/2310025/"
@@ -101,6 +111,7 @@ const tooLarge = await worker.fetch(request("/v1/drugs/search", JSON.stringify({
 assert.equal(tooLarge.status, 400);
 assert.match((await tooLarge.json()).error, /过大/);
 
-assert.ok(browserUrls.includes(semaglutide39));
-assert.ok(onlineClomipramine.some(url => browserUrls.includes(url)), "未命中索引时应联网读取可信说明书");
+assert.ok(!browserUrls.includes(semaglutide39), "可信说明书可直接读取时不应消耗 Browser Run 配额");
+assert.ok(browserUrls.some(url => url.includes("/search/") && decodeURIComponent(url).includes("氯米帕明")), "未命中索引时应联网发现可信说明书");
+globalThis.fetch = nativeFetch;
 console.log("Worker hybrid trusted-source v12 tests passed");

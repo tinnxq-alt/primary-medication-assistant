@@ -193,8 +193,8 @@ async function browserSearch(query, env) {
   return extractSearchLinks(payload);
 }
 
-async function fetchSourcePage(rawUrl) {
-  let current = safePublicUrl(rawUrl);
+async function fetchSourcePage(rawUrl, resolveAllowedUrl = safePublicUrl) {
+  let current = resolveAllowedUrl(rawUrl);
   if (!current) throw new Error("SOURCE_URL_INVALID");
   for (let redirectCount = 0; redirectCount < 3; redirectCount += 1) {
     const controller = new AbortController();
@@ -216,7 +216,7 @@ async function fetchSourcePage(rawUrl) {
     }
     if ([301, 302, 303, 307, 308].includes(response.status)) {
       const location = response.headers.get("location");
-      const next = location ? safePublicUrl(new URL(location, current).href) : null;
+      const next = location ? resolveAllowedUrl(new URL(location, current).href) : null;
       if (!next) throw new Error("SOURCE_REDIRECT_INVALID");
       current = next;
       continue;
@@ -467,6 +467,7 @@ export {
   categoryFromDrugName,
   extractSearchLinks,
   extractSection,
+  fetchSourcePage,
   htmlToText,
   parseInstructionPage,
   safePublicUrl,
