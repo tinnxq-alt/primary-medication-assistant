@@ -94,8 +94,7 @@
     });
   };
 
-  new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true });
-  window.addEventListener("hashchange", schedule);
+  window.addEventListener("primary-medication-rendered", schedule);
   window.addEventListener("DOMContentLoaded", schedule);
   schedule();
 })();
