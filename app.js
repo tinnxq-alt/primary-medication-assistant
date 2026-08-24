@@ -105,6 +105,17 @@
     try { const url = new URL(String(value || ""), location.href); return ["https:", "http:"].includes(url.protocol) ? url.href : ""; }
     catch { return ""; }
   };
+  const interactionEngine = window.DRUG_INTERACTIONS;
+  const interactionSeverityClass = severity => severity === "禁忌" ? "blocked" : severity === "严重" ? "warn" : "info";
+  const interactionRuleCard = (rule, partners = []) => {
+    const sourceUrl = safeExternalUrl(rule.source?.url);
+    const uniquePartners = [...new Map(partners.map(partner => [partner.id, partner])).values()];
+    const shownPartners = uniquePartners.slice(0, 8).map(partner => partner.drugName).join("、");
+    const partnerText = shownPartners
+      ? `<p class="drug-sub"><strong>本药库相关药品：</strong>${esc(shownPartners)}${uniquePartners.length > 8 ? ` 等 ${uniquePartners.length} 种` : ""}</p>`
+      : "";
+    return `<article class="card interaction-rule-card"><div class="detail-head"><div><h3>${esc(rule.title)}</h3><span class="badge ${interactionSeverityClass(rule.severity)}">${esc(rule.severity)}</span></div></div>${partnerText}<p class="drug-sub"><strong>机制：</strong>${esc(rule.mechanism)}</p><p class="drug-sub"><strong>可能后果：</strong>${esc(rule.consequence)}</p><p class="drug-sub"><strong>处理建议：</strong>${esc(rule.recommendation)}</p><p class="drug-sub"><strong>依据：</strong>${sourceUrl ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener">${esc(rule.source?.label)}</a>` : esc(rule.source?.label || "未记录")}${rule.source?.checkedAt ? ` · 核验 ${esc(rule.source.checkedAt)}` : ""}</p></article>`;
+  };
   const normalizeServiceEndpoint = value => {
     const raw = String(value || "").trim().replace(/\/+$/, "");
     if (!raw) return "";
@@ -168,7 +179,7 @@
     const merged = { ...drug, ...(override || {}), ...(category ? { category } : {}) };
     if (!merged.therapeuticClass) merged.therapeuticClass = normalizeDrugCategory(merged.category, merged.drugName);
     if (override && !drug.isCustom) {
-      merged.qualityIssue = [drug.qualityIssue, "本机目录字段已编辑，须按药盒、批准文号和现行说明书复核。"].filter(Boolean).join(" ");
+      merged.qualityIssue = [merged.qualityIssue, "本机药品详情已编辑，须按药盒、批准文号和现行说明书复核。"].filter(Boolean).join(" ");
       merged.localEdited = true;
     }
     return withPharmacyScopes(merged, "ward");
@@ -226,6 +237,13 @@
     const drug = catalogSnapshot().byId.get(id);
     return drug ? applyLocalOverrides(drug) : drug;
   };
+  const recordPharmacyId = record => {
+    if (record?.pharmacyId && PHARMACIES[record.pharmacyId]) return record.pharmacyId;
+    const scopes = normalizePharmacyScopes(drugById(record?.drugId));
+    return scopes.includes(state.activePharmacy) ? state.activePharmacy : scopes[0];
+  };
+  const recordBelongsToPharmacy = (record, pharmacyId = state.activePharmacy) =>
+    recordPharmacyId(record) === normalizePharmacyId(pharmacyId);
   const isFavorite = id => state.favorites.includes(id);
   const isCached = id => state.cached.includes(id);
   const isRemembered = id => state.remembered.includes(id);
@@ -344,7 +362,11 @@
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
       const count = button.querySelector("[data-pharmacy-count]");
-      if (count) count.textContent = String(views.counts[pharmacyId]);
+      if (count) {
+        const outpatientNotLoaded = pharmacyId === "outpatient" && !Array.isArray(window.OUTPATIENT_DRUG_CATALOG);
+        const expectedOutpatientCount = Number(window.OUTPATIENT_CATALOG_EXPECTED_COUNT) || 395;
+        count.textContent = String(outpatientNotLoaded ? expectedOutpatientCount : views.counts[pharmacyId]);
+      }
     });
   }
 
@@ -352,8 +374,14 @@
     if (typeof window.loadOutpatientDrugCatalog !== "function") {
       throw new Error("门诊药库加载模块不可用");
     }
-    const catalog = await window.loadOutpatientDrugCatalog();
+    let catalog = await window.loadOutpatientDrugCatalog();
     if (!Array.isArray(catalog)) throw new Error("门诊药库数据格式无效");
+    if (typeof window.hydrateOutpatientClinicalCatalog === "function") {
+      catalog = await window.hydrateOutpatientClinicalCatalog(catalog);
+    }
+    if (!Array.isArray(catalog) || catalog.length !== 395) {
+      throw new Error(`门诊药库临床资料加载异常：应为 395，实际为 ${Array.isArray(catalog) ? catalog.length : 0}`);
+    }
     return catalog;
   }
 
@@ -511,7 +539,11 @@
     const clinical = drug.clinical;
     const safetyUrl = safeExternalUrl(drug.safetyNotice?.url);
     const sourceUrl = safeExternalUrl(drug.source?.url);
-    const notes = state.notes.filter(note => note.drugId === id);
+    const detailPharmacy = normalizePharmacyScopes(drug).includes(state.activePharmacy)
+      ? state.activePharmacy
+      : normalizePharmacyScopes(drug)[0];
+    const notes = state.notes.filter(note => note.drugId === id && recordBelongsToPharmacy(note, detailPharmacy));
+    const interactionFindings = interactionEngine?.findRelevant?.(drug, visibleDrugs()) || [];
     const clinicalFields = {
       indication: clinical?.indication || "待逐条核验具体厂家现行说明书",
       dosage: clinical?.dosage || "待逐条核验具体厂家现行说明书",
@@ -536,11 +568,23 @@
           <div class="detail-item"><dt>药物作用分类</dt><dd>${esc(drug.therapeuticClass || "作用待分类")}</dd></div>
           <div class="detail-item"><dt>药品属性 / 医保标记</dt><dd>${esc(drug.category || "未分类")} · ${esc(drug.insuranceClass || "未标注")}</dd></div>
           <div class="detail-item"><dt>生产企业</dt><dd>${esc(drug.manufacturer || "待核验")}</dd></div>
+          <div class="detail-item"><dt>上市许可持有人</dt><dd>${esc(drug.marketingAuthorizationHolder || "待核验")}</dd></div>
+          <div class="detail-item"><dt>批准文号</dt><dd>${esc(drug.approvalNumber || "待核验")}</dd></div>
+          <div class="detail-item"><dt>主要成分</dt><dd>${esc(Array.isArray(drug.components) && drug.components.length ? drug.components.join("、") : "未单独录入")}</dd></div>
+          ${drug.packagingNote ? `<div class="detail-item"><dt>包装说明</dt><dd>${esc(drug.packagingNote)}</dd></div>` : ""}
           ${markedField("indication", "适应症")}
           ${markedField("dosage", "用法用量")}
           ${markedField("adverseReactions", "不良反应")}
           ${markedField("precautions", "注意事项")}
         </dl>
+        <div class="clinical-editor" style="margin-top:16px">
+          <h3>相互作用与禁忌</h3>
+          ${drug.contraindications ? `<div class="notice danger" style="margin-top:10px"><strong>本药禁忌补充：</strong>${esc(drug.contraindications)}</div>` : ""}
+          ${drug.interactionNotes ? `<div class="notice" style="margin-top:10px"><strong>本药相互作用补充：</strong>${esc(drug.interactionNotes)}</div>` : ""}
+          <div class="card-list" style="margin-top:10px">${interactionFindings.length
+            ? interactionFindings.map(item => interactionRuleCard(item.rule, item.partners)).join("")
+            : empty("当前目录未命中内置高风险组合；未命中不代表可以联用，仍须核对完整说明书和患者具体情况。")}</div>
+        </div>
         ${clinical ? `<p class="muted" style="margin-bottom:8px">长按或拖选说明书摘要文字，然后选择标记样式。</p><div id="markToolbar" class="mark-toolbar" hidden><small id="selectedTextPreview"></small><button class="btn secondary small" data-mark-type="underline">划线</button><button class="btn secondary small" data-mark-type="bold">加粗</button><button class="btn secondary small" data-mark-type="highlight">荧光笔</button></div>` : ""}
         <div class="source-box">
           <strong>来源：</strong>${esc(drug.source?.label || "未记录")}<br>
@@ -549,7 +593,7 @@
         </div>
         <div class="toolbar" style="margin-top:16px">
           <button class="btn ${isCached(id) ? "ghost" : "secondary"}" data-cache="${esc(id)}">${isCached(id) ? "移出缓存" : "缓存此药"}</button>
-          ${drug.isCustom ? '<button class="btn secondary" id="editCustomDrugBtn">编辑药品</button>' : ""}
+          <button class="btn secondary" id="editDrugBtn">编辑药品</button>
           <button class="btn primary" id="addNoteBtn">添加笔记</button>
         </div>
       </section>
@@ -558,7 +602,7 @@
         <div class="card-list">${notes.length ? notes.map(note => noteCard(note)).join("") : empty("暂无笔记")}</div>
       </section>`;
     document.getElementById("addNoteBtn").addEventListener("click", () => openNoteModal(id));
-    document.getElementById("editCustomDrugBtn")?.addEventListener("click", () => openEditDrugModal(id));
+    document.getElementById("editDrugBtn").addEventListener("click", () => openEditDrugModal(id));
     if (clinical) setupTextMarking(id);
   }
 
@@ -586,7 +630,7 @@
       if (!selectionData) return;
       const duplicate = state.marks.some(mark => mark.drugId === drugId && mark.field === selectionData.field && mark.text === selectionData.text && mark.type === button.dataset.markType);
       if (!duplicate) {
-        state.marks.push({ id: `mark-${Date.now()}`, drugId, ...selectionData, type: button.dataset.markType, createdAt: new Date().toISOString() });
+        state.marks.push({ id: `mark-${Date.now()}`, drugId, pharmacyId: recordPharmacyId({ drugId }), ...selectionData, type: button.dataset.markType, createdAt: new Date().toISOString() });
         saveState("marks");
         toast("文本标记已保存");
       }
@@ -638,8 +682,8 @@
     app.innerHTML = `
       <section class="panel section">
         <h2>添加药物</h2>
-        <h3 style="margin-top:14px">1. 智能识别（AI 自动填充）</h3>
-        <p class="notice">当前目标为${esc(pharmacyLabel(state.activePharmacy))}。输入已收录的中文商品名或通用名，点击“智能识别”或按回车即可自动填充；商品名只用于识别通用成分，规格仍须按药盒核对。</p>
+        <h3 style="margin-top:14px">1. 联网自动检索说明书</h3>
+        <p class="notice">当前目标为${esc(pharmacyLabel(state.activePharmacy))}。输入至少 2 个汉字的中文药名片段，停顿后会自动检索可信说明书；也可按回车或立即检索。存在多个厂家/规格时请先选择对应候选。</p>
         <form id="drugForm" style="margin-top:16px">
           <div class="field"><label>药品名称 *</label><div class="toolbar"><input id="drugNameInput" name="drugName" required maxlength="60" autocomplete="off" placeholder="输入商品名或通用名"><button class="btn secondary" id="lookupDrugBtn" type="button">智能识别</button></div></div>
           <div id="lookupStatus" class="muted" role="status" aria-live="polite"></div>
@@ -649,8 +693,15 @@
           <div class="form-grid" style="margin-top:12px">
             <div class="field"><label>所属药库 *</label><select name="pharmacyScope" required>${pharmacyOptions}</select></div>
             <div class="field"><label>药品分类 *</label><select name="category" required><option value="">请选择分类</option>${categoryOptions}</select></div>
+            <div class="field"><label>通用名</label><input name="genericName"></div>
             <div class="field"><label>商品名</label><input name="tradeName"></div>
             <div class="field"><label>药品规格</label><input name="specification" placeholder='例如：5mg*28片'></div>
+            <div class="field"><label>剂型</label><input name="dosageForm"></div>
+            <div class="field"><label>药物作用分类</label><input name="therapeuticClass"></div>
+            <div class="field"><label>医保标记</label><input name="insuranceClass" value="未标注"></div>
+            <div class="field"><label>生产企业</label><input name="manufacturer"></div>
+            <div class="field"><label>上市许可持有人</label><input name="marketingAuthorizationHolder"></div>
+            <div class="field"><label>批准文号</label><input name="approvalNumber"></div>
           </div>
           <div class="field"><label>适应症 *</label><textarea name="indication" rows="4" required></textarea></div>
           <div class="field"><label>用法用量 *</label><textarea name="dosage" rows="4" required></textarea></div>
@@ -665,15 +716,19 @@
     const form = document.getElementById("drugForm");
     const setField = (name, value) => { const field = form.elements.namedItem(name); if (field && value !== undefined && value !== null) field.value = value; };
     const useCandidate = candidate => {
-      ["drugName", "tradeName", "specification"].forEach(name => setField(name, candidate[name]));
+      ["drugName", "genericName", "tradeName", "specification", "dosageForm", "therapeuticClass", "insuranceClass", "manufacturer", "marketingAuthorizationHolder", "approvalNumber"].forEach(name => setField(name, candidate[name]));
+      if (!candidate.genericName) setField("genericName", candidate.drugName);
       setField("category", normalizeDrugCategory(candidate.category, candidate.drugName));
       ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(name, candidate.clinical?.[name]));
       setField("sourceLabel", candidate.source?.label || "中文联网候选"); setField("sourceUrl", candidate.source?.url || ""); setField("sourceCheckedAt", candidate.source?.checkedAt || "");
       setField("sourceStatus", candidate.source?.status || "needs-review");
       const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
+      const isVerified = isVerifiedSource(candidate.source?.status);
       document.getElementById("selectedSource").textContent = isDraft
         ? `当前来源：${candidate.source?.label || "中文未核验草稿"}（未核验草稿；全部字段可编辑，可直接保存）`
-        : `当前来源：${candidate.source?.label || "中文联网候选"}（来源已核验；填入内容仍可编辑）`;
+        : isVerified
+          ? `当前来源：${candidate.source?.label || "中文核验资料"}（来源已核验；填入内容仍可编辑）`
+          : `当前来源：${candidate.source?.label || "中文联网候选"}（网页原文已提取，须按厂家、批准文号和现行说明书复核）`;
       form.scrollIntoView({ behavior: "smooth", block: "start" });
       toast(isDraft ? "未核验草稿已自动填入，可修改后直接保存" : "核验资料已填入，所有字段均可修改");
     };
@@ -685,9 +740,11 @@
         const sourceUrl = safeExternalUrl(candidate.source?.url);
         const tradeNameSourceUrl = safeExternalUrl(candidate.lookupMeta?.tradeNameSource?.url);
         const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
+        const isVerified = isVerifiedSource(candidate.source?.status);
         const confidence = { high: "高", medium: "中", low: "低" }[candidate.smartMeta?.confidence] || "";
         const meta = [confidence && `可信度：${confidence}`, candidate.smartMeta?.approvalNumber && `批准文号：${candidate.smartMeta.approvalNumber}`].filter(Boolean).join(" · ");
-        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeDrugCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge ${isDraft ? "warn" : "ok"}">${isDraft ? "未核验草稿" : "核验资料"}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}${candidate.lookupMeta?.matchedByTradeName ? " · 商品名已识别" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${tradeNameSourceUrl ? `<a class="btn ghost small link-btn" href="${esc(tradeNameSourceUrl)}" target="_blank" rel="noopener">查看商品名来源</a>` : ""}${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
+        const sourceBadge = isDraft ? "未核验草稿" : isVerified ? "核验资料" : "联网原文待复核";
+        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeDrugCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge ${isVerified ? "ok" : "warn"}">${sourceBadge}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}${candidate.lookupMeta?.matchedByTradeName ? " · 商品名已识别" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${tradeNameSourceUrl ? `<a class="btn ghost small link-btn" href="${esc(tradeNameSourceUrl)}" target="_blank" rel="noopener">查看商品名来源</a>` : ""}${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
       }).join("") : empty("暂未生成可自动填充的中文资料。可稍后重试，或使用下方中文搜索入口手动补充。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
     const renderVerificationLinks = links => {
@@ -755,15 +812,18 @@
         pharmacyScopes: [pharmacyScope],
         rawName: drugName,
         drugName,
-        genericName: drugName,
+        genericName: data.genericName.trim() || drugName,
         tradeName: data.tradeName.trim(),
         specification: data.specification.trim(),
-        dosageForm: "",
+        dosageForm: data.dosageForm.trim(),
         category,
-        manufacturer: "",
-        insuranceClass: "未标注",
+        therapeuticClass: data.therapeuticClass.trim() || normalizeDrugCategory(category, drugName),
+        manufacturer: data.manufacturer.trim(),
+        marketingAuthorizationHolder: data.marketingAuthorizationHolder.trim(),
+        approvalNumber: data.approvalNumber.trim(),
+        insuranceClass: data.insuranceClass.trim() || "未标注",
         clinical: clinicalFields,
-        qualityIssue: unverifiedDraft ? "此条目由 AI 自动生成，属于未核验草稿；全部字段可编辑，且不能替代对应厂家现行说明书。" : networkImported ? "联网候选字段尚未按批准文号和具体厂家现行说明书复核。" : "自定义药品尚未核验说明书与批准文号。",
+        qualityIssue: unverifiedDraft ? "此条目属于未核验草稿；全部字段可编辑，且不能替代对应厂家现行说明书。" : networkImported ? "联网候选字段尚未按批准文号和具体厂家现行说明书复核。" : "自定义药品尚未核验说明书与批准文号。",
         source: { status: unverifiedDraft ? "unverified-draft" : "needs-review", label: data.sourceLabel.trim() || "用户手动录入", url: data.sourceUrl.trim(), checkedAt: data.sourceCheckedAt.trim() || now.slice(0, 10) },
         importedFromNetwork: networkImported,
         isCustom: true
@@ -775,7 +835,7 @@
       }
       const notes = data.notes.trim();
       if (notes) {
-        state.notes.push({ id: `note-${Date.now()}`, drugId, content: notes, updatedAt: now });
+        state.notes.push({ id: `note-${Date.now()}`, drugId, pharmacyId: pharmacyScope, content: notes, updatedAt: now });
         saveState("notes");
       }
       state.activePharmacy = pharmacyScope;
@@ -824,6 +884,8 @@
       return ({
       drugName: drug.genericName || drug.drugName, genericName: drug.genericName || drug.drugName, tradeName: alias?.tradeName || drug.tradeName || "", specification: alias ? "" : drug.specification,
       category: normalizeDrugCategory(drug.category, drug.drugName),
+      dosageForm: drug.dosageForm || "", therapeuticClass: drug.therapeuticClass || "", insuranceClass: drug.insuranceClass || "",
+      manufacturer: drug.manufacturer || "", marketingAuthorizationHolder: drug.marketingAuthorizationHolder || "", approvalNumber: drug.approvalNumber || "",
       clinical: { ...drug.clinical }, source: { ...drug.source, label: `${drug.source.label}（本项目核验资料）` },
       lookupMeta: { matchedByTradeName: Boolean(alias), tradeNameSource: alias?.source || null }
     }); }).filter(isChineseCandidate);
@@ -841,6 +903,8 @@
         drugName: candidate.genericName || candidate.drugName, genericName: candidate.genericName || candidate.drugName,
         tradeName: alias?.tradeName || candidate.tradeName || "", specification: alias ? "" : candidate.specification || "",
         category: normalizeDrugCategory(candidate.category, candidate.drugName),
+        dosageForm: candidate.dosageForm || "", therapeuticClass: candidate.therapeuticClass || "", insuranceClass: candidate.insuranceClass || "",
+        manufacturer: candidate.manufacturer || "", marketingAuthorizationHolder: candidate.marketingAuthorizationHolder || "", approvalNumber: candidate.approvalNumber || "",
         clinical: candidate.clinical ? { ...candidate.clinical } : null,
         source: { ...candidate.source, label: `${candidate.source.label}（联网中文库）` },
         lookupMeta: { matchedByTradeName: Boolean(alias), tradeNameSource: alias?.source || null }
@@ -869,7 +933,7 @@
       const response = await fetch(`${endpoint}/v1/drugs/search`, {
         method: "POST", cache: "no-store", signal: controller.signal,
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ query, directoryHint: directoryHintFor(query) })
+        body: JSON.stringify({ query })
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(payload.error || `免费检索服务返回 ${response.status}`);
@@ -879,7 +943,10 @@
         const draft = candidate.draft === true || candidate.verified === false;
         return ({
         drugName: candidate.drugName || "", genericName: candidate.drugName || "", tradeName: candidate.tradeName || "",
-        specification: candidate.specification || "", category: normalizeDrugCategory(candidate.category, candidate.drugName),
+        specification: candidate.specification || "", dosageForm: candidate.dosageForm || "",
+        manufacturer: candidate.manufacturer || "", marketingAuthorizationHolder: candidate.manufacturer || "", approvalNumber: candidate.approvalNumber || "",
+        therapeuticClass: normalizeDrugCategory(candidate.category, candidate.drugName),
+        category: normalizeDrugCategory(candidate.category, candidate.drugName),
         clinical: {
           indication: candidate.indications || candidate.clinical?.indication || "",
           dosage: candidate.dosage || candidate.clinical?.dosage || "",
@@ -888,7 +955,7 @@
         },
         source: {
           status: draft ? "unverified-draft" : "needs-review",
-          label: draft ? `未核验 AI 草稿：${candidate.sourceTitle || "中文资料草稿"}` : `免费联网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
+          label: draft ? `未核验草稿：${candidate.sourceTitle || "中文资料草稿"}` : `免费联网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
           url: candidate.sourceUrl || "", checkedAt: candidate.sourceCheckedAt || new Date().toISOString().slice(0, 10)
         },
         smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "", draft, verified: candidate.verified === true, editable: candidate.editable !== false },
@@ -898,7 +965,7 @@
         }
       }); }).filter(isChineseCandidate).slice(0, 6);
       const verificationLinks = Array.isArray(payload.verificationLinks)
-        ? payload.verificationLinks.map(link => ({ label: String(link.label || ""), url: safeExternalUrl(link.url) })).filter(link => link.label && link.url).slice(0, 6)
+        ? payload.verificationLinks.map(link => ({ label: String(link.label || link.title || ""), url: safeExternalUrl(link.url) })).filter(link => link.label && link.url).slice(0, 6)
         : [];
       return { candidates, warnings: Array.isArray(payload.warnings) ? payload.warnings.filter(hasChineseText).slice(0, 8) : [], verificationLinks, mode: payload.mode || "" };
     } catch (error) {
@@ -932,10 +999,10 @@
     app.innerHTML = `
       <section class="panel section">
         <h2>两药联用查询</h2>
-        <p class="notice danger"><strong>安全限制：</strong>权威相互作用 API 尚未配置。当前只能匹配你手动维护的禁忌组合，未匹配不代表可以联用。</p>
+        <p class="notice danger"><strong>安全边界：</strong>当前匹配公开现行说明书整理的高风险规则及本机自定义记录，重点覆盖禁忌和严重组合；不是完整处方审核，未匹配不代表可以联用。</p>
         <div class="field" style="margin-top:16px"><label>药品 A</label><select id="drugA"><option value="">请选择</option>${options}</select></div>
         <div class="field"><label>药品 B</label><select id="drugB"><option value="">请选择</option>${options}</select></div>
-        <button class="btn primary" id="checkInteraction">查询已录入禁忌</button>
+        <button class="btn primary" id="checkInteraction">查询相互作用</button>
         <div id="interactionResult" style="margin-top:14px"></div>
       </section>`;
     document.getElementById("checkInteraction").addEventListener("click", () => {
@@ -946,10 +1013,16 @@
         result.innerHTML = '<div class="notice danger">请选择两种不同药品。</div>';
         return;
       }
-      const match = state.contraindications.find(item => [item.drugA, item.drugB].includes(a) && [item.drugA, item.drugB].includes(b));
-      result.innerHTML = match
-        ? `<div class="notice danger"><strong>${esc(match.severity)}：</strong>${esc(match.consequence || "存在自定义禁忌记录")}${match.mechanism ? `<br><strong>机制：</strong>${esc(match.mechanism)}` : ""}${match.recommendation ? `<br><strong>建议：</strong>${esc(match.recommendation)}` : ""}</div>`
-        : '<div class="notice">本地自定义禁忌中未匹配到记录。由于权威 API 未配置，不能据此判断可联用，请查具体说明书/指南或咨询药师。</div>';
+      const drugA = drugById(a);
+      const drugB = drugById(b);
+      const verifiedMatches = interactionEngine?.findMatches?.(drugA, drugB) || [];
+      const customMatches = state.contraindications.filter(item =>
+        (item.drugA === a && item.drugB === b) || (item.drugA === b && item.drugB === a));
+      const verifiedHtml = verifiedMatches.map(rule => interactionRuleCard(rule)).join("");
+      const customHtml = customMatches.map(match => `<article class="card"><div class="detail-head"><h3>本机自定义记录</h3><span class="badge ${interactionSeverityClass(match.severity)}">${esc(match.severity)}</span></div>${match.mechanism ? `<p class="drug-sub"><strong>机制：</strong>${esc(match.mechanism)}</p>` : ""}<p class="drug-sub"><strong>可能后果：</strong>${esc(match.consequence || "存在自定义禁忌记录")}</p><p class="drug-sub"><strong>处理建议：</strong>${esc(match.recommendation || "请咨询药师")}</p></article>`).join("");
+      result.innerHTML = verifiedHtml || customHtml
+        ? `<div class="card-list">${verifiedHtml}${customHtml}</div>`
+        : '<div class="notice">未命中当前高风险规则或本机自定义记录。不能据此判断可联用，请继续核对两药完整说明书、剂量、适应症、肝肾功能及患者其他用药。</div>';
     });
   }
 
@@ -1031,7 +1104,7 @@
       </section>
       <section class="panel section">
         <div class="section-title"><h2>智能识别服务</h2><span class="badge ${state.smartSearchEndpoint ? "ok" : "warn"}" id="smartSearchBadge">${state.smartSearchEndpoint ? "已配置" : "未配置"}</span></div>
-        <p class="muted">填写已部署的 Cloudflare Worker 地址。核验资料优先，缺失时使用 Workers AI 免费额度生成可编辑的未核验中文草稿；不需要 OpenAI 密钥。</p>
+        <p class="muted">填写已部署的 Cloudflare Worker 地址。服务先查 259 条可信说明书来源索引，未命中时自动限定可信域名联网检索；只提取网页原文，不使用 OpenAI 或 Workers AI 补写临床内容。</p>
         <div class="field"><label>Worker 地址</label><input id="smartSearchEndpoint" inputmode="url" placeholder="https://primary-medication-smart-search.你的账号.workers.dev" value="${esc(state.smartSearchEndpoint)}"></div>
         <div class="toolbar"><button class="btn primary" id="saveSmartSearchEndpoint">保存地址</button><button class="btn secondary" id="testSmartSearchEndpoint">测试连接</button><button class="btn ghost" id="clearSmartSearchEndpoint">清除</button></div>
         <p class="muted" id="smartSearchStatus" role="status" aria-live="polite"></p>
@@ -1069,7 +1142,9 @@
         const payload = await response.json().catch(() => ({}));
         if (!response.ok || !payload.ok) throw new Error(payload.error || `服务返回 ${response.status}`);
         if (!["free-verified", "free-ai-draft"].includes(payload.mode) || payload.requiresPaidApi !== false || payload.configured === false) throw new Error("免费智能检索服务尚未正确部署");
-        endpointStatus.textContent = "连接成功：核验资料优先，缺失时生成可编辑的未核验草稿；不使用收费 API。";
+        endpointStatus.textContent = payload.trustedOnlineDiscoverySupported
+          ? "连接成功：可信索引优先，未命中时自动联网检索真实说明书；不使用收费 API 或生成临床知识。"
+          : "连接成功：可查询可信说明书来源索引；不使用收费 API。";
         toast("免费中文检索服务连接成功");
       } catch (error) { endpointStatus.textContent = `连接失败：${error.message || "请检查地址和 Worker 设置"}`; toast("免费中文检索服务连接失败"); }
       finally { button.disabled = false; button.textContent = "测试连接"; }
@@ -1260,7 +1335,13 @@
 
   function renderContraindications() {
     let editingId = "";
+    const verifiedRules = interactionEngine?.rules || [];
     app.innerHTML = `
+      <section class="section">
+        <div class="section-title"><h2>已核验高风险规则</h2><small>${verifiedRules.length} 条</small></div>
+        <p class="notice danger">优先展示“禁忌”和“严重”组合，规则均附公开说明书来源。规则是重点筛查集，并非完整相互作用数据库。</p>
+        <div class="card-list" style="margin-top:12px">${verifiedRules.length ? verifiedRules.map(rule => interactionRuleCard(rule)).join("") : empty("高风险规则尚未加载。")}</div>
+      </section>
       <section class="panel section">
         <h2>自定义禁忌组合</h2>
         <p class="notice danger">自定义记录仅用于院内整理，不代表系统已完成临床验证。</p>
@@ -1310,15 +1391,21 @@
 
   function renderNotebook() {
     const fieldLabels = { indication: "适应症", dosage: "用法用量", adverseReactions: "不良反应", precautions: "注意事项" };
-    const markCards = state.marks.map(mark => {
+    const pharmacyId = state.activePharmacy;
+    const notes = state.notes.filter(note => recordBelongsToPharmacy(note, pharmacyId));
+    const marks = state.marks.filter(mark => recordBelongsToPharmacy(mark, pharmacyId));
+    app.dataset.notebookPharmacy = pharmacyId;
+    const markCards = marks.map(mark => {
       const drug = drugById(mark.drugId);
       const typeLabels = { underline: "划线", bold: "加粗", highlight: "荧光笔" };
       return `<article class="card"><div class="detail-head"><div><h3>${esc(drug?.drugName || "已删除药品")}</h3><span class="badge info">${esc(fieldLabels[mark.field] || mark.field)} · ${esc(typeLabels[mark.type] || mark.type)}</span></div><button class="btn ghost small" data-delete-mark="${esc(mark.id)}">删除</button></div><p class="mark-quote">${esc(mark.text)}</p></article>`;
     });
     app.innerHTML = `
-      <section class="section"><div class="section-title"><h2>全部药品笔记</h2><button class="btn ghost small" id="exportNotes">导出笔记本</button></div><div class="card-list">${state.notes.length ? [...state.notes].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)).map(noteCard).join("") : empty("还没有笔记。请从药品详情页添加。")}</div></section>
-      <section class="section"><div class="section-title"><h2>文本标记</h2><small>${state.marks.length} 条</small></div><div class="marks-list">${markCards.length ? markCards.join("") : empty("还没有划线、加粗或荧光笔标记。")}</div></section>`;
-    document.getElementById("exportNotes").onclick = () => downloadJson("drug-notebook.json", { exportedAt: new Date().toISOString(), notes: state.notes, marks: state.marks });
+      <section class="section" data-notebook-section="notes"><div class="section-title"><h2>${esc(pharmacyLabel(pharmacyId))}笔记</h2><button class="btn ghost small" id="exportNotes">导出当前药库</button></div><div class="card-list">${notes.length ? [...notes].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)).map(noteCard).join("") : empty(`还没有${pharmacyLabel(pharmacyId)}笔记。请从药品详情页添加。`)}</div></section>
+      <section class="section" data-notebook-section="marks"><div class="section-title"><h2>${esc(pharmacyLabel(pharmacyId))}文本标记</h2><small>${marks.length} 条</small></div><div class="marks-list" data-local-marks-signature="${esc(marks.map(mark => `${mark.id}:${mark.type}`).join("|"))}">${markCards.length ? markCards.join("") : empty("还没有划线、加粗或荧光笔标记。")}</div></section>`;
+    document.getElementById("exportNotes").onclick = () => downloadJson(`${pharmacyId}-drug-notebook.json`, {
+      exportedAt: new Date().toISOString(), pharmacyId, pharmacyLabel: pharmacyLabel(pharmacyId), notes, marks
+    });
   }
 
   function drugOptions() {
@@ -1347,11 +1434,12 @@
   function openNoteModal(drugId, noteId = "") {
     const drug = drugById(drugId);
     const existing = state.notes.find(note => note.id === noteId);
-    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="noteForm"><h2>${existing ? "编辑笔记" : "添加笔记"}</h2><p class="muted">${esc(drug?.drugName)}</p><div class="field"><label>笔记内容</label><textarea name="content" rows="6" required>${esc(existing?.content)}</textarea></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button></div></form></div>`;
+    const pharmacyId = existing ? recordPharmacyId(existing) : recordPharmacyId({ drugId });
+    modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="noteForm"><h2>${existing ? "编辑笔记" : "添加笔记"}</h2><p class="muted">${esc(drug?.drugName)} · ${esc(pharmacyLabel(pharmacyId))}</p><div class="field"><label>笔记内容</label><textarea name="content" rows="6" required>${esc(existing?.content)}</textarea></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button></div></form></div>`;
     document.getElementById("noteForm").onsubmit = event => {
       event.preventDefault(); const content = new FormData(event.target).get("content").trim();
-      if (existing) state.notes = state.notes.map(note => note.id === noteId ? { ...note, content, updatedAt: new Date().toISOString() } : note);
-      else state.notes.push({ id: `note-${Date.now()}`, drugId, content, updatedAt: new Date().toISOString() });
+      if (existing) state.notes = state.notes.map(note => note.id === noteId ? { ...note, pharmacyId, content, updatedAt: new Date().toISOString() } : note);
+      else state.notes.push({ id: `note-${Date.now()}`, drugId, pharmacyId, content, updatedAt: new Date().toISOString() });
       saveState("notes"); closeModal(); toast(existing ? "笔记已更新" : "笔记已保存"); render();
     };
   }
@@ -1360,31 +1448,53 @@
     const drug = drugById(drugId);
     if (!drug) return toast("未找到该药品");
     const hasLocalOverride = Boolean(state.drugOverrides[drugId] || state.categoryOverrides[drugId]);
+    const storedOverride = state.drugOverrides[drugId] || {};
+    const editSource = storedOverride.source || drug.source || {};
+    const editQualityIssue = Object.hasOwn(storedOverride, "qualityIssue") ? storedOverride.qualityIssue : drug.qualityIssue;
     const categories = [...new Set([...DRUG_CATEGORY_IDS, ...visibleDrugs().map(item => item.category || "未分类"), ...state.customCategories])];
     const currentDrugPharmacy = normalizePharmacyScopes(drug)[0];
     const pharmacyOptions = Object.entries(PHARMACIES).map(([id, pharmacy]) =>
       `<option value="${esc(id)}" ${id === currentDrugPharmacy ? "selected" : ""}>${esc(pharmacy.label)}</option>`
     ).join("");
     modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="editDrugForm">
-      <h2>${drug.isCustom ? "编辑自定义药品" : "编辑本机缓存字段"}</h2>
-      <p class="notice ${drug.isCustom ? "" : "danger"}">${drug.isCustom ? "保存后仍保持“未核验”状态。" : "这里只修改当前浏览器中的目录字段，不会改写内置数据或说明书临床字段；保存后会显示待复核提示。"}</p>
+      <h2>编辑药品详情</h2>
+      <p class="notice danger">修改只保存在当前浏览器。保存后统一标记为“待复核”，不会覆盖项目内置核验资料；临床使用前仍须核对具体厂家现行说明书。</p>
       <div class="form-grid" style="margin-top:16px">
         <div class="field"><label>药品名称 *</label><input name="drugName" value="${esc(drug.drugName)}" required></div>
+        <div class="field"><label>原始名称</label><input name="rawName" value="${esc(drug.rawName || drug.drugName)}"></div>
         <div class="field"><label>通用名</label><input name="genericName" value="${esc(drug.genericName)}"></div>
-        ${drug.isCustom ? `<div class="field"><label>商品名</label><input name="tradeName" value="${esc(drug.tradeName)}"></div>` : ""}
-        ${drug.isCustom ? `<div class="field"><label>所属药库 *</label><select name="pharmacyScope" required>${pharmacyOptions}</select></div>` : ""}
+        <div class="field"><label>商品名</label><input name="tradeName" value="${esc(drug.tradeName)}"></div>
+        <div class="field"><label>所属药库 *</label><select name="pharmacyScope" required>${pharmacyOptions}</select></div>
         <div class="field"><label>规格</label><input name="specification" value="${esc(drug.specification)}"></div>
         <div class="field"><label>剂型</label><input name="dosageForm" value="${esc(drug.dosageForm)}"></div>
-        <div class="field"><label>类别${drug.isCustom ? " *" : ""}</label><input name="category" list="editCategoryOptions" value="${esc(drug.category || "未分类")}" ${drug.isCustom ? "required" : ""}><datalist id="editCategoryOptions">${categories.map(category => `<option value="${esc(category)}">`).join("")}</datalist></div>
+        <div class="field"><label>药品属性 *</label><input name="category" list="editCategoryOptions" value="${esc(drug.category || "未分类")}" required><datalist id="editCategoryOptions">${categories.map(category => `<option value="${esc(category)}">`).join("")}</datalist></div>
+        <div class="field"><label>药物作用分类</label><input name="therapeuticClass" value="${esc(drug.therapeuticClass)}"></div>
+        <div class="field"><label>医保标记</label><input name="insuranceClass" value="${esc(drug.insuranceClass || "未标注")}"></div>
         <div class="field"><label>生产企业</label><input name="manufacturer" value="${esc(drug.manufacturer)}"></div>
+        <div class="field"><label>上市许可持有人</label><input name="marketingAuthorizationHolder" value="${esc(drug.marketingAuthorizationHolder)}"></div>
+        <div class="field"><label>批准文号</label><input name="approvalNumber" value="${esc(drug.approvalNumber)}"></div>
+        <div class="field"><label>主要成分（顿号分隔）</label><input name="components" value="${esc(Array.isArray(drug.components) ? drug.components.join("、") : drug.components || "")}"></div>
       </div>
-      ${drug.isCustom ? `<details class="clinical-editor" ${drug.clinical ? "open" : ""}>
-        <summary>适应症等临床字段</summary>
+      <details class="clinical-editor" open>
+        <summary>临床说明书摘要</summary>
         <div class="field"><label>适应症 *</label><textarea name="indication" rows="4" required>${esc(drug.clinical?.indication)}</textarea></div>
         <div class="field"><label>用法用量 *</label><textarea name="dosage" rows="4" required>${esc(drug.clinical?.dosage)}</textarea></div>
-        <div class="field"><label>不良反应</label><textarea name="adverseReactions" rows="4">${esc(drug.clinical?.adverseReactions)}</textarea></div>
-        <div class="field"><label>注意事项</label><textarea name="precautions" rows="4">${esc(drug.clinical?.precautions)}</textarea></div>
-      </details>` : ""}
+        <div class="field"><label>不良反应 *</label><textarea name="adverseReactions" rows="4" required>${esc(drug.clinical?.adverseReactions)}</textarea></div>
+        <div class="field"><label>注意事项 / 禁忌 *</label><textarea name="precautions" rows="4" required>${esc(drug.clinical?.precautions)}</textarea></div>
+      </details>
+      <details class="clinical-editor" open>
+        <summary>相互作用与禁忌补充</summary>
+        <div class="field"><label>该药相互作用补充</label><textarea name="interactionNotes" rows="4" placeholder="例如：与某药合用会增加出血风险">${esc(drug.interactionNotes)}</textarea></div>
+        <div class="field"><label>该药禁忌补充</label><textarea name="contraindications" rows="4" placeholder="例如：妊娠期或严重肝功能不全禁用">${esc(drug.contraindications)}</textarea></div>
+      </details>
+      <details class="clinical-editor">
+        <summary>来源与质控信息</summary>
+        <div class="field"><label>来源标题</label><input name="sourceLabel" value="${esc(String(editSource.label || "").replace(/（本机编辑，待复核）$/u, ""))}"></div>
+        <div class="field"><label>来源网址（HTTPS）</label><input name="sourceUrl" type="url" value="${esc(editSource.url)}"></div>
+        <div class="field"><label>核验日期</label><input name="sourceCheckedAt" type="date" value="${esc(editSource.checkedAt)}"></div>
+        <div class="field"><label>包装说明</label><textarea name="packagingNote" rows="3">${esc(drug.packagingNote)}</textarea></div>
+        <div class="field"><label>质控提示</label><textarea name="qualityIssue" rows="3">${esc(editQualityIssue)}</textarea></div>
+      </details>
       <div class="modal-actions">
         ${drug.isCustom ? '<button type="button" class="btn danger" id="deleteEditedDrug">删除药品</button>' : hasLocalOverride ? '<button type="button" class="btn danger" id="restoreDrugFields">恢复原始字段</button>' : ""}
         <button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button>
@@ -1393,33 +1503,58 @@
     document.getElementById("editDrugForm").onsubmit = event => {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(event.target));
+      const pharmacyScope = normalizePharmacyId(data.pharmacyScope, currentDrugPharmacy);
+      const category = data.category.trim() || "未分类";
+      const sourceUrl = data.sourceUrl.trim();
+      if (sourceUrl && !/^https:\/\//i.test(sourceUrl)) return toast("来源网址必须使用 HTTPS，或留空");
+      const source = {
+        status: "needs-review",
+        label: `${data.sourceLabel.trim() || "用户本机编辑"}（本机编辑，待复核）`,
+        url: sourceUrl,
+        checkedAt: data.sourceCheckedAt.trim() || new Date().toISOString().slice(0, 10)
+      };
+      const clinical = {
+        indication: data.indication.trim(),
+        dosage: data.dosage.trim(),
+        adverseReactions: data.adverseReactions.trim(),
+        precautions: data.precautions.trim(),
+        source: { ...source }
+      };
+      if (!clinical.indication || !clinical.dosage || !clinical.adverseReactions || !clinical.precautions) {
+        return toast("请完整填写四项临床说明书摘要");
+      }
       const fields = {
         drugName: data.drugName.trim(),
+        rawName: data.rawName.trim() || data.drugName.trim(),
         genericName: data.genericName.trim(),
-        ...(drug.isCustom ? { tradeName: data.tradeName.trim() } : {}),
+        tradeName: data.tradeName.trim(),
+        pharmacyScopes: [pharmacyScope],
         specification: data.specification.trim(),
         dosageForm: data.dosageForm.trim(),
-        manufacturer: data.manufacturer.trim()
+        category,
+        therapeuticClass: data.therapeuticClass.trim() || normalizeDrugCategory(category, data.drugName),
+        insuranceClass: data.insuranceClass.trim() || "未标注",
+        manufacturer: data.manufacturer.trim(),
+        marketingAuthorizationHolder: data.marketingAuthorizationHolder.trim(),
+        approvalNumber: data.approvalNumber.trim(),
+        components: data.components.split(/[、,，;；]/).map(item => item.trim()).filter(Boolean),
+        clinical,
+        source,
+        packagingNote: data.packagingNote.trim(),
+        qualityIssue: data.qualityIssue.trim(),
+        interactionNotes: data.interactionNotes.trim(),
+        contraindications: data.contraindications.trim(),
+        localEditedAt: new Date().toISOString()
       };
-      const category = data.category.trim() || "未分类";
       if (drug.isCustom) {
-        const pharmacyScope = normalizePharmacyId(data.pharmacyScope, currentDrugPharmacy);
-        const clinicalFields = {
-          indication: data.indication.trim(), dosage: data.dosage.trim(),
-          adverseReactions: data.adverseReactions.trim(), precautions: data.precautions.trim()
-        };
-        if (!DRUG_CATEGORY_IDS.includes(category) || !clinicalFields.indication || !clinicalFields.dosage) {
-          return toast("请选择有效分类，并填写适应症和用法用量");
-        }
-        const clinical = clinicalFields;
         state.customDrugs = state.customDrugs.map(item => item.id === drugId
-          ? { ...item, ...fields, pharmacyScopes: [pharmacyScope], rawName: fields.drugName, category, clinical, updatedAt: new Date().toISOString() }
+          ? { ...item, ...fields, isCustom: true, updatedAt: new Date().toISOString() }
           : item);
         saveState("customDrugs");
         state.activePharmacy = pharmacyScope;
         write("activePharmacy", state.activePharmacy);
       } else {
-        state.drugOverrides[drugId] = { ...fields, localEditedAt: new Date().toISOString() };
+        state.drugOverrides[drugId] = fields;
         state.categoryOverrides[drugId] = category;
         saveState("drugOverrides"); saveState("categoryOverrides");
       }
@@ -1427,13 +1562,13 @@
       if (!builtInCategories.has(category) && !state.customCategories.includes(category)) {
         state.customCategories.push(category); saveState("customCategories");
       }
-      closeModal(); render(); toast(drug.isCustom ? "自定义药品已更新" : "本机缓存字段已更新，待复核");
+      closeModal(); render(); toast("药品详情已在本机更新，待复核");
     };
     document.getElementById("restoreDrugFields")?.addEventListener("click", () => {
       closeModal();
-      confirmModal("恢复该药品的原始目录字段和分类？", () => {
+      confirmModal("恢复该药品的全部原始详情和分类？", () => {
         delete state.drugOverrides[drugId]; delete state.categoryOverrides[drugId];
-        saveState("drugOverrides"); saveState("categoryOverrides"); render(); toast("已恢复原始目录字段");
+        saveState("drugOverrides"); saveState("categoryOverrides"); render(); toast("已恢复原始药品详情");
       });
     });
     document.getElementById("deleteEditedDrug")?.addEventListener("click", () => {
@@ -1574,6 +1709,7 @@
     const { route, param } = currentRoute();
     updateChrome(route);
     updatePharmacyChrome();
+    if (route !== "notebook") delete app.dataset.notebookPharmacy;
     const handlers = {
       home: renderHome,
       categories: renderCategories,

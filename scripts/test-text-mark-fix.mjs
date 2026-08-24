@@ -20,7 +20,7 @@ assert.doesNotMatch(source, /location\.reload\(/, "文本标记新增和删除�
 assert.doesNotMatch(source, /window\.scrollTo\(\{ top: 0/, "文本标记逻辑不得主动回到页面顶部");
 assert.match(source, /localMarksSignature/, "笔记本标记同步必须避免 MutationObserver 重复重绘");
 assert.match(source, /groupNotebookSection\("文本标记", "marks"\)/);
-assert.match(source, /groupNotebookSection\("全部药品笔记", "notes"\)/);
+assert.match(source, /groupNotebookSection\("药品笔记", "notes"\)/);
 assert.match(source, /selectionchange/);
 assert.match(source, /touchend/);
 assert.match(positionFix, /const preferredTop = rect\.bottom \+ gap/, "自定义标记条必须优先贴在选中文字下方");

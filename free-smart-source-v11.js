@@ -58,8 +58,14 @@
 
   function fillCandidate(candidate, form) {
     setField(form, "drugName", candidate.drugName || "");
+    setField(form, "genericName", candidate.drugName || "");
     setField(form, "tradeName", candidate.tradeName || "");
     setField(form, "specification", candidate.specification || "");
+    setField(form, "dosageForm", candidate.dosageForm || "");
+    setField(form, "therapeuticClass", candidate.category || "");
+    setField(form, "manufacturer", candidate.manufacturer || "");
+    setField(form, "marketingAuthorizationHolder", candidate.manufacturer || "");
+    setField(form, "approvalNumber", candidate.approvalNumber || "");
     setField(form, "category", candidate.category || "其他");
     setField(form, "indication", candidate.clinical?.indication || "");
     setField(form, "dosage", candidate.clinical?.dosage || "");
@@ -68,7 +74,7 @@
     setField(form, "sourceLabel", candidate.sourceTitle || candidate.sourceHost || "可信说明书网页");
     setField(form, "sourceUrl", candidate.sourceUrl || "");
     setField(form, "sourceCheckedAt", candidate.sourceCheckedAt || new Date().toISOString().slice(0, 10));
-    setField(form, "sourceStatus", "unverified-draft");
+    setField(form, "sourceStatus", "needs-review");
 
     const selected = document.getElementById("selectedSource");
     if (selected) {
@@ -116,7 +122,9 @@
       if (!response.ok) throw new Error(payload.error || `说明书解析返回 ${response.status}`);
       const candidate = Array.isArray(payload.candidates) ? payload.candidates[0] : null;
       if (!candidate) throw new Error((payload.warnings || ["该说明书页面暂未能安全解析"]).join("；"));
-      if (!candidate.clinical?.indication || !candidate.clinical?.dosage) throw new Error("说明书缺少可安全提取的适应症或用法用量");
+      if (!["indication", "dosage", "adverseReactions", "precautions"].every(field => String(candidate.clinical?.[field] || "").trim())) {
+        throw new Error("说明书缺少可安全提取的完整临床四字段");
+      }
       fillCandidate(candidate, form);
       renderManualResult(candidate);
       if (status) status.textContent = `已从“${candidate.drugName}”说明书网页原文自动填充。请继续核对规格、厂家和批准文号。`;
@@ -140,13 +148,13 @@
 
     const panel = form.closest(".panel");
     const heading = [...(panel?.querySelectorAll("h3") || [])].find(node => /智能识别|联网检索|免费说明书识别/.test(node.textContent));
-    if (heading && heading.textContent !== "1. 免费说明书识别") heading.textContent = "1. 免费说明书识别";
+    if (heading && heading.textContent !== "1. 联网自动检索说明书") heading.textContent = "1. 联网自动检索说明书";
     const notice = heading?.nextElementSibling;
-    const copy = "先用本地可信说明书索引匹配药名，不调用 OpenAI、不会产生 API 费用。索引未收录时，可在下方粘贴 39药品通或药源网的具体说明书链接；临床字段只从页面原文提取，缺失内容不会猜测补写。";
+    const copy = "输入至少 2 个汉字的中文药名片段，停顿后自动先查 259 条可信说明书索引；未命中时仅在可信域名联网发现真实说明书。四项临床摘要完整且候选唯一时自动填充，存在多个厂家或规格时请手动选择，缺失内容不会猜测补写。";
     if (notice?.classList.contains("notice") && notice.textContent !== copy) notice.textContent = copy;
 
     const lookupButton = document.getElementById("lookupDrugBtn");
-    if (lookupButton && !lookupButton.disabled && lookupButton.textContent !== "免费索引识别") lookupButton.textContent = "免费索引识别";
+    if (lookupButton && !lookupButton.disabled && lookupButton.textContent !== "立即联网检索") lookupButton.textContent = "立即联网检索";
 
     if (!document.getElementById("freeSourceUrlBox")) {
       const status = document.getElementById("lookupStatus");
@@ -155,7 +163,7 @@
       box.id = "freeSourceUrlBox";
       box.className = "field";
       box.style.marginTop = "12px";
-      box.innerHTML = `<label for="trustedSourceUrlInput">说明书链接（索引未命中时）</label><div class="toolbar"><input id="trustedSourceUrlInput" inputmode="url" autocomplete="off" placeholder="粘贴 39药品通 / 药源网具体说明书链接"><button class="btn secondary" id="parseTrustedSourceBtn" type="button">解析并自动填充</button></div><p class="muted">仅接受可信域名 HTTPS 链接；不会把其他网站当作医学来源。</p>`;
+      box.innerHTML = `<label for="trustedSourceUrlInput">说明书链接（自动检索未命中时可选）</label><div class="toolbar"><input id="trustedSourceUrlInput" inputmode="url" autocomplete="off" placeholder="粘贴 39药品通 / 药源网具体说明书链接"><button class="btn secondary" id="parseTrustedSourceBtn" type="button">解析并自动填充</button></div><p class="muted">仅接受可信域名 HTTPS 链接；不会把其他网站当作医学来源。</p>`;
       status.insertAdjacentElement("afterend", box);
       document.getElementById("parseTrustedSourceBtn")?.addEventListener("click", parseManualSource);
     }
