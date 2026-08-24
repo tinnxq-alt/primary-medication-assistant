@@ -807,8 +807,7 @@
       "specification": "250mg:2.5mg×24片/盒",
       "dosageForm": "片剂",
       "category": "西药",
-      "manufacturer": "北京四环科宝制药…",
-      "qualityIssue": "原始规格“252.5mg”缺少成分分隔，暂规范为250mg:2.5mg，仍须按包装和批准文号复核。",
+      "manufacturer": "北京四环科宝制药股份有限公司",
       "clinical": {
         "indication": "用于成人2型糖尿病，可作为饮食和运动不能充分控制血糖时的初始治疗，或用于单用格列吡嗪/二甲双胍控制不佳者；具体适用人群按说明书判断。",
         "dosage": "应随餐服用并从低剂量开始，根据血糖和耐受性逐步调整；不同既往治疗方案的起始剂量不同，必须由医生个体化决定，不得超过说明书规定的最大日剂量。",
@@ -817,9 +816,9 @@
       },
       "source": {
         "status": "verified-monograph",
-        "label": "丁香园：二甲双胍格列吡嗪片说明书资料",
-        "url": "https://drugs.dxy.cn/drug/5Yzik39z2M1oIwCOsnTXxA%3D%3D",
-        "checkedAt": "2026-08-16"
+        "label": "丁香园：北京四环科宝二甲双胍格列吡嗪片说明书",
+        "url": "https://drugs.dxy.cn/pc/drug/ol07A4SHFUflogXbVtBqVw%3D%3D",
+        "checkedAt": "2026-08-24"
       }
     },
     {

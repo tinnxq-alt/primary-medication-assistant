@@ -6,6 +6,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXPECTED_CATALOG_COUNT = 164;
 const EXPECTED_OUTPATIENT_CATALOG_COUNT = 395;
 const EXPECTED_OUTPATIENT_VERIFICATION_COUNT = 22;
+const EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT = 128;
 const EXPECTED_THERAPEUTIC_CLASS_COUNT = 44;
 const EXPECTED_TRADE_NAME_ALIAS_COUNT = 13;
 const VERIFIED_STATUSES = new Set([
@@ -54,6 +55,17 @@ await import(pathToFileURL(path.join(ROOT, "outpatient-web-verification.js")).hr
 const catalog = globalThis.window.DRUG_CATALOG;
 const outpatientCatalog = globalThis.window.OUTPATIENT_DRUG_CATALOG;
 const labels = JSON.parse(readText("chinese-drug-labels.json"));
+globalThis.CustomEvent ||= class CustomEvent {
+  constructor(type, options = {}) {
+    this.type = type;
+    this.detail = options.detail;
+  }
+};
+globalThis.window.addEventListener = () => {};
+globalThis.window.dispatchEvent = () => {};
+globalThis.window.loadChineseDrugLabels = async () => labels;
+await import(pathToFileURL(path.join(ROOT, "outpatient-clinical-hydration.js")).href);
+const outpatientHydration = globalThis.window.applyOutpatientClinicalReferences(outpatientCatalog, labels);
 
 if (!Array.isArray(catalog)) fail("drugs.js 未生成 window.DRUG_CATALOG 数组");
 if (!Array.isArray(outpatientCatalog)) fail("outpatient-drugs.js 未生成 window.OUTPATIENT_DRUG_CATALOG 数组");
@@ -70,6 +82,15 @@ if (Array.isArray(outpatientCatalog) && outpatientCatalog.length !== EXPECTED_OU
 }
 if (globalThis.window.OUTPATIENT_WEB_VERIFICATION_COUNT !== EXPECTED_OUTPATIENT_VERIFICATION_COUNT) {
   fail(`门诊网络核验补丁应有 ${EXPECTED_OUTPATIENT_VERIFICATION_COUNT} 条，实际为 ${globalThis.window.OUTPATIENT_WEB_VERIFICATION_COUNT || 0} 条`);
+}
+if (outpatientHydration.hydratedCount !== EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT) {
+  fail(`门诊说明书资料应安全复用 ${EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT} 条，实际为 ${outpatientHydration.hydratedCount} 条`);
+}
+for (const drug of outpatientHydration.catalog.filter(item => item.outpatientClinicalReference)) {
+  for (const field of CLINICAL_FIELDS) {
+    if (!isNonEmpty(drug.clinical?.[field])) fail(`门诊 ${drug.internalCode} 复用资料缺少 clinical.${field}`);
+  }
+  if (!isHttpsUrl(drug.source?.url)) fail(`门诊 ${drug.internalCode} 复用资料缺少有效 HTTPS 来源`);
 }
 if (Array.isArray(labels.drugs) && labels.drugs.length !== EXPECTED_CATALOG_COUNT) {
   fail(`核验库应有 ${EXPECTED_CATALOG_COUNT} 条，实际为 ${labels.drugs.length} 条`);
@@ -140,6 +161,19 @@ const verifiedOutpatient = (outpatientCatalog || []).filter(drug => drug.metadat
 if (verifiedOutpatient.length !== EXPECTED_OUTPATIENT_VERIFICATION_COUNT) {
   fail(`门诊目录应用网络核验补丁后应有 ${EXPECTED_OUTPATIENT_VERIFICATION_COUNT} 条主数据记录，实际为 ${verifiedOutpatient.length} 条`);
 }
+const outpatientNeedsReview = (outpatientCatalog || []).filter(drug => drug.source?.status === "needs-review");
+if (outpatientNeedsReview.length !== 0) {
+  fail(`门诊目录不应再有待核验记录，实际为 ${outpatientNeedsReview.length} 条：${outpatientNeedsReview.map(drug => drug.internalCode).join("、")}`);
+}
+const metforminGlipizide = (outpatientCatalog || []).find(drug => drug.internalCode === "FX5882");
+if (metforminGlipizide?.drugName !== "二甲双胍格列吡嗪片") fail("FX5882 药名必须为二甲双胍格列吡嗪片");
+if (metforminGlipizide?.specification !== "250mg:2.5mg*24片/盒") fail("FX5882 包装必须为 24片/盒");
+if (metforminGlipizide?.qualityIssue) fail("FX5882 已确认 24片/盒，不得保留待核验警告");
+if (metforminGlipizide?.metadataVerification?.status !== "verified") fail("FX5882 主数据应为已核验状态");
+if (metforminGlipizide?.metadataVerification?.checkedAt !== "2026-08-24") fail("FX5882 核验日期应更新为 2026-08-24");
+const wardMetforminGlipizide = (catalog || []).find(drug => drug.drugName === "二甲双胍格列吡嗪片");
+if (wardMetforminGlipizide?.specification !== "250mg:2.5mg×24片/盒") fail("病房二甲双胍格列吡嗪片包装必须为 24片/盒");
+if (wardMetforminGlipizide?.qualityIssue) fail("病房二甲双胍格列吡嗪片不得保留待核验警告");
 
 if (therapeuticClasses.size !== EXPECTED_THERAPEUTIC_CLASS_COUNT) {
   fail(`作用分类应有 ${EXPECTED_THERAPEUTIC_CLASS_COUNT} 类，实际为 ${therapeuticClasses.size} 类`);
@@ -213,7 +247,7 @@ for (const [relativePath, source] of [["app.js", appSource], ["fast-search-ui.js
   if (/chinese-drug-labels\.json/.test(source)) fail(`${relativePath} 不得绕过中文核验库单例加载器`);
 }
 
-const runtimeFiles = ["app.js", "catalog-data-loader.js", "drug-lookup.js", "pharmacy-scope.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "index.html", "style.css", "worker/src/index.js"];
+const runtimeFiles = ["app.js", "catalog-data-loader.js", "drug-lookup.js", "pharmacy-scope.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-hydration.js", "index.html", "style.css", "worker/src/index.js"];
 const forbiddenRuntimePatterns = [
   { label: "OCR", pattern: /\bocr\b/i },
   { label: "相机调用", pattern: /getUserMedia\s*\(/i },
@@ -238,6 +272,9 @@ for (const script of ["outpatient-loader.js", "outpatient-web-verification.js", 
 if (htmlSource.indexOf('src="catalog-data-loader.js"') < 0 || htmlSource.indexOf('src="catalog-data-loader.js"') > htmlSource.indexOf('src="app.js"')) {
   fail("index.html 必须在 app.js 之前加载 catalog-data-loader.js");
 }
+if (htmlSource.indexOf('src="outpatient-clinical-hydration.js"') < htmlSource.indexOf('src="catalog-data-loader.js"') || htmlSource.indexOf('src="outpatient-clinical-hydration.js"') > htmlSource.indexOf('src="app.js"')) {
+  fail("index.html 必须在 catalog-data-loader.js 之后、app.js 之前加载 outpatient-clinical-hydration.js");
+}
 if (htmlSource.includes('src="outpatient-drugs.js"')) fail("index.html 不得同步加载体积较大的门诊目录");
 if (htmlSource.indexOf('src="outpatient-loader.js"') > htmlSource.indexOf('src="outpatient-web-verification.js"')) {
   fail("index.html 必须先加载门诊懒加载器，再加载网络核验补丁");
@@ -245,7 +282,7 @@ if (htmlSource.indexOf('src="outpatient-loader.js"') > htmlSource.indexOf('src="
 if (!/ensureOutpatientCatalogLoaded\(\)/.test(appSource) || !/loadOutpatientDrugCatalog/.test(appSource)) {
   fail("app.js 切换门诊药库时必须触发门诊目录懒加载");
 }
-for (const shellFile of ["outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "pharmacy-scope.js", "catalog-data-loader.js"]) {
+for (const shellFile of ["outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-hydration.js", "pharmacy-scope.js", "catalog-data-loader.js"]) {
   if (!serviceWorkerSource.includes(`"./${shellFile}"`)) fail(`service-worker.js 必须离线缓存 ${shellFile}`);
 }
 if (/accept\s*=\s*["'][^"']*image/i.test(htmlSource)) fail("index.html 重新引入了图片文件上传入口");
@@ -262,6 +299,7 @@ console.log([
   `病房药库 ${catalog.length} 条`,
   `门诊药库 ${outpatientCatalog.length} 条`,
   `门诊主数据核验 ${verifiedOutpatient.length} 条`,
+  `门诊说明书复用 ${outpatientHydration.hydratedCount} 条`,
   `可用核验资料 ${verifiedCount} 条`,
   `安全锁定 ${blocked.length} 条`,
   `作用分类 ${therapeuticClasses.size} 类`,
