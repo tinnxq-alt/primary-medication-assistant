@@ -5,9 +5,11 @@ import {
   trustedDiscovery,
   trustedSourceUrl
 } from "./index-v8.js";
+import { fetchSourcePage, parseInstructionPage } from "./index-v3.js";
 import { findIndexedSources } from "./free-source-index.js";
 
 const CANDIDATE_LIMIT = 3;
+const SOURCE_PARSE_ATTEMPT_LIMIT = 5;
 const MAX_BODY_BYTES = 4096;
 const USER_PASTE_HOSTS = new Set(["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"]);
 
@@ -71,26 +73,44 @@ async function parseSources(query, sourceUrls, env) {
   const diagnostics = [];
   let fetchedSourceCount = 0;
 
-  for (const sourceUrl of sourceUrls) {
+  for (const sourceUrl of sourceUrls.slice(0, SOURCE_PARSE_ATTEMPT_LIMIT)) {
     if (candidates.length >= CANDIDATE_LIMIT) break;
+    let candidate = null;
     try {
-      const candidate = await parseTrustedSource(sourceUrl, query, env.BROWSER);
-      fetchedSourceCount += 1;
-      diagnostics.push({ stage: "source-parse", sourceHost: new URL(sourceUrl).hostname, ok: Boolean(candidate) });
-      if (!candidate) continue;
-      const key = candidateKey(candidate);
-      if (seen.has(key)) continue;
-      seen.add(key);
-      candidates.push(candidate);
+      const page = await fetchSourcePage(sourceUrl, trustedSourceUrl);
+      candidate = parseInstructionPage(page, query);
+      diagnostics.push({ stage: "trusted-direct-fetch", sourceHost: new URL(page.url).hostname, ok: Boolean(candidate) });
     } catch (error) {
-      fetchedSourceCount += 1;
       diagnostics.push({
-        stage: "source-parse",
+        stage: "trusted-direct-fetch",
         sourceHost: (() => { try { return new URL(sourceUrl).hostname; } catch { return "invalid"; } })(),
         ok: false,
         error: String(error?.message || error).slice(0, 160)
       });
     }
+    if (!candidate) {
+      try {
+        candidate = await parseTrustedSource(sourceUrl, query, env.BROWSER);
+        diagnostics.push({ stage: "browser-source-parse", sourceHost: new URL(sourceUrl).hostname, ok: Boolean(candidate) });
+      } catch (error) {
+        const message = String(error?.message || error).slice(0, 160);
+        diagnostics.push({
+          stage: "browser-source-parse",
+          sourceHost: (() => { try { return new URL(sourceUrl).hostname; } catch { return "invalid"; } })(),
+          ok: false,
+          error: message
+        });
+        fetchedSourceCount += 1;
+        if (/BROWSER_CONTENT_429|rate limit/i.test(message)) break;
+        continue;
+      }
+    }
+    fetchedSourceCount += 1;
+    if (!candidate) continue;
+    const key = candidateKey(candidate);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    candidates.push(candidate);
   }
   return { candidates, fetchedSourceCount, diagnostics };
 }
