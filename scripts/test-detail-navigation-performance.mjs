@@ -11,6 +11,18 @@ assert.match(app, /catalogSnapshot\(\)\.byId\.get\(id\)/, "点击药品后必须
 assert.match(app, /visibleDrugCache\?\.source === snapshot\.drugs/, "可见药品不得在每次路由切换时整库重建");
 assert.match(app, /pharmacyViews\(\)\.byPharmacy/, "药库筛选结果必须复用缓存视图");
 assert.match(app, /primary-medication-rendered/, "主应用渲染完成后必须发送显式事件");
+assert.match(app, /let categoryBrowseActive = false;/, "必须记录详情是否来自药品分类筛选");
+assert.match(
+  app,
+  /function openCategoryDrugList[\s\S]*?navigate\("all"\);[\s\S]*?categoryBrowseActive = true;[\s\S]*?renderAll\(filterAction, filterForm, filterAttribute\)/,
+  "药品分类的作用、属性、剂型与自定义分类筛选必须统一标记来源"
+);
+assert.match(
+  app,
+  /function openDrugDetail[\s\S]*?categoryBrowseActive && currentRoute\(\)\.route === "all"[\s\S]*?history\.replaceState\(history\.state, "", hash\);[\s\S]*?render\(\);/,
+  "从药品分类进入详情时必须替换中间的全部药物历史项"
+);
+assert.match(app, /if \(drug\) return openDrugDetail\(drug\.dataset\.openDrug\);/, "所有药品卡片必须通过来源感知的详情入口打开");
 
 assert.doesNotMatch(
   outpatientMetadata,
@@ -23,6 +35,6 @@ assert.match(
   "门诊详情增强应仅在主应用完成一次渲染后运行"
 );
 
-assert.match(serviceWorker, /primary-medication-v50/, "详情点击性能修复必须升级离线缓存版本");
+assert.match(serviceWorker, /primary-medication-v51/, "分类详情返回修复必须升级离线缓存版本");
 
-console.log("详情点击性能检查通过：整库索引/筛选缓存已启用，门诊详情 DOM 自触发循环已移除");
+console.log("详情导航检查通过：点击性能缓存已启用，分类来源返回路径已保留");
