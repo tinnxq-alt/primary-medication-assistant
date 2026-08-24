@@ -141,7 +141,7 @@
   ).join(" ");
 
   async function hydrateVerifiedCatalog() {
-    const response = await fetch("./chinese-drug-labels.json?v=12", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=13", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
@@ -733,7 +733,7 @@
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=12", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=13", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");

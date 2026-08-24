@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const EXPECTED_CATALOG_COUNT = 167;
+const EXPECTED_CATALOG_COUNT = 164;
 const EXPECTED_OUTPATIENT_CATALOG_COUNT = 395;
 const EXPECTED_OUTPATIENT_VERIFICATION_COUNT = 22;
 const EXPECTED_THERAPEUTIC_CLASS_COUNT = 44;
@@ -15,6 +15,7 @@ const VERIFIED_STATUSES = new Set([
   "verified-regulator"
 ]);
 const CLINICAL_FIELDS = ["indication", "dosage", "adverseReactions", "precautions"];
+const DELETED_WARD_DRUG_NAMES = new Set(["丹七片", "格列吡嗪片", "格列齐特片(II)"]);
 const errors = [];
 
 function fail(message) {
@@ -75,6 +76,10 @@ if (Array.isArray(labels.drugs) && labels.drugs.length !== EXPECTED_CATALOG_COUN
 }
 if (Array.isArray(labels.tradeNameAliases) && labels.tradeNameAliases.length !== EXPECTED_TRADE_NAME_ALIAS_COUNT) {
   fail(`商品名别名应有 ${EXPECTED_TRADE_NAME_ALIAS_COUNT} 条，实际为 ${labels.tradeNameAliases.length} 条`);
+}
+for (const deletedName of DELETED_WARD_DRUG_NAMES) {
+  if ((catalog || []).some(drug => drug.drugName === deletedName)) fail(`${deletedName}仍存在于病房目录`);
+  if ((labels.drugs || []).some(drug => drug.drugName === deletedName)) fail(`${deletedName}仍存在于中文核验库`);
 }
 
 const normalizedTradeNames = new Set();
@@ -191,10 +196,8 @@ for (const { catalog: drug, verified } of matched) {
 const statusCounts = countBy(matched, pair => pair.verified.source?.status || "missing");
 const verifiedCount = [...VERIFIED_STATUSES].reduce((sum, status) => sum + (statusCounts[status] || 0), 0);
 const blocked = matched.filter(pair => pair.verified.source?.status === "blocked");
-if (verifiedCount !== 166) fail(`可用核验资料应为 166 条，实际为 ${verifiedCount} 条`);
-if (blocked.length !== 1 || blocked[0]?.catalog.drugName !== "格列吡嗪片") {
-  fail(`锁定项应仅为格列吡嗪片，实际为：${blocked.map(pair => pair.catalog.drugName).join("、") || "无"}`);
-}
+if (verifiedCount !== 164) fail(`可用核验资料应为 164 条，实际为 ${verifiedCount} 条`);
+if (blocked.length !== 0) fail(`永久删除后不应再有安全锁定项，实际为 ${blocked.length} 条`);
 
 const appSource = readText("app.js");
 const serviceWorkerSource = readText("service-worker.js");

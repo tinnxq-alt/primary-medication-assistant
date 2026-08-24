@@ -6,7 +6,7 @@
 
 - 已接通 13 个页面入口：首页、分类、搜索、详情、收藏、添加药物、相互作用、症状搜索、记忆卡片、缓存管理、全部药物、用药禁忌、笔记本。
 - 内置用户提供的药品目录，并将“院内目录字段”与“说明书临床字段”分开保存。
-- 已建立病房/门诊双药库：病房保留原始 167 个品规及历史 ID，当前启用 164 个品规；丹七片、格列吡嗪片和格列齐特片(II)已从运行时病房药库移除。门诊药库已独立导入首批 395 个品规。
+- 已建立病房/门诊双药库：病房药库现有 164 个品规；丹七片、格列吡嗪片和格列齐特片(II)及其核验资料已永久删除，其余药品继续使用原有历史 ID。门诊药库已独立导入首批 395 个品规。
 - 门诊目录按需加载：首次切换到门诊药库时再载入，不阻塞病房药库首屏；加载失败可直接重试，离线应用仍预缓存门诊目录。
 - 顶部药库切换会独立过滤首页、分类、全部药物、闪卡和缓存；搜索默认限于当前药库，也可切换为搜索全部药库。
 - 支持模糊搜索、分类/剂型筛选、收藏分组、药品笔记、自定义药品、自定义禁忌、闪卡、JSON 导出和离线应用外壳。
@@ -29,7 +29,7 @@
 - 记忆卡片支持按分类筛选、顺序或随机模式、重新洗牌和仅查看未记住药品。
 - 缓存管理页支持安装 PWA、主动检查更新，以及完整导出/恢复收藏、分组、自定义药品、笔记、标记、禁忌和本机字段。
 - 对明显串行错配的数据设置质控提示；未核验说明书的适应症、剂量、不良反应和注意事项显示“待核验”。
-- 已接入国家药监局品种说明书范本：阿卡波糖片、格列吡嗪片、莫匹罗星软膏、乳果糖口服溶液、酚麻美敏片。
+- 已接入国家药监局品种说明书范本：阿卡波糖片、莫匹罗星软膏、乳果糖口服溶液、酚麻美敏片。
 - 已接入国家药监局安全修订公告：左氧氟沙星口服/注射剂、珍菊降压片；安全公告与完整说明书分开显示。
 
 ## 安全边界
@@ -56,7 +56,7 @@ Worker 使用 Cloudflare Workers 与 Browser Run 读取项目内置索引中的�
 
 ## 数据维护规则
 
-- `drugs.js` 保留原始 167 条病房清单及其历史 ID；`catalog-retirements.js` 在运行时排除停用品种。当前病房药库启用 164 条，3 个停用品种不会显示，后续药品 ID 不前移。
+- `drugs.js` 当前保存 164 条病房清单。3 个已删除品种的历史 ID 保留为空位，不再保存其名称、目录字段或临床核验资料，后续药品 ID 不前移。
 - `outpatient-drugs.js` 是独立门诊目录，当前 395 条；由 `outpatient-loader.js` 在首次切换门诊药库时加载。后续导入条目必须使用唯一 ID 并包含 `pharmacyScopes: ["outpatient"]`。完全相同且需要跨库复用的品规可同时包含 `ward` 与 `outpatient`。
 - 收藏、笔记、标记、禁忌与相互作用选择器跨药库共用；药品列表和缓存仍按当前药库隔离。
 - 只有带 `source.status: "verified-template"` 的临床字段可以展示为“范本已核验”。
@@ -65,13 +65,12 @@ Worker 使用 Cloudflare Workers 与 Browser Run 读取项目内置索引中的�
 
 ## 自动质量检查
 
-每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括原始病房 167 个目录品规与核验库的一一对应、运行时停用品种检查（当前病房药库 164 条）、门诊 395 个品规、22 条门诊主数据核验补丁、懒加载失败重试、双药库归属及跨库 ID 唯一性、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
+每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括病房 164 个目录品规与核验库的一一对应、3 个品种永久删除及其余历史 ID 稳定性、门诊 395 个品规、22 条门诊主数据核验补丁、懒加载失败重试、双药库归属及跨库 ID 唯一性、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、44 个作用分类，以及不得重新引入 OCR、相机或图片上传入口。
 
 本地可执行：
 
 ```bash
 node --check app.js
-node --check catalog-retirements.js
 node --check outpatient-loader.js
 node --check outpatient-web-verification.js
 node --check pharmacy-scope.js
@@ -80,7 +79,7 @@ node --check outpatient-drugs.js
 node --check service-worker.js
 node --check worker/src/index.js
 node scripts/audit-catalog.mjs
-node scripts/test-catalog-retirements.mjs
+node scripts/test-catalog-deletions.mjs
 node scripts/test-drug-lookup.mjs
 node scripts/test-pharmacy-scope.mjs
 node scripts/test-outpatient-loader.mjs
