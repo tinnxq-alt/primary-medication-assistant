@@ -30,7 +30,6 @@
   });
   const {
     drugBelongsToPharmacy,
-    filterDrugsByPharmacy,
     normalizePharmacyId,
     normalizePharmacyScopes,
     withPharmacyScopes
@@ -114,14 +113,54 @@
     url.search = ""; url.hash = "";
     return url.href.replace(/\/+$/, "");
   };
-  const builtInCatalogDrugs = () => [
-    ...window.DRUG_CATALOG.map(drug => withPharmacyScopes(drug, "ward")),
-    ...(window.OUTPATIENT_DRUG_CATALOG || []).map(drug => withPharmacyScopes(drug, "outpatient"))
-  ];
-  const catalogDrugs = () => [
-    ...builtInCatalogDrugs(),
-    ...state.customDrugs.map(drug => withPharmacyScopes(drug, "ward"))
-  ];
+  let catalogSnapshotCache = null;
+  let visibleDrugCache = null;
+  let pharmacyCountCache = null;
+  const CATALOG_VIEW_STATE_KEYS = new Set(["customDrugs", "hidden", "categoryOverrides", "drugOverrides"]);
+
+  function invalidateCatalogCaches() {
+    catalogSnapshotCache = null;
+    visibleDrugCache = null;
+    pharmacyCountCache = null;
+  }
+
+  function catalogSnapshot() {
+    const ward = Array.isArray(window.DRUG_CATALOG) ? window.DRUG_CATALOG : [];
+    const outpatient = Array.isArray(window.OUTPATIENT_DRUG_CATALOG) ? window.OUTPATIENT_DRUG_CATALOG : [];
+    const custom = state.customDrugs;
+    if (catalogSnapshotCache
+      && catalogSnapshotCache.ward === ward
+      && catalogSnapshotCache.outpatient === outpatient
+      && catalogSnapshotCache.custom === custom
+      && catalogSnapshotCache.wardLength === ward.length
+      && catalogSnapshotCache.outpatientLength === outpatient.length
+      && catalogSnapshotCache.customLength === custom.length) {
+      return catalogSnapshotCache;
+    }
+
+    const builtIn = [
+      ...ward.map(drug => withPharmacyScopes(drug, "ward")),
+      ...outpatient.map(drug => withPharmacyScopes(drug, "outpatient"))
+    ];
+    const drugs = [...builtIn, ...custom.map(drug => withPharmacyScopes(drug, "ward"))];
+    catalogSnapshotCache = {
+      ward,
+      outpatient,
+      custom,
+      wardLength: ward.length,
+      outpatientLength: outpatient.length,
+      customLength: custom.length,
+      builtIn,
+      drugs,
+      byId: new Map(drugs.map(drug => [drug.id, drug]))
+    };
+    visibleDrugCache = null;
+    pharmacyCountCache = null;
+    return catalogSnapshotCache;
+  }
+
+  const builtInCatalogDrugs = () => catalogSnapshot().builtIn;
+  const catalogDrugs = () => catalogSnapshot().drugs;
   const applyLocalOverrides = drug => {
     const override = state.drugOverrides[drug.id];
     const category = state.categoryOverrides[drug.id];
@@ -133,10 +172,30 @@
     }
     return withPharmacyScopes(merged, "ward");
   };
-  const visibleDrugs = () => catalogDrugs()
-    .filter(drug => !state.hidden.includes(drug.id))
-    .map(applyLocalOverrides);
-  const allDrugs = (pharmacyId = state.activePharmacy) => filterDrugsByPharmacy(visibleDrugs(), pharmacyId);
+  const visibleDrugs = () => {
+    const snapshot = catalogSnapshot();
+    if (visibleDrugCache?.source === snapshot.drugs) return visibleDrugCache.drugs;
+    const hidden = new Set(state.hidden);
+    const drugs = snapshot.drugs
+      .filter(drug => !hidden.has(drug.id))
+      .map(applyLocalOverrides);
+    visibleDrugCache = { source: snapshot.drugs, drugs };
+    pharmacyCountCache = null;
+    return drugs;
+  };
+  function pharmacyViews() {
+    const drugs = visibleDrugs();
+    if (pharmacyCountCache?.source === drugs) return pharmacyCountCache;
+    const byPharmacy = { ward: [], outpatient: [] };
+    drugs.forEach(drug => normalizePharmacyScopes(drug).forEach(pharmacyId => { byPharmacy[pharmacyId].push(drug); }));
+    pharmacyCountCache = {
+      source: drugs,
+      byPharmacy,
+      counts: { ward: byPharmacy.ward.length, outpatient: byPharmacy.outpatient.length }
+    };
+    return pharmacyCountCache;
+  }
+  const allDrugs = (pharmacyId = state.activePharmacy) => pharmacyViews().byPharmacy[normalizePharmacyId(pharmacyId)];
   const pharmacyLabel = pharmacyId => PHARMACIES[normalizePharmacyId(pharmacyId)].label;
   const pharmacyBadges = drug => normalizePharmacyScopes(drug).map(pharmacyId =>
     `<span class="badge pharmacy ${esc(pharmacyId)}">${esc(PHARMACIES[pharmacyId].shortLabel)}药库</span>`
@@ -160,15 +219,19 @@
       target.source = { ...entry.source };
       if (entry.qualityIssue) target.qualityIssue = entry.qualityIssue;
     }
+    invalidateCatalogCaches();
   }
   const drugById = id => {
-    const drug = catalogDrugs().find(item => item.id === id);
+    const drug = catalogSnapshot().byId.get(id);
     return drug ? applyLocalOverrides(drug) : drug;
   };
   const isFavorite = id => state.favorites.includes(id);
   const isCached = id => state.cached.includes(id);
   const isRemembered = id => state.remembered.includes(id);
-  const saveState = key => write(key, state[key]);
+  const saveState = key => {
+    write(key, state[key]);
+    if (CATALOG_VIEW_STATE_KEYS.has(key)) invalidateCatalogCaches();
+  };
 
   function toast(message) {
     toastEl.textContent = message;
@@ -254,14 +317,14 @@
 
   function updatePharmacyChrome() {
     if (!pharmacySwitcher) return;
-    const drugs = visibleDrugs();
+    const views = pharmacyViews();
     pharmacySwitcher.querySelectorAll("[data-pharmacy-switch]").forEach(button => {
       const pharmacyId = normalizePharmacyId(button.dataset.pharmacySwitch);
       const active = pharmacyId === state.activePharmacy;
       button.classList.toggle("active", active);
       button.setAttribute("aria-pressed", String(active));
       const count = button.querySelector("[data-pharmacy-count]");
-      if (count) count.textContent = String(filterDrugsByPharmacy(drugs, pharmacyId).length);
+      if (count) count.textContent = String(views.counts[pharmacyId]);
     });
   }
 
@@ -1508,6 +1571,7 @@
     };
     (handlers[route] || renderHome)();
     window.scrollTo({ top: 0, behavior: "instant" });
+    window.dispatchEvent(new CustomEvent("primary-medication-rendered", { detail: { route, param } }));
   }
 
   document.addEventListener("click", event => {
@@ -1605,6 +1669,7 @@
   window.addEventListener("beforeinstallprompt", event => { event.preventDefault(); deferredInstallPrompt = event; updateInstallControls(); });
   window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; updateInstallControls(); toast("应用已安装到桌面"); });
   window.addEventListener("outpatient-clinical-hydrated", () => {
+    invalidateCatalogCaches();
     if (state.activePharmacy !== "outpatient") return;
     const route = currentRoute().route;
     if (["home", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();

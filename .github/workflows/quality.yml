@@ -42,6 +42,7 @@ jobs:
           node --check outpatient-loader.js
           node --check outpatient-web-verification.js
           node --check outpatient-clinical-hydration.js
+          node --check outpatient-metadata-ui.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -78,6 +79,8 @@ jobs:
         run: node scripts/test-outpatient-clinical-hydration.mjs
       - name: Response performance tests
         run: node scripts/test-response-performance.mjs
+      - name: Detail navigation performance tests
+        run: node scripts/test-detail-navigation-performance.mjs
       - name: Text mark and notebook tests
         run: node scripts/test-text-mark-fix.mjs
       - name: Notebook delete tests

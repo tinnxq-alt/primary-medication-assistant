@@ -87,7 +87,8 @@ assert.ok(
 );
 
 const serviceWorker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
-assert.match(serviceWorker, /primary-medication-v49/);
+const cacheVersion = Number(serviceWorker.match(/primary-medication-v(\d+)/)?.[1] || 0);
+assert.ok(cacheVersion >= 49, "门诊说明书复用缓存版本不得低于 v49");
 assert.match(serviceWorker, /\.\/outpatient-clinical-hydration\.js/);
 
 const metadataUi = fs.readFileSync(path.join(root, "outpatient-metadata-ui.js"), "utf8");
