@@ -79,7 +79,9 @@
     notice.style.marginTop = "14px";
     notice.textContent = drug.metadataVerification
       ? "药品主数据已通过公开注册/政府目录/生产企业资料核验；适应症、用法用量、不良反应等临床字段仍以对应厂家现行说明书为准。"
-      : "临床摘要来自同药品名称（含剂型）及同成分规格的已核验资料；包装数量和生产企业仍以门诊药库主数据为准。";
+      : drug.outpatientClinicalReference?.status === "matched-outpatient-verified-source"
+        ? "临床摘要来自与院内编码、完整药名（含剂型）及成分规格严格对应的网络说明书资料；包装数量和生产企业仍以门诊药库主数据为准。"
+        : "临床摘要来自同药品名称（含剂型）及同成分规格的已核验资料；包装数量和生产企业仍以门诊药库主数据为准。";
     if (heading?.parentNode) heading.parentNode.insertBefore(notice, grid);
     else grid.parentNode?.insertBefore(notice, grid);
   };
