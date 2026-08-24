@@ -328,5 +328,6 @@ export {
   parseTrustedSource,
   siteRestrictedRss,
   sourceGroundedCandidates,
+  trustedDiscovery,
   trustedSourceUrl
 };

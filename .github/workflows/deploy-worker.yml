@@ -60,8 +60,9 @@ jobs:
           const fs = require('fs');
           try {
             const payload = JSON.parse(fs.readFileSync('/tmp/worker-health.json', 'utf8'));
-            const valid = payload.discovery === 'local-source-index-v11'
+            const valid = payload.discovery === 'hybrid-source-discovery-v12'
               && payload.mode === 'free-verified'
+              && payload.trustedOnlineDiscoverySupported === true
               && payload.requiresPaidApi === false
               && payload.usesOpenAI === false
               && payload.sourceGrounded === true
@@ -76,7 +77,7 @@ jobs:
             fi
             sleep 4
           done
-          echo "Timed out waiting for zero-cost Worker v11" >&2
+          echo "Timed out waiting for hybrid trusted-source Worker v12" >&2
           exit 1
 
       - name: Smoke test free indexed instruction retrieval
@@ -102,9 +103,9 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
-          if (payload.discovery !== 'local-source-index-v11' || payload.requiresPaidApi !== false || payload.usesOpenAI !== false) {
+          if (payload.discovery !== 'local-source-index-v12' || payload.requiresPaidApi !== false || payload.usesOpenAI !== false) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error('zero-cost v11 mode is not active');
+            throw new Error('hybrid trusted-source v12 mode is not active');
           }
           if (payload.generatesClinicalKnowledge !== false || payload.sourceGrounded !== true) {
             throw new Error('Worker must remain source-grounded and must not generate clinical knowledge');
@@ -124,7 +125,7 @@ jobs:
           });
           if (!target) {
             console.error(JSON.stringify(payload, null, 2));
-            throw new Error('free v11 smoke did not produce a source-grounded semaglutide candidate');
+            throw new Error('free v12 smoke did not produce a source-grounded semaglutide candidate');
           }
           console.log(`free indexed candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
           NODE
@@ -152,7 +153,7 @@ jobs:
             --write-out '%{http_code}' || true)
 
           {
-            echo "### Worker v11 免费模式自动部署验收"
+            echo "### Worker v12 可信来源混合检索自动部署验收"
             echo
             echo "- Commit: \`$GITHUB_SHA\`"
             echo "- Health HTTP: \`${HEALTH_CODE:-curl-error}\`"

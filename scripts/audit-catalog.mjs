@@ -5,8 +5,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXPECTED_CATALOG_COUNT = 164;
 const EXPECTED_OUTPATIENT_CATALOG_COUNT = 395;
-const EXPECTED_OUTPATIENT_VERIFICATION_COUNT = 22;
-const EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT = 128;
+const EXPECTED_OUTPATIENT_VERIFICATION_COUNT = 33;
+const EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT = 129;
+const EXPECTED_OUTPATIENT_CLINICAL_SUPPLEMENT_COUNT = 266;
 const EXPECTED_THERAPEUTIC_CLASS_COUNT = 44;
 const EXPECTED_TRADE_NAME_ALIAS_COUNT = 13;
 const VERIFIED_STATUSES = new Set([
@@ -64,8 +65,10 @@ globalThis.CustomEvent ||= class CustomEvent {
 globalThis.window.addEventListener = () => {};
 globalThis.window.dispatchEvent = () => {};
 globalThis.window.loadChineseDrugLabels = async () => labels;
+await import(pathToFileURL(path.join(ROOT, "outpatient-clinical-supplement.js")).href);
 await import(pathToFileURL(path.join(ROOT, "outpatient-clinical-hydration.js")).href);
 const outpatientHydration = globalThis.window.applyOutpatientClinicalReferences(outpatientCatalog, labels);
+const outpatientCoverage = globalThis.window.applyOutpatientClinicalCoverage(outpatientCatalog, labels);
 
 if (!Array.isArray(catalog)) fail("drugs.js 未生成 window.DRUG_CATALOG 数组");
 if (!Array.isArray(outpatientCatalog)) fail("outpatient-drugs.js 未生成 window.OUTPATIENT_DRUG_CATALOG 数组");
@@ -85,6 +88,18 @@ if (globalThis.window.OUTPATIENT_WEB_VERIFICATION_COUNT !== EXPECTED_OUTPATIENT_
 }
 if (outpatientHydration.hydratedCount !== EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT) {
   fail(`门诊说明书资料应安全复用 ${EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT} 条，实际为 ${outpatientHydration.hydratedCount} 条`);
+}
+if (outpatientCoverage.supplementedCount !== EXPECTED_OUTPATIENT_CLINICAL_SUPPLEMENT_COUNT) {
+  fail(`门诊说明书资料应逐条补充 ${EXPECTED_OUTPATIENT_CLINICAL_SUPPLEMENT_COUNT} 条，实际为 ${outpatientCoverage.supplementedCount} 条`);
+}
+if (outpatientCoverage.totalClinicalCount !== EXPECTED_OUTPATIENT_CATALOG_COUNT) {
+  fail(`门诊 ${EXPECTED_OUTPATIENT_CATALOG_COUNT} 条药品均应有临床四字段，实际覆盖 ${outpatientCoverage.totalClinicalCount} 条`);
+}
+for (const drug of outpatientCoverage.catalog) {
+  for (const field of CLINICAL_FIELDS) {
+    if (!isNonEmpty(drug.clinical?.[field])) fail(`门诊 ${drug.internalCode} 缺少 clinical.${field}`);
+  }
+  if (!isHttpsUrl(drug.source?.url)) fail(`门诊 ${drug.internalCode} 缺少有效 HTTPS 说明书来源`);
 }
 for (const drug of outpatientHydration.catalog.filter(item => item.outpatientClinicalReference)) {
   for (const field of CLINICAL_FIELDS) {
@@ -247,7 +262,7 @@ for (const [relativePath, source] of [["app.js", appSource], ["fast-search-ui.js
   if (/chinese-drug-labels\.json/.test(source)) fail(`${relativePath} 不得绕过中文核验库单例加载器`);
 }
 
-const runtimeFiles = ["app.js", "catalog-data-loader.js", "drug-lookup.js", "pharmacy-scope.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-hydration.js", "index.html", "style.css", "worker/src/index.js"];
+const runtimeFiles = ["app.js", "catalog-data-loader.js", "drug-lookup.js", "pharmacy-scope.js", "drug-interactions.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-supplement.js", "outpatient-clinical-hydration.js", "index.html", "style.css", "worker/src/index.js"];
 const forbiddenRuntimePatterns = [
   { label: "OCR", pattern: /\bocr\b/i },
   { label: "相机调用", pattern: /getUserMedia\s*\(/i },
@@ -299,7 +314,7 @@ console.log([
   `病房药库 ${catalog.length} 条`,
   `门诊药库 ${outpatientCatalog.length} 条`,
   `门诊主数据核验 ${verifiedOutpatient.length} 条`,
-  `门诊说明书复用 ${outpatientHydration.hydratedCount} 条`,
+  `门诊说明书覆盖 ${outpatientCoverage.totalClinicalCount} 条（复用 ${outpatientHydration.hydratedCount} + 补充 ${outpatientCoverage.supplementedCount}）`,
   `可用核验资料 ${verifiedCount} 条`,
   `安全锁定 ${blocked.length} 条`,
   `作用分类 ${therapeuticClasses.size} 类`,

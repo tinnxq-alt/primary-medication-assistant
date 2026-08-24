@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node test.mjs && node test-v11.mjs",
-    "check": "node --check src/index.js && node --check src/index-v2.js && node --check src/index-v3.js && node --check src/index-v4.js && node --check src/index-v5.js && node --check src/index-v6.js && node --check src/index-v7.js && node --check src/index-v8.js && node --check src/index-v9.js && node --check src/index-v10.js && node --check src/index-v11.js && node --check src/free-source-index.js && node --check test.mjs && node --check test-v11.mjs",
+    "test": "node test.mjs && node test-v11.mjs && node test-v12.mjs",
+    "check": "node --check src/index.js && node --check src/index-v2.js && node --check src/index-v3.js && node --check src/index-v4.js && node --check src/index-v5.js && node --check src/index-v6.js && node --check src/index-v7.js && node --check src/index-v8.js && node --check src/index-v9.js && node --check src/index-v10.js && node --check src/index-v11.js && node --check src/index-v12.js && node --check src/free-source-index.js && node --check test.mjs && node --check test-v11.mjs && node --check test-v12.mjs",
     "dev": "wrangler dev",
     "deploy": "wrangler deploy"
   },

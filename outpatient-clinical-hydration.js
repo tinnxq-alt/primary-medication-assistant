@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const HYDRATED_AT = "2026-08-24";
+  const HYDRATED_AT = "2026-08-25";
   const VERIFIED_SOURCE_STATUSES = new Set([
     "verified-template",
     "verified-label",
@@ -77,15 +77,34 @@
     return { catalog: hydrated, hydratedCount };
   }
 
+  function applyOutpatientClinicalCoverage(catalog, payload) {
+    const exact = applyOutpatientClinicalReferences(catalog, payload);
+    const supplemental = typeof window.applyOutpatientClinicalSupplement === "function"
+      ? window.applyOutpatientClinicalSupplement(exact.catalog)
+      : { catalog: exact.catalog, supplementedCount: 0 };
+    return {
+      catalog: supplemental.catalog,
+      hydratedCount: exact.hydratedCount,
+      supplementedCount: supplemental.supplementedCount,
+      totalClinicalCount: supplemental.catalog.filter(drug => drug.clinical).length
+    };
+  }
+
   async function hydrateOutpatientClinicalCatalog(catalog = window.OUTPATIENT_DRUG_CATALOG) {
     if (hydrationPromise) return hydrationPromise;
     hydrationPromise = window.loadChineseDrugLabels()
       .then(payload => {
-        const result = applyOutpatientClinicalReferences(catalog, payload);
+        const result = applyOutpatientClinicalCoverage(catalog, payload);
         window.OUTPATIENT_DRUG_CATALOG = result.catalog;
         window.OUTPATIENT_CLINICAL_REUSE_COUNT = result.hydratedCount;
+        window.OUTPATIENT_CLINICAL_SUPPLEMENT_APPLIED_COUNT = result.supplementedCount;
+        window.OUTPATIENT_CLINICAL_TOTAL_COUNT = result.totalClinicalCount;
         window.dispatchEvent(new CustomEvent("outpatient-clinical-hydrated", {
-          detail: { count: result.hydratedCount }
+          detail: {
+            count: result.hydratedCount,
+            supplementedCount: result.supplementedCount,
+            totalClinicalCount: result.totalClinicalCount
+          }
         }));
         return result.catalog;
       })
@@ -97,6 +116,7 @@
   }
 
   window.applyOutpatientClinicalReferences = applyOutpatientClinicalReferences;
+  window.applyOutpatientClinicalCoverage = applyOutpatientClinicalCoverage;
   window.hydrateOutpatientClinicalCatalog = hydrateOutpatientClinicalCatalog;
   window.addEventListener("outpatient-catalog-loaded", () => {
     hydrateOutpatientClinicalCatalog().catch(error => console.error("门诊说明书资料加载失败", error));

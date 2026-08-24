@@ -35,6 +35,7 @@ assert.match(
   "门诊详情增强应仅在主应用完成一次渲染后运行"
 );
 
-assert.match(serviceWorker, /primary-medication-v51/, "分类详情返回修复必须升级离线缓存版本");
+const cacheVersion = Number(serviceWorker.match(/primary-medication-v(\d+)/)?.[1] || 0);
+assert.ok(cacheVersion >= 52, "本轮门诊资料、编辑与相互作用更新必须升级离线缓存版本");
 
 console.log("详情导航检查通过：点击性能缓存已启用，分类来源返回路径已保留");

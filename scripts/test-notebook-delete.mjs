@@ -10,7 +10,7 @@ assert.match(app, /\[data-delete-note\]/, "普通笔记删除应继续由主应�
 assert.match(app, /\[data-delete-mark\]/, "文本标记删除应继续由主应用状态处理");
 assert.match(app, /confirmModal\("确认删除这条笔记？"/);
 assert.match(app, /confirmModal\("确认删除这条文本标记？"/);
-assert.match(unified, /groupNotebookSection\("全部药品笔记", "notes"\)/);
+assert.match(unified, /groupNotebookSection\("药品笔记", "notes"\)/);
 assert.match(unified, /groupNotebookSection\("文本标记", "marks"\)/);
 assert.doesNotMatch(html, /src="notebook-delete-fix\.js"/, "不得再加载会整页 reload 的旧删除补丁");
 assert.ok(html.indexOf('src="notebook-scroll-fix.js"') < html.indexOf('src="mark-notebook-ui.js"'), "滚动保护应先于统一标记层加载");

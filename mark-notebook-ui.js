@@ -39,12 +39,33 @@
     toast.timer = setTimeout(() => node.classList.remove("show"), 1500);
   }
 
-  function drugNameById(drugId) {
+  function knownDrugs() {
     return [
       ...(window.DRUG_CATALOG || []),
       ...(window.OUTPATIENT_DRUG_CATALOG || []),
       ...readList("customDrugs")
-    ].find(drug => drug?.id === drugId)?.drugName || "已删除药品";
+    ];
+  }
+
+  function drugById(drugId) {
+    return knownDrugs().find(drug => drug?.id === drugId);
+  }
+
+  function drugNameById(drugId) {
+    return drugById(drugId)?.drugName || "已删除药品";
+  }
+
+  function activeNotebookPharmacy() {
+    const value = app?.dataset.notebookPharmacy || "ward";
+    return value === "outpatient" ? "outpatient" : "ward";
+  }
+
+  function recordPharmacyId(record) {
+    if (["ward", "outpatient"].includes(record?.pharmacyId)) return record.pharmacyId;
+    const drug = drugById(record?.drugId);
+    const scopes = window.PHARMACY_SCOPE?.normalizePharmacyScopes?.(drug) || ["ward"];
+    const active = activeNotebookPharmacy();
+    return scopes.includes(active) ? active : scopes[0];
   }
 
   function resolveRange(mark, text) {
@@ -205,6 +226,7 @@
       && mark.start === info.start && mark.end === info.end && mark.type === type);
     if (!exists) {
       marks.push({ id: `mark-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, drugId: info.drugId,
+        pharmacyId: recordPharmacyId({ drugId: info.drugId }),
         field: info.field, text: info.text, start: info.start, end: info.end, type, createdAt: new Date().toISOString() });
       writeList("marks", marks);
     }
@@ -246,10 +268,12 @@
   function refreshNotebookMarks() {
     if (currentRoute() !== "notebook") return false;
     const section = [...document.querySelectorAll("#app > .section, #app .section")]
-      .find(node => node.querySelector(":scope > .section-title h2")?.textContent.trim() === "文本标记");
+      .find(node => node.dataset.notebookSection === "marks"
+        || node.querySelector(":scope > .section-title h2")?.textContent.trim() === "文本标记");
     const list = section?.querySelector(":scope > .marks-list");
     if (!section || !list) return false;
-    const marks = readList("marks");
+    const pharmacyId = activeNotebookPharmacy();
+    const marks = readList("marks").filter(mark => recordPharmacyId(mark) === pharmacyId);
     const signature = marks.map(mark => `${mark.id}:${mark.type}`).join("|");
     if (list.dataset.localMarksSignature === signature) return false;
     const count = section.querySelector(":scope > .section-title small");
@@ -263,7 +287,8 @@
   function groupNotebookSection(title, kind) {
     if (currentRoute() !== "notebook") return;
     const section = [...document.querySelectorAll("#app > .section, #app .section")]
-      .find(node => node.querySelector(":scope > .section-title h2")?.textContent.trim() === title);
+      .find(node => node.dataset.notebookSection === kind
+        || node.querySelector(":scope > .section-title h2")?.textContent.trim() === title);
     const list = kind === "notes" ? section?.querySelector(":scope > .card-list") : section?.querySelector(":scope > .marks-list");
     if (!list || list.dataset.groupedByDrug === "true") return;
     const cards = [...list.children].filter(node => node.matches("article.card"));
@@ -296,7 +321,7 @@
 
   function groupNotebook() {
     refreshNotebookMarks();
-    groupNotebookSection("全部药品笔记", "notes");
+    groupNotebookSection("药品笔记", "notes");
     groupNotebookSection("文本标记", "marks");
   }
 
@@ -313,12 +338,18 @@
   }
 
   function exportNotebook() {
-    const payload = { exportedAt: new Date().toISOString(), notes: readList("notes"), marks: readList("marks") };
+    const pharmacyId = activeNotebookPharmacy();
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      pharmacyId,
+      notes: readList("notes").filter(note => recordPharmacyId(note) === pharmacyId),
+      marks: readList("marks").filter(mark => recordPharmacyId(mark) === pharmacyId)
+    };
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = "drug-notebook.json";
+    link.download = `${pharmacyId}-drug-notebook.json`;
     link.click();
     URL.revokeObjectURL(url);
     toast("已生成导出文件");

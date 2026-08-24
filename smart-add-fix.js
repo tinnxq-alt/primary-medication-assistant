@@ -9,6 +9,8 @@
   let candidateMap = new Map();
   let requestId = 0;
   let lastWarmAt = 0;
+  let autoLookupTimer = null;
+  let lastAutoQuery = "";
 
   const esc = value => String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -100,6 +102,7 @@
       return {
         candidates: (Array.isArray(payload.candidates) ? payload.candidates : []).map(item => ({
           drugName: String(item.drugName || "").trim(),
+          genericName: String(item.drugName || "").trim(),
           tradeName: String(item.tradeName || "").trim(),
           specification: String(item.specification || "").trim(),
           manufacturer: String(item.manufacturer || "").trim(),
@@ -113,14 +116,15 @@
             precautions: String(item.clinical?.precautions || "").trim()
           },
           source: {
-            status: "unverified-draft",
+            status: "needs-review",
             label: String(item.sourceTitle || item.sourceHost || "联网药品说明书"),
             url: String(item.sourceUrl || ""),
             host: String(item.sourceHost || ""),
             quality: String(item.sourceQuality || "网页说明书来源"),
             checkedAt: String(item.sourceCheckedAt || new Date().toISOString().slice(0, 10))
           }
-        })).filter(item => hasChinese(item.drugName) && item.clinical.indication && item.clinical.dosage).slice(0, 3),
+        })).filter(item => hasChinese(item.drugName)
+          && ["indication", "dosage", "adverseReactions", "precautions"].every(field => item.clinical[field])).slice(0, 3),
         warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
         elapsedMs: Number(payload.elapsedMs) || 0,
         searchResultCount: Number(payload.searchResultCount) || 0
@@ -143,11 +147,17 @@
     if (field && value !== undefined && value !== null) field.value = value;
   }
 
-  function fill(candidate, node = currentForm()) {
+  function fill(candidate, node = currentForm(), { silent = false } = {}) {
     if (!candidate || !node) return;
     setField(node, "drugName", candidate.drugName || "");
+    setField(node, "genericName", candidate.genericName || candidate.drugName || "");
     setField(node, "tradeName", candidate.tradeName || "");
     setField(node, "specification", candidate.specification || "");
+    setField(node, "dosageForm", candidate.dosageForm || "");
+    setField(node, "therapeuticClass", candidate.category || "");
+    setField(node, "manufacturer", candidate.manufacturer || "");
+    setField(node, "marketingAuthorizationHolder", candidate.manufacturer || "");
+    setField(node, "approvalNumber", candidate.approvalNumber || "");
     setField(node, "category", candidate.category && candidate.category !== "其他" ? candidate.category : "其他");
     setField(node, "indication", candidate.clinical?.indication || "");
     setField(node, "dosage", candidate.clinical?.dosage || "");
@@ -156,13 +166,13 @@
     setField(node, "sourceLabel", `${candidate.source?.label || "联网药品说明书"}｜${candidate.source?.quality || "网页来源"}`);
     setField(node, "sourceUrl", candidate.source?.url || "");
     setField(node, "sourceCheckedAt", candidate.source?.checkedAt || "");
-    setField(node, "sourceStatus", "unverified-draft");
+    setField(node, "sourceStatus", "needs-review");
     const source = document.getElementById("selectedSource");
     if (source) {
       const extra = [candidate.manufacturer && `生产企业：${candidate.manufacturer}`, candidate.approvalNumber && `批准文号：${candidate.approvalNumber}`].filter(Boolean).join("；");
       source.textContent = `当前来源：${candidate.source?.label || "联网药品说明书"}（${candidate.source?.quality || "网页来源"}）${extra ? `；${extra}` : ""}`;
     }
-    toast(`已从说明书原文填入：${candidate.drugName}`);
+    if (!silent) toast(`已从说明书原文填入：${candidate.drugName}`);
   }
 
   function renderCandidates(candidates) {
@@ -194,24 +204,25 @@
     const panel = document.querySelector("#drugForm")?.closest(".panel");
     if (!panel) return;
     const heading = [...panel.querySelectorAll("h3")].find(node => node.textContent.includes("智能识别"));
-    if (heading) heading.textContent = "1. 联网检索药品说明书";
+    if (heading) heading.textContent = "1. 联网自动检索说明书";
     const notice = heading?.nextElementSibling;
     if (notice?.classList.contains("notice")) {
-      notice.textContent = "无需输入完整药名。输入 2 个及以上汉字后联网搜索真实药品说明书；只有从来源网页原文中同时提取到药名、适应症和用法用量的页面才会成为候选。选择候选后自动填充，缺失字段不会猜测补写。";
+      notice.textContent = "输入至少 2 个汉字的中文药名片段，停顿后自动先查 259 条可信说明书索引；未命中时仅在可信域名联网发现真实说明书。四项临床摘要完整且候选唯一时自动填充，存在多个厂家或规格时请手动选择，缺失内容不会猜测补写。";
     }
     const input = document.getElementById("drugNameInput");
     if (input) input.placeholder = "输入药名片段，如“司美”“孟鲁”“阿奇”";
     const button = document.getElementById("lookupDrugBtn");
-    if (button && !button.disabled) button.textContent = "联网检索说明书";
+    if (button && !button.disabled) button.textContent = "立即联网检索";
   }
 
-  async function run() {
+  async function run({ automatic = false } = {}) {
     const node = currentForm();
     if (!node) return;
     const query = String(node.elements.namedItem("drugName")?.value || "").trim();
-    if (!query) return toast("请先输入药名片段");
-    if (!hasChinese(query)) return toast("请输入中文药品名称");
-    if (chineseCount(query) < 2) return toast("至少输入 2 个汉字");
+    if (!query) return automatic ? undefined : toast("请先输入药名片段");
+    if (!hasChinese(query)) return automatic ? undefined : toast("请输入中文药品名称");
+    if (chineseCount(query) < 2) return automatic ? undefined : toast("至少输入 2 个汉字");
+    lastAutoQuery = query;
 
     const id = ++requestId;
     const button = document.getElementById("lookupDrugBtn");
@@ -233,9 +244,19 @@
       const result = await remoteInstructionCandidates(query);
       if (id !== requestId) return;
       renderCandidates(result.candidates);
+      const exactCandidates = result.candidates.filter(candidate => normalize(candidate.drugName) === normalize(query));
+      const autoCandidate = result.candidates.length === 1
+        ? result.candidates[0]
+        : exactCandidates.length === 1 ? exactCandidates[0] : null;
+      if (autoCandidate) {
+        fill(autoCandidate, node, { silent: automatic });
+        document.querySelector(`[data-candidate-card="${autoCandidate.lookupId}"]`)?.setAttribute("data-selected", "true");
+      }
       const timing = result.elapsedMs ? `，耗时 ${(result.elapsedMs / 1000).toFixed(1)} 秒` : "";
       if (status) status.textContent = result.candidates.length
-        ? `从 ${result.searchResultCount || "多个"} 个网页搜索结果中筛出 ${result.candidates.length} 份可解析说明书${timing}。请选择与药盒规格/厂家对应的一项。`
+        ? autoCandidate
+          ? `已从可信说明书原文自动填充“${autoCandidate.drugName}”${timing}。请核对药盒规格、厂家和批准文号。`
+          : `从 ${result.searchResultCount || "多个"} 个来源中筛出 ${result.candidates.length} 份完整说明书${timing}。存在多个厂家或规格，请选择对应候选后自动填充。`
         : `没有找到可安全自动填充的说明书${timing}。${result.warnings.join("；")}`;
     } catch (error) {
       if (id !== requestId) return;
@@ -243,7 +264,7 @@
       if (status) status.textContent = `联网说明书检索失败：${error.message || "网络异常"}`;
       toast("联网说明书检索暂不可用");
     } finally {
-      if (id === requestId && button) { button.disabled = false; button.textContent = "联网检索说明书"; }
+      if (id === requestId && button) { button.disabled = false; button.textContent = "立即联网检索"; }
     }
   }
 
@@ -287,6 +308,21 @@
       if (savedQuery && input && !input.value) {
         input.value = savedQuery;
         sessionStorage.removeItem("drug-add-query");
+      }
+      if (input && input.dataset.onlineAutofillBound !== "true") {
+        input.dataset.onlineAutofillBound = "true";
+        input.addEventListener("input", () => {
+          clearTimeout(autoLookupTimer);
+          const query = input.value.trim();
+          if (!hasChinese(query) || chineseCount(query) < 2) {
+            lastAutoQuery = "";
+            return;
+          }
+          autoLookupTimer = setTimeout(() => {
+            if (currentForm() !== input.form || input.value.trim() !== query || query === lastAutoQuery) return;
+            run({ automatic: true });
+          }, 900);
+        });
       }
     });
     setTimeout(enhanceAddCopy, 50);

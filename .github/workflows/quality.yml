@@ -41,8 +41,10 @@ jobs:
           node --check header-brand.js
           node --check outpatient-loader.js
           node --check outpatient-web-verification.js
+          node --check outpatient-clinical-supplement.js
           node --check outpatient-clinical-hydration.js
           node --check outpatient-metadata-ui.js
+          node --check drug-interactions.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -59,8 +61,10 @@ jobs:
           node --check worker/src/index-v9.js
           node --check worker/src/index-v10.js
           node --check worker/src/index-v11.js
+          node --check worker/src/index-v12.js
           node --check worker/src/free-source-index.js
           node --check worker/test-v11.mjs
+          node --check worker/test-v12.mjs
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
       - name: Catalog permanent deletion tests
@@ -77,6 +81,10 @@ jobs:
         run: node scripts/test-outpatient-loader.mjs
       - name: Outpatient instruction hydration tests
         run: node scripts/test-outpatient-clinical-hydration.mjs
+      - name: Drug interaction tests
+        run: node scripts/test-drug-interactions.mjs
+      - name: Pharmacy notes and editing tests
+        run: node scripts/test-pharmacy-notes-and-editing.mjs
       - name: Response performance tests
         run: node scripts/test-response-performance.mjs
       - name: Detail navigation performance tests
