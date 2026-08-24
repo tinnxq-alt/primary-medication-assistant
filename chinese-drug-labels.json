@@ -162,32 +162,6 @@
       }
     },
     {
-      "drugName": "格列吡嗪片",
-      "genericName": "格列吡嗪",
-      "specification": "待核验（原始：50mg×30片/盒）",
-      "dosageForm": "片剂",
-      "category": "西药",
-      "manufacturer": "待核验",
-      "clinical": {
-        "indication": "用于经饮食控制及体育锻炼疗效不满意的2型糖尿病；须由医生结合患者情况判断。",
-        "dosage": "口服剂量因人而异。国家药监局范本列示一般2.5～20mg/日、早餐前30分钟服用；不可据此修复当前来源不明的50mg规格。",
-        "adverseReactions": "可发生低血糖；其他内容须核对具体厂家现行说明书。",
-        "precautions": "当前院内清单的规格、通用名和厂家明显发生串行错配，本条暂时禁止作为规格依据。",
-        "source": {
-          "status": "blocked",
-          "label": "国家药监局：格列吡嗪片说明书范本",
-          "url": "https://www.nmpa.gov.cn/wwwroot/hysms3/023.htm",
-          "checkedAt": "2026-08-15"
-        }
-      },
-      "source": {
-        "status": "blocked",
-        "label": "国家药监局：格列吡嗪片说明书范本",
-        "url": "https://www.nmpa.gov.cn/wwwroot/hysms3/023.htm",
-        "checkedAt": "2026-08-15"
-      }
-    },
-    {
       "drugName": "阿普唑仑片",
       "genericName": "阿普唑仑",
       "specification": "0.4mg×14片/盒",
@@ -628,26 +602,6 @@
       }
     },
     {
-      "drugName": "格列齐特片(II)",
-      "genericName": "格列齐特",
-      "specification": "80mg×60片/盒",
-      "dosageForm": "片剂",
-      "category": "西药",
-      "manufacturer": "天津华津制药有限…",
-      "clinical": {
-        "indication": "用于经饮食控制和运动仍不能满意控制血糖的成人2型糖尿病。",
-        "dosage": "口服，常从一次40～80mg、一日1～2次开始，根据血糖调整至每日80～240mg，分2～3次服用；老年人及高风险患者须减量并遵医嘱。",
-        "adverseReactions": "最重要的不良反应为低血糖；还可见恶心、呕吐、上腹不适、腹泻或便秘、皮疹，少数出现血细胞减少或肝功能异常。",
-        "precautions": "规律进餐并监测血糖；饮食不足、饮酒、剧烈运动、肝肾功能不全或与其他降糖药合用可增加低血糖风险。1型糖尿病、糖尿病酮症酸中毒及妊娠哺乳期等按现行说明书禁忌处理。"
-      },
-      "source": {
-        "status": "verified-template",
-        "label": "国家药监局：格列齐特片说明书范本",
-        "url": "https://www.nmpa.gov.cn/wwwroot/hysms3/028.htm",
-        "checkedAt": "2026-08-16"
-      }
-    },
-    {
       "drugName": "丹参酮IIA磺酸钠注射液",
       "genericName": "丹参酮IIA磺酸钠",
       "specification": "2ml:10mg/支",
@@ -684,26 +638,6 @@
         "status": "verified-monograph",
         "label": "湖南药事服务平台：丹龙口服液说明书资料",
         "url": "https://www.hnysfww.com/goods.php?id=12658",
-        "checkedAt": "2026-08-16"
-      }
-    },
-    {
-      "drugName": "丹七片",
-      "genericName": "丹七片",
-      "specification": "0.31g×48片/瓶",
-      "dosageForm": "片剂",
-      "category": "中成药",
-      "manufacturer": "天津同仁堂集团…",
-      "clinical": {
-        "indication": "活血化瘀；用于血瘀气滞所致心胸痹痛、眩晕头痛和经期腹痛等。",
-        "dosage": "口服，一次3～5片，一日3次；按医嘱和具体厂家说明书使用。",
-        "adverseReactions": "现有说明书资料记载尚不明确；用药后如出现胃肠不适、皮疹或异常出血应停药并就医。",
-        "precautions": "孕妇慎用；有出血倾向或正在使用抗凝、抗血小板药者应先咨询医生。不能以本品替代急性胸痛的紧急评估和标准治疗。"
-      },
-      "source": {
-        "status": "verified-monograph",
-        "label": "医库：天津同仁堂丹七片说明书资料",
-        "url": "https://drugs.meditool.cn/Drugtype/druginfo?datatype=1&druginfoid=29472&msgtype=1",
         "checkedAt": "2026-08-16"
       }
     },

@@ -24,7 +24,7 @@
   const write = (key, value) => localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
   const PHARMACIES = Object.freeze({
     ward: { label: "病房药库", shortLabel: "病房", emptyText: "病房药库暂无药品。" },
-    outpatient: { label: "门诊药库", shortLabel: "门诊", emptyText: "门诊药库已建立，等待导入门诊药品。" }
+    outpatient: { label: "门诊药库", shortLabel: "门诊", emptyText: "门诊药库暂无药品。" }
   });
   const {
     drugBelongsToPharmacy,
@@ -141,7 +141,7 @@
   ).join(" ");
 
   async function hydrateVerifiedCatalog() {
-    const response = await fetch("./chinese-drug-labels.json?v=12", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=13", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
@@ -258,6 +258,24 @@
       const count = button.querySelector("[data-pharmacy-count]");
       if (count) count.textContent = String(filterDrugsByPharmacy(drugs, pharmacyId).length);
     });
+  }
+
+  async function ensureOutpatientCatalogLoaded() {
+    if (typeof window.loadOutpatientDrugCatalog !== "function") {
+      throw new Error("门诊药库加载模块不可用");
+    }
+    const catalog = await window.loadOutpatientDrugCatalog();
+    if (!Array.isArray(catalog)) throw new Error("门诊药库数据格式无效");
+    return catalog;
+  }
+
+  function setPharmacySwitchLoading(button, loading) {
+    if (!pharmacySwitcher || !button) return;
+    pharmacySwitcher.setAttribute("aria-busy", String(loading));
+    button.disabled = loading;
+    const count = button.querySelector("[data-pharmacy-count]");
+    if (loading && count) count.textContent = "…";
+    if (!loading) updatePharmacyChrome();
   }
 
   function renderHome() {
@@ -715,7 +733,7 @@
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=12", { cache: "no-store", headers: { Accept: "application/json" } });
+    const response = await fetch("./chinese-drug-labels.json?v=13", { cache: "no-store", headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
     const payload = await response.json();
     if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
@@ -1504,15 +1522,37 @@
     if (event.target.closest("[data-close-modal]")) closeModal();
   });
 
-  pharmacySwitcher?.addEventListener("click", event => {
+  let pharmacySwitchPromise = null;
+  pharmacySwitcher?.addEventListener("click", async event => {
     const button = event.target.closest("[data-pharmacy-switch]");
     if (!button) return;
     const pharmacyId = normalizePharmacyId(button.dataset.pharmacySwitch);
     if (pharmacyId === state.activePharmacy) return;
+
+    let outpatientCount = 0;
+    if (pharmacyId === "outpatient") {
+      if (pharmacySwitchPromise) return;
+      setPharmacySwitchLoading(button, true);
+      toast("正在加载门诊药库…");
+      pharmacySwitchPromise = ensureOutpatientCatalogLoaded();
+      try {
+        outpatientCount = (await pharmacySwitchPromise).length;
+      } catch (error) {
+        console.error("门诊药库加载失败", error);
+        toast("门诊药库加载失败，请稍后重试");
+        return;
+      } finally {
+        pharmacySwitchPromise = null;
+        setPharmacySwitchLoading(button, false);
+      }
+    }
+
     state.activePharmacy = pharmacyId;
     write("activePharmacy", state.activePharmacy);
     closeModal();
-    toast(`已切换到${pharmacyLabel(pharmacyId)}`);
+    toast(pharmacyId === "outpatient"
+      ? `已切换到门诊药库（${outpatientCount} 个品规）`
+      : `已切换到${pharmacyLabel(pharmacyId)}`);
     if (currentRoute().route === "home") render();
     else navigate("home");
   });
@@ -1546,8 +1586,17 @@
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));
   }
-  hydrateVerifiedCatalog()
-    .catch(error => console.error("中文核验库加载失败", error))
+  const startupTasks = [
+    hydrateVerifiedCatalog().catch(error => console.error("中文核验库加载失败", error))
+  ];
+  if (state.activePharmacy === "outpatient") {
+    startupTasks.push(ensureOutpatientCatalogLoaded().catch(error => {
+      console.error("启动时门诊药库加载失败", error);
+      state.activePharmacy = "ward";
+      toast("门诊药库暂时无法加载，已显示病房药库");
+    }));
+  }
+  Promise.all(startupTasks)
     .finally(() => {
       if (!location.hash) navigate("home", "", true);
       render();

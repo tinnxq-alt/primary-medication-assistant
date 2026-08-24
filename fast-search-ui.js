@@ -32,7 +32,7 @@
 
   function loadAliases() {
     if (!aliasPromise) {
-      aliasPromise = fetch("./chinese-drug-labels.json?v=12", { cache: "force-cache", headers: { Accept: "application/json" } })
+      aliasPromise = fetch("./chinese-drug-labels.json?v=13", { cache: "force-cache", headers: { Accept: "application/json" } })
         .then(response => response.ok ? response.json() : null)
         .then(payload => Array.isArray(payload?.tradeNameAliases) ? payload.tradeNameAliases : [])
         .catch(() => []);

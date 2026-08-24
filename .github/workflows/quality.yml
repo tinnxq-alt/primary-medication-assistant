@@ -38,7 +38,8 @@ jobs:
           node --check mark-notebook-ui.js
           node --check mark-menu-below-selection.js
           node --check header-brand.js
-          node --check catalog-retirements.js
+          node --check outpatient-loader.js
+          node --check outpatient-web-verification.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -59,8 +60,8 @@ jobs:
           node --check worker/test-v11.mjs
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
-      - name: Catalog retirements tests
-        run: node scripts/test-catalog-retirements.mjs
+      - name: Catalog permanent deletion tests
+        run: node scripts/test-catalog-deletions.mjs
       - name: Drug name lookup tests
         run: node scripts/test-drug-lookup.mjs
       - name: Fast partial-name search tests
@@ -69,6 +70,8 @@ jobs:
         run: node scripts/test-smart-add-fix.mjs
       - name: Pharmacy scope tests
         run: node scripts/test-pharmacy-scope.mjs
+      - name: Outpatient lazy loading tests
+        run: node scripts/test-outpatient-loader.mjs
       - name: Text mark and notebook tests
         run: node scripts/test-text-mark-fix.mjs
       - name: Notebook delete tests
