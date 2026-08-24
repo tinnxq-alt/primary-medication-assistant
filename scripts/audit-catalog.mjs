@@ -4,6 +4,8 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXPECTED_CATALOG_COUNT = 167;
+const EXPECTED_OUTPATIENT_CATALOG_COUNT = 395;
+const EXPECTED_OUTPATIENT_VERIFICATION_COUNT = 22;
 const EXPECTED_THERAPEUTIC_CLASS_COUNT = 44;
 const EXPECTED_TRADE_NAME_ALIAS_COUNT = 13;
 const VERIFIED_STATUSES = new Set([
@@ -46,6 +48,7 @@ function isHttpsUrl(value) {
 globalThis.window = {};
 await import(pathToFileURL(path.join(ROOT, "drugs.js")).href);
 await import(pathToFileURL(path.join(ROOT, "outpatient-drugs.js")).href);
+await import(pathToFileURL(path.join(ROOT, "outpatient-web-verification.js")).href);
 
 const catalog = globalThis.window.DRUG_CATALOG;
 const outpatientCatalog = globalThis.window.OUTPATIENT_DRUG_CATALOG;
@@ -60,6 +63,12 @@ if (!Array.isArray(labels.tradeNameAliases)) fail("chinese-drug-labels.json 缺�
 
 if (Array.isArray(catalog) && catalog.length !== EXPECTED_CATALOG_COUNT) {
   fail(`目录应有 ${EXPECTED_CATALOG_COUNT} 条，实际为 ${catalog.length} 条`);
+}
+if (Array.isArray(outpatientCatalog) && outpatientCatalog.length !== EXPECTED_OUTPATIENT_CATALOG_COUNT) {
+  fail(`门诊目录应有 ${EXPECTED_OUTPATIENT_CATALOG_COUNT} 条，实际为 ${outpatientCatalog.length} 条`);
+}
+if (globalThis.window.OUTPATIENT_WEB_VERIFICATION_COUNT !== EXPECTED_OUTPATIENT_VERIFICATION_COUNT) {
+  fail(`门诊网络核验补丁应有 ${EXPECTED_OUTPATIENT_VERIFICATION_COUNT} 条，实际为 ${globalThis.window.OUTPATIENT_WEB_VERIFICATION_COUNT || 0} 条`);
 }
 if (Array.isArray(labels.drugs) && labels.drugs.length !== EXPECTED_CATALOG_COUNT) {
   fail(`核验库应有 ${EXPECTED_CATALOG_COUNT} 条，实际为 ${labels.drugs.length} 条`);
@@ -120,6 +129,11 @@ for (const [index, drug] of (outpatientCatalog || []).entries()) {
   if (catalogIds.has(drug.id)) fail(`${label}与其他药库使用了重复 ID：${drug.id}`);
   catalogIds.add(drug.id);
   if (!Array.isArray(drug.pharmacyScopes) || !drug.pharmacyScopes.includes("outpatient")) fail(`${label}必须属于门诊药库`);
+}
+
+const verifiedOutpatient = (outpatientCatalog || []).filter(drug => drug.metadataVerification);
+if (verifiedOutpatient.length !== EXPECTED_OUTPATIENT_VERIFICATION_COUNT) {
+  fail(`门诊目录应用网络核验补丁后应有 ${EXPECTED_OUTPATIENT_VERIFICATION_COUNT} 条主数据记录，实际为 ${verifiedOutpatient.length} 条`);
 }
 
 if (therapeuticClasses.size !== EXPECTED_THERAPEUTIC_CLASS_COUNT) {
@@ -191,7 +205,7 @@ if (appCatalogVersions.length < 2 || new Set(appCatalogVersions).size !== 1 || a
   fail(`app.js 与 service-worker.js 的核验库缓存版本不一致：${appCatalogVersions.join("、") || "缺失"} / ${cacheCatalogVersion || "缺失"}`);
 }
 
-const runtimeFiles = ["app.js", "drug-lookup.js", "pharmacy-scope.js", "outpatient-drugs.js", "index.html", "style.css", "worker/src/index.js"];
+const runtimeFiles = ["app.js", "drug-lookup.js", "pharmacy-scope.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "index.html", "style.css", "worker/src/index.js"];
 const forbiddenRuntimePatterns = [
   { label: "OCR", pattern: /\bocr\b/i },
   { label: "相机调用", pattern: /getUserMedia\s*\(/i },
@@ -208,12 +222,19 @@ const htmlSource = readText("index.html");
 if (htmlSource.indexOf('src="drug-lookup.js"') < 0 || htmlSource.indexOf('src="drug-lookup.js"') > htmlSource.indexOf('src="app.js"')) {
   fail("index.html 必须在 app.js 之前加载 drug-lookup.js");
 }
-for (const script of ["outpatient-drugs.js", "pharmacy-scope.js"]) {
+for (const script of ["outpatient-loader.js", "outpatient-web-verification.js", "pharmacy-scope.js"]) {
   if (htmlSource.indexOf(`src="${script}"`) < 0 || htmlSource.indexOf(`src="${script}"`) > htmlSource.indexOf('src="app.js"')) {
     fail(`index.html 必须在 app.js 之前加载 ${script}`);
   }
 }
-for (const shellFile of ["outpatient-drugs.js", "pharmacy-scope.js"]) {
+if (htmlSource.includes('src="outpatient-drugs.js"')) fail("index.html 不得同步加载体积较大的门诊目录");
+if (htmlSource.indexOf('src="outpatient-loader.js"') > htmlSource.indexOf('src="outpatient-web-verification.js"')) {
+  fail("index.html 必须先加载门诊懒加载器，再加载网络核验补丁");
+}
+if (!/ensureOutpatientCatalogLoaded\(\)/.test(appSource) || !/loadOutpatientDrugCatalog/.test(appSource)) {
+  fail("app.js 切换门诊药库时必须触发门诊目录懒加载");
+}
+for (const shellFile of ["outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "pharmacy-scope.js"]) {
   if (!serviceWorkerSource.includes(`"./${shellFile}"`)) fail(`service-worker.js 必须离线缓存 ${shellFile}`);
 }
 if (/accept\s*=\s*["'][^"']*image/i.test(htmlSource)) fail("index.html 重新引入了图片文件上传入口");
@@ -229,6 +250,7 @@ console.log([
   "药品目录质控通过",
   `病房药库 ${catalog.length} 条`,
   `门诊药库 ${outpatientCatalog.length} 条`,
+  `门诊主数据核验 ${verifiedOutpatient.length} 条`,
   `可用核验资料 ${verifiedCount} 条`,
   `安全锁定 ${blocked.length} 条`,
   `作用分类 ${therapeuticClasses.size} 类`,

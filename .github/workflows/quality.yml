@@ -39,6 +39,8 @@ jobs:
           node --check mark-menu-below-selection.js
           node --check header-brand.js
           node --check catalog-retirements.js
+          node --check outpatient-loader.js
+          node --check outpatient-web-verification.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -69,6 +71,8 @@ jobs:
         run: node scripts/test-smart-add-fix.mjs
       - name: Pharmacy scope tests
         run: node scripts/test-pharmacy-scope.mjs
+      - name: Outpatient lazy loading tests
+        run: node scripts/test-outpatient-loader.mjs
       - name: Text mark and notebook tests
         run: node scripts/test-text-mark-fix.mjs
       - name: Notebook delete tests

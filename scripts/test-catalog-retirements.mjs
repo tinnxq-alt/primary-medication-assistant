@@ -17,18 +17,20 @@ const nextDrugId = nextDrug.id;
 vm.runInContext(fs.readFileSync("catalog-retirements.js", "utf8"), context);
 const activeCatalog = context.window.DRUG_CATALOG;
 
-assert.equal(activeCatalog.length, 166, "运行时病房药库应为 166 条");
-assert.ok(!activeCatalog.some(drug => drug.drugName === "丹七片"), "丹七片不得出现在运行时药库");
+assert.equal(activeCatalog.length, 164, "运行时病房药库应为 164 条");
+for (const retiredName of ["丹七片", "格列吡嗪片", "格列齐特片(II)"]) {
+  assert.ok(!activeCatalog.some(drug => drug.drugName === retiredName), `${retiredName}不得出现在运行时药库`);
+  assert.ok(context.window.RETIRED_DRUG_NAMES.includes(retiredName), `停用清单必须记录${retiredName}`);
+}
 assert.equal(activeCatalog.find(drug => drug.drugName === "丹栀逍遥丸")?.id, nextDrugId, "删除丹七片不得导致后续药品 ID 前移");
-assert.ok(context.window.RETIRED_DRUG_NAMES.includes("丹七片"), "停用清单必须记录丹七片");
 
 const html = fs.readFileSync("index.html", "utf8");
 const worker = fs.readFileSync("service-worker.js", "utf8");
 assert.ok(html.indexOf('src="catalog-retirements.js"') > html.indexOf('src="drugs.js"'), "停用清单必须在 drugs.js 之后加载");
 assert.ok(html.indexOf('src="catalog-retirements.js"') < html.indexOf('src="app.js"'), "停用清单必须在 app.js 之前生效");
-assert.match(html, /病房药库<\/span><strong data-pharmacy-count>166<\/strong>/, "首页初始病房药库数量应为 166");
+assert.match(html, /病房药库<\/span><strong data-pharmacy-count>164<\/strong>/, "首页初始病房药库数量应为 164");
 const cacheVersion = Number(worker.match(/primary-medication-v(\d+)/)?.[1] || 0);
 assert.ok(cacheVersion >= 31, "PWA 缓存版本不得低于 v31");
 assert.match(worker, /catalog-retirements\.js/, "PWA 离线缓存必须包含停用清单");
 
-console.log("药品停用检查通过｜丹七片已移除｜病房药库 166 条｜后续药品 ID 保持稳定");
+console.log("药品停用检查通过｜3 个停用品种已移除｜病房药库 164 条｜历史 ID 保持稳定");

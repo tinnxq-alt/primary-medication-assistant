@@ -6,7 +6,8 @@
 
 - 已接通 13 个页面入口：首页、分类、搜索、详情、收藏、添加药物、相互作用、症状搜索、记忆卡片、缓存管理、全部药物、用药禁忌、笔记本。
 - 内置用户提供的药品目录，并将“院内目录字段”与“说明书临床字段”分开保存。
-- 已建立病房/门诊双药库：原始病房清单 167 个品规，当前启用 166 个品规；丹七片已从运行时病房药库移除。门诊药库使用独立目录文件，等待后续批量导入。
+- 已建立病房/门诊双药库：病房保留原始 167 个品规及历史 ID，当前启用 164 个品规；丹七片、格列吡嗪片和格列齐特片(II)已从运行时病房药库移除。门诊药库已独立导入首批 395 个品规。
+- 门诊目录按需加载：首次切换到门诊药库时再载入，不阻塞病房药库首屏；加载失败可直接重试，离线应用仍预缓存门诊目录。
 - 顶部药库切换会独立过滤首页、分类、全部药物、闪卡和缓存；搜索默认限于当前药库，也可切换为搜索全部药库。
 - 支持模糊搜索、分类/剂型筛选、收藏分组、药品笔记、自定义药品、自定义禁忌、闪卡、JSON 导出和离线应用外壳。
 - 药品列表支持左滑显示收藏、缓存或删除操作。
@@ -16,13 +17,13 @@
 - 自定义分类支持新增、点击筛选，以及长按进入重命名/删除模式。
 - 缓存管理按当前药库独立展示，支持预加载、逐项编辑本机目录字段、恢复原始字段、批量移出、批量修改分类、重复检测和 JSON 导出。
 - 自定义药品支持从详情页编辑或删除；修改不会自动获得说明书“已核验”状态。
-- 添加自定义药品时，可通过独立 Cloudflare Worker 优先查询项目中文核验库；没有核验资料时，使用 Workers AI 免费额度生成中文“未核验草稿”。
+- 添加自定义药品时，可通过独立 Cloudflare Worker 查询项目内置的可信说明书来源索引；临床字段只从真实说明书网页原文提取，缺失内容不会猜测补写。
 - 添加药物提供两种方式：输入已收录的中文商品名或通用名后点击“智能识别”（也可按回车）自动填充，或直接手动填写表单。
 - 商品名通过带来源的别名表映射到通用名；命中商品名时不会套用其他厂家包装规格，规格留空并提示按药盒或现行说明书核对。
 - 智能识别固定返回 `drugName`、`tradeName`、`category`、`indications`、`specification`、`dosage`、`adverseReactions`、`precautions`；所有字段都可编辑，未核验草稿无需人工放行即可保存。
 - 手动录入必填药品名称、药品分类、适应症和用法用量；商品名、规格、不良反应、注意事项和备注为选填。备注同步写入本地笔记本。
 - 自定义药品保存到浏览器本地存储，可选择病房或门诊药库，并自动显示在对应药库的“全部药物”和所选分类中。
-- AI 草稿始终保留“未核验草稿”标识，不伪装成说明书或核验资料；国家药监局及全网中文搜索入口继续用于补充核验。
+- 联网导入内容始终保留来源与待复核标识，不伪装成对应厂家已核验资料；国家药监局及可信说明书链接继续用于补充核验。
 - 笔记支持新增、编辑和删除，详情页与笔记本中的修改会同步保存。
 - 自定义禁忌支持药物组合、严重程度、作用机制、可能后果和处理建议，并可搜索、筛选、编辑或删除。
 - 记忆卡片支持按分类筛选、顺序或随机模式、重新洗牌和仅查看未记住药品。
@@ -49,14 +50,14 @@
 
 ## 启用免费智能识别
 
-Worker 使用 Cloudflare Workers Free 计划及 Workers AI 免费额度，不调用 OpenAI 或其他收费 API。GitHub 仓库只需设置 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID` 两个 Actions secrets；合并部署工作流后会自动发布。免费额度用完时草稿生成会暂时停止，不会自动转为付费。
+Worker 使用 Cloudflare Workers 与 Browser Run 读取项目内置索引中的真实说明书网页，不调用 OpenAI 或 Workers AI。GitHub 仓库只需设置 `CLOUDFLARE_API_TOKEN` 和 `CLOUDFLARE_ACCOUNT_ID` 两个 Actions secrets；合并部署工作流后会自动发布。
 
 网站已默认使用 `https://primary-medication-smart-search.tinnxq.workers.dev`；打开“缓存管理” → “免费中文检索服务”可测试连接或更换地址。完整步骤和安全说明见 [`worker/README.md`](worker/README.md)。
 
 ## 数据维护规则
 
-- `drugs.js` 保留原始 167 条病房清单及其历史 ID；`catalog-retirements.js` 在运行时排除停用品种。当前病房药库启用 166 条，丹七片已移除，后续药品 ID 不前移。
-- `outpatient-drugs.js` 是独立门诊目录；后续导入条目必须使用唯一 ID 并包含 `pharmacyScopes: ["outpatient"]`。完全相同且需要跨库复用的品规可同时包含 `ward` 与 `outpatient`。
+- `drugs.js` 保留原始 167 条病房清单及其历史 ID；`catalog-retirements.js` 在运行时排除停用品种。当前病房药库启用 164 条，3 个停用品种不会显示，后续药品 ID 不前移。
+- `outpatient-drugs.js` 是独立门诊目录，当前 395 条；由 `outpatient-loader.js` 在首次切换门诊药库时加载。后续导入条目必须使用唯一 ID 并包含 `pharmacyScopes: ["outpatient"]`。完全相同且需要跨库复用的品规可同时包含 `ward` 与 `outpatient`。
 - 收藏、笔记、标记、禁忌与相互作用选择器跨药库共用；药品列表和缓存仍按当前药库隔离。
 - 只有带 `source.status: "verified-template"` 的临床字段可以展示为“范本已核验”。
 - 每次增加说明书内容时必须记录来源 URL、核验日期，并注明是品种范本还是具体厂家说明书。
@@ -64,13 +65,15 @@ Worker 使用 Cloudflare Workers Free 计划及 Workers AI 免费额度，不调
 
 ## 自动质量检查
 
-每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括原始病房 167 个目录品规与核验库的一一对应、运行时停用品种检查（当前病房药库 166 条）、双药库归属及跨库 ID 唯一性、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
+每个 Pull Request 都会自动执行药品资料与代码质控。检查范围包括原始病房 167 个目录品规与核验库的一一对应、运行时停用品种检查（当前病房药库 164 条）、门诊 395 个品规、22 条门诊主数据核验补丁、懒加载失败重试、双药库归属及跨库 ID 唯一性、临床四字段、商品名别名映射与来源、来源 URL 与核验日期、44 个作用分类、唯一锁定项，以及不得重新引入 OCR、相机或图片上传入口。
 
 本地可执行：
 
 ```bash
 node --check app.js
 node --check catalog-retirements.js
+node --check outpatient-loader.js
+node --check outpatient-web-verification.js
 node --check pharmacy-scope.js
 node --check drugs.js
 node --check outpatient-drugs.js
@@ -80,6 +83,7 @@ node scripts/audit-catalog.mjs
 node scripts/test-catalog-retirements.mjs
 node scripts/test-drug-lookup.mjs
 node scripts/test-pharmacy-scope.mjs
+node scripts/test-outpatient-loader.mjs
 node worker/test.mjs
 ```
 

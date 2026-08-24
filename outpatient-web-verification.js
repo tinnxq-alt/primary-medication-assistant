@@ -35,7 +35,7 @@
     "FX5882":{"drugName":"二甲双胍格列吡嗪片","genericName":"二甲双胍格列吡嗪片","tradeName":"","specification":"250mg:2.5mg*24片/盒","dosageForm":"片剂","manufacturer":"北京四环科宝制药股份有限公司","marketingAuthorizationHolder":"北京四环科宝药业有限公司","approvalNumber":"国药准字H20140028","components":["盐酸二甲双胍250mg","格列吡嗪2.5mg"],"therapeuticClass":"降糖药","qualityIssue":"成分规格、批准文号及生产企业已核验；院内截图显示24片/盒，但公开监管/院方资料中该批准文号常见12片或20片包装，24片包装仍需以本院实物药盒或采购主数据最终确认。","sources":["https://yjj.beijing.gov.cn/yjj/xxcx/jdjcxx/fxzxjcxx/543353937/index.html"]}
   };
 
-  window.OUTPATIENT_DRUG_CATALOG = (window.OUTPATIENT_DRUG_CATALOG || []).map(drug => {
+  const applyOutpatientWebVerification = catalog => (Array.isArray(catalog) ? catalog : []).map(drug => {
     const patch = verifiedMetadata[drug.internalCode];
     if (!patch) return drug;
 
@@ -62,4 +62,12 @@
       }
     };
   });
+
+  // 门诊目录采用懒加载：先暴露可复用补丁函数，数据到达后再应用。
+  // 只有目录已经存在时才立即写回，避免把“尚未加载”误判为空目录。
+  window.applyOutpatientWebVerification = applyOutpatientWebVerification;
+  window.OUTPATIENT_WEB_VERIFICATION_COUNT = Object.keys(verifiedMetadata).length;
+  if (Array.isArray(window.OUTPATIENT_DRUG_CATALOG)) {
+    window.OUTPATIENT_DRUG_CATALOG = applyOutpatientWebVerification(window.OUTPATIENT_DRUG_CATALOG);
+  }
 })();
