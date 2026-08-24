@@ -4,6 +4,8 @@
   const STORAGE_PREFIX = "primary-medication-pro:v1:";
   const DEFAULT_SMART_SEARCH_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
   const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph", "verified-regulator"]);
+  const INITIAL_SEARCH_RENDER_LIMIT = 40;
+  const INITIAL_ALL_RENDER_LIMIT = 60;
   const app = document.getElementById("app");
   const pageTitle = document.getElementById("pageTitle");
   const backBtn = document.getElementById("backBtn");
@@ -141,15 +143,18 @@
   ).join(" ");
 
   async function hydrateVerifiedCatalog() {
-    const response = await fetch("./chinese-drug-labels.json?v=13", { cache: "no-store", headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(`中文核验库返回 ${response.status}`);
-    const payload = await response.json();
-    if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文核验库格式无效");
+    const payload = await window.loadChineseDrugLabels();
     tradeNameAliases = normalizeTradeNameAliases(payload.tradeNameAliases);
+    const byNameAndSpec = new Map();
+    const byName = new Map();
+    for (const drug of window.DRUG_CATALOG) {
+      byNameAndSpec.set(`${drug.drugName}\u0000${drug.specification || ""}`, drug);
+      if (!byName.has(drug.drugName)) byName.set(drug.drugName, drug);
+    }
     for (const entry of payload.drugs) {
       if (!entry?.drugName || !entry.clinical || !entry.source?.status) continue;
-      const target = window.DRUG_CATALOG.find(drug => drug.drugName === entry.drugName && (!entry.specification || drug.specification === entry.specification))
-        || window.DRUG_CATALOG.find(drug => drug.drugName === entry.drugName);
+      const target = (entry.specification && byNameAndSpec.get(`${entry.drugName}\u0000${entry.specification}`))
+        || byName.get(entry.drugName);
       if (!target) continue;
       target.clinical = { ...entry.clinical, source: { ...entry.source } };
       target.source = { ...entry.source };
@@ -383,11 +388,14 @@
         <div class="toolbar"><input id="searchInput" value="${esc(initialQuery)}" placeholder="输入药品名、作用分类、规格或厂家"><select id="searchPharmacy"><option value="current">当前：${esc(currentPharmacyLabel)}</option><option value="all">全部药库</option></select><select id="statusFilter"><option value="">全部数据状态</option><option value="verified">全部已核验</option><option value="verified-regulator">官方资料已核验</option><option value="verified-label">说明书已核验</option><option value="verified-monograph">通用资料已核验</option><option value="verified-template">范本已核验</option><option value="needs-review">待复核</option><option value="blocked">数据锁定</option><option value="inventory-only">仅目录</option></select></div>
         <p id="resultCount" class="muted"></p>
         <div id="searchResults" class="card-list"></div>
+        <button class="btn secondary load-more" id="searchLoadMore" type="button" hidden>显示更多</button>
       </section>`;
     const input = document.getElementById("searchInput");
     const filter = document.getElementById("statusFilter");
     const pharmacyFilter = document.getElementById("searchPharmacy");
-    const draw = () => {
+    let visibleLimit = INITIAL_SEARCH_RENDER_LIMIT;
+    const draw = (resetLimit = false) => {
+      if (resetLimit) visibleLimit = INITIAL_SEARCH_RENDER_LIMIT;
       const q = normalize(input.value);
       const status = filter.value;
       const searchAllPharmacies = pharmacyFilter.value === "all";
@@ -396,12 +404,18 @@
         const statusMatch = !status || (status === "verified" ? isVerifiedSource(drug.source?.status) : drug.source?.status === status);
         return (!q || haystack.includes(q)) && statusMatch;
       });
-      document.getElementById("resultCount").textContent = `找到 ${results.length} 个品规 · ${searchAllPharmacies ? "全部药库" : currentPharmacyLabel}`;
-      document.getElementById("searchResults").innerHTML = results.length ? results.map(drugCard).join("") : empty("没有匹配结果，请检查名称或添加自定义药品。", '<button class="btn primary" data-route-link="add">添加药品</button>');
+      const shownResults = results.slice(0, visibleLimit);
+      document.getElementById("resultCount").textContent = `找到 ${results.length} 个品规${results.length > shownResults.length ? ` · 已显示 ${shownResults.length} 个` : ""} · ${searchAllPharmacies ? "全部药库" : currentPharmacyLabel}`;
+      document.getElementById("searchResults").innerHTML = results.length ? shownResults.map(drugCard).join("") : empty("没有匹配结果，请检查名称或添加自定义药品。", '<button class="btn primary" data-route-link="add">添加药品</button>');
+      document.getElementById("searchLoadMore").hidden = shownResults.length >= results.length;
     };
-    input.addEventListener("input", draw);
-    filter.addEventListener("change", draw);
-    pharmacyFilter.addEventListener("change", draw);
+    input.addEventListener("input", () => draw(true));
+    filter.addEventListener("change", () => draw(true));
+    pharmacyFilter.addEventListener("change", () => draw(true));
+    document.getElementById("searchLoadMore").addEventListener("click", () => {
+      visibleLimit += INITIAL_SEARCH_RENDER_LIMIT;
+      draw();
+    });
     draw();
   }
 
@@ -733,10 +747,7 @@
   }
 
   async function fetchChineseCatalogCandidates(query) {
-    const response = await fetch("./chinese-drug-labels.json?v=13", { cache: "no-store", headers: { Accept: "application/json" } });
-    if (!response.ok) throw new Error(`中文资料服务返回 ${response.status}`);
-    const payload = await response.json();
-    if (payload?.schemaVersion !== 1 || payload.language !== "zh-CN" || !Array.isArray(payload.drugs)) throw new Error("中文资料格式无效");
+    const payload = await window.loadChineseDrugLabels();
     const aliases = normalizeTradeNameAliases(payload.tradeNameAliases);
     return payload.drugs
       .filter(candidate => isVerifiedSource(candidate.source?.status))
@@ -1069,11 +1080,13 @@
   }
 
   function renderAll(filterAction = "", filterForm = "", filterAttribute = "") {
-    const actionClasses = [...new Set(allDrugs().map(d => d.therapeuticClass || "作用待分类"))].sort((a,b) => a.localeCompare(b, "zh-CN"));
-    const attributes = [...new Set(allDrugs().map(d => d.category || "属性待核验"))];
-    const forms = [...new Set(allDrugs().map(d => d.dosageForm || "剂型待核验"))];
+    const initialDrugs = allDrugs();
+    const actionClasses = [...new Set(initialDrugs.map(d => d.therapeuticClass || "作用待分类"))].sort((a,b) => a.localeCompare(b, "zh-CN"));
+    const attributes = [...new Set(initialDrugs.map(d => d.category || "属性待核验"))];
+    const forms = [...new Set(initialDrugs.map(d => d.dosageForm || "剂型待核验"))];
     let batchMode = false;
     let currentResults = [];
+    let visibleLimit = INITIAL_ALL_RENDER_LIMIT;
     const selected = new Set();
     const hiddenInCurrentPharmacy = () => state.hidden.filter(id => {
       const drug = catalogDrugs().find(item => item.id === id);
@@ -1089,19 +1102,28 @@
           <p class="muted">内置药品执行“删除”时仅在本机隐藏，可恢复；自定义药品会删除并需要二次确认。</p>
         </div>
         <p id="allCount" class="muted"></p><div id="allList" class="card-list"></div>
+        <button class="btn secondary load-more" id="allLoadMore" type="button" hidden>显示更多</button>
       </section>`;
-    const draw = () => {
+    const draw = (resetLimit = false) => {
+      if (resetLimit && !batchMode) visibleLimit = INITIAL_ALL_RENDER_LIMIT;
       const q = normalize(document.getElementById("allQuery").value);
       const action = document.getElementById("allAction").value;
       const attribute = document.getElementById("allAttribute").value;
       const form = document.getElementById("allForm").value;
-      currentResults = allDrugs().filter(d => (!q || normalize(`${d.drugName}${d.genericName}${d.tradeName}${d.specification}${d.manufacturer}${d.therapeuticClass}`).includes(q)) && (!action || d.therapeuticClass === action) && (!attribute || d.category === attribute) && (!form || d.dosageForm === form));
-      document.getElementById("allCount").textContent = `${currentResults.length} 个品规${batchMode ? " · 批量模式" : ""}`;
-      const emptyMessage = allDrugs().length ? "没有匹配的药品。" : PHARMACIES[state.activePharmacy].emptyText;
-      document.getElementById("allList").innerHTML = currentResults.length ? currentResults.map(drug => drugCard(drug, { selectable: batchMode, selected: selected.has(drug.id) })).join("") : empty(emptyMessage, '<button class="btn primary" data-route-link="add">添加药品</button>');
+      const availableDrugs = allDrugs();
+      currentResults = availableDrugs.filter(d => (!q || normalize(`${d.drugName}${d.genericName}${d.tradeName}${d.specification}${d.manufacturer}${d.therapeuticClass}`).includes(q)) && (!action || d.therapeuticClass === action) && (!attribute || d.category === attribute) && (!form || d.dosageForm === form));
+      const shownResults = batchMode ? currentResults : currentResults.slice(0, visibleLimit);
+      document.getElementById("allCount").textContent = `${currentResults.length} 个品规${!batchMode && shownResults.length < currentResults.length ? ` · 已显示 ${shownResults.length} 个` : ""}${batchMode ? " · 批量模式" : ""}`;
+      const emptyMessage = availableDrugs.length ? "没有匹配的药品。" : PHARMACIES[state.activePharmacy].emptyText;
+      document.getElementById("allList").innerHTML = currentResults.length ? shownResults.map(drug => drugCard(drug, { selectable: batchMode, selected: selected.has(drug.id) })).join("") : empty(emptyMessage, '<button class="btn primary" data-route-link="add">添加药品</button>');
+      document.getElementById("allLoadMore").hidden = batchMode || shownResults.length >= currentResults.length;
       document.getElementById("selectedCount").textContent = `已选 ${selected.size} 项`;
     };
-    ["allQuery", "allAction", "allAttribute", "allForm"].forEach(id => document.getElementById(id).addEventListener(id === "allQuery" ? "input" : "change", draw));
+    ["allQuery", "allAction", "allAttribute", "allForm"].forEach(id => document.getElementById(id).addEventListener(id === "allQuery" ? "input" : "change", () => draw(true)));
+    document.getElementById("allLoadMore").addEventListener("click", () => {
+      visibleLimit += INITIAL_ALL_RENDER_LIMIT;
+      draw();
+    });
     document.getElementById("batchModeBtn").addEventListener("click", () => {
       batchMode = !batchMode;
       if (!batchMode) selected.clear();
@@ -1584,21 +1606,34 @@
   window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; updateInstallControls(); toast("应用已安装到桌面"); });
   updateNetwork();
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js").catch(() => {}));
-  }
-  const startupTasks = [
-    hydrateVerifiedCatalog().catch(error => console.error("中文核验库加载失败", error))
-  ];
-  if (state.activePharmacy === "outpatient") {
-    startupTasks.push(ensureOutpatientCatalogLoaded().catch(error => {
-      console.error("启动时门诊药库加载失败", error);
-      state.activePharmacy = "ward";
-      toast("门诊药库暂时无法加载，已显示病房药库");
-    }));
-  }
-  Promise.all(startupTasks)
-    .finally(() => {
-      if (!location.hash) navigate("home", "", true);
-      render();
+    window.addEventListener("load", () => {
+      const registerServiceWorker = () => navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      if ("requestIdleCallback" in window) window.requestIdleCallback(registerServiceWorker, { timeout: 3000 });
+      else window.setTimeout(registerServiceWorker, 1000);
     });
+  }
+  if (!location.hash) navigate("home", "", true);
+  if (state.activePharmacy === "outpatient") {
+    updateChrome(currentRoute().route);
+    updatePharmacyChrome();
+    app.innerHTML = '<section class="panel section"><p class="muted">正在加载门诊药库…</p></section>';
+    ensureOutpatientCatalogLoaded()
+      .then(() => render())
+      .catch(error => {
+        console.error("启动时门诊药库加载失败", error);
+        state.activePharmacy = "ward";
+        write("activePharmacy", state.activePharmacy);
+        toast("门诊药库暂时无法加载，已显示病房药库");
+        render();
+      });
+  } else {
+    render();
+  }
+  hydrateVerifiedCatalog()
+    .then(() => {
+      const route = currentRoute().route;
+      const outpatientStillLoading = state.activePharmacy === "outpatient" && !Array.isArray(window.OUTPATIENT_DRUG_CATALOG);
+      if (!outpatientStillLoading && ["home", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();
+    })
+    .catch(error => console.error("中文核验库加载失败", error));
 })();
