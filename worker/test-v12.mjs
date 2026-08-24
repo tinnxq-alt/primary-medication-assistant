@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import worker, { normalizeUserSourceUrl } from "./src/index-v12.js";
+
+const wranglerConfig = JSON.parse(fs.readFileSync(new URL("./wrangler.jsonc", import.meta.url), "utf8"));
+assert.ok(
+  wranglerConfig.compatibility_date <= new Date().toISOString().slice(0, 10),
+  "Cloudflare compatibility_date 不得晚于 UTC 当日"
+);
 
 const origin = "https://tinnxq-alt.github.io";
 const semaglutide39 = "https://ypk.39.net/2310025/manual/";
