@@ -31,6 +31,7 @@ jobs:
       - name: JavaScript syntax
         run: |
           node --check app.js
+          node --check catalog-data-loader.js
           node --check fast-search-ui.js
           node --check smart-add-fix.js
           node --check free-smart-source-v11.js
@@ -72,6 +73,8 @@ jobs:
         run: node scripts/test-pharmacy-scope.mjs
       - name: Outpatient lazy loading tests
         run: node scripts/test-outpatient-loader.mjs
+      - name: Response performance tests
+        run: node scripts/test-response-performance.mjs
       - name: Text mark and notebook tests
         run: node scripts/test-text-mark-fix.mjs
       - name: Notebook delete tests

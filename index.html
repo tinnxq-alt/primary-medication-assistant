@@ -7,7 +7,6 @@
   <meta name="description" content="基层用药助手：药品目录、收藏、笔记与离线缓存。仅供医务人员核对资料，不替代诊疗决策。">
   <title>基层用药助手</title>
   <script>try{if(sessionStorage.getItem("primary-medication:view-restore"))document.documentElement.classList.add("restoring-view")}catch{}</script>
-  <link rel="preconnect" href="https://primary-medication-smart-search.tinnxq.workers.dev" crossorigin>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon-192.png" sizes="192x192">
   <link rel="apple-touch-icon" href="icon-192.png">
@@ -34,19 +33,20 @@
   </nav>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="modalRoot"></div>
-  <script src="drugs.js"></script>
-  <script src="outpatient-loader.js"></script>
-  <script src="outpatient-web-verification.js"></script>
-  <script src="drug-lookup.js"></script>
-  <script src="pharmacy-scope.js"></script>
-  <script src="app.js"></script>
-  <script src="outpatient-metadata-ui.js"></script>
-  <script src="fast-search-ui.js"></script>
-  <script src="smart-add-fix.js"></script>
-  <script src="free-smart-source-v11.js"></script>
-  <script src="notebook-scroll-fix.js"></script>
-  <script src="mark-notebook-ui.js"></script>
-  <script src="mark-menu-below-selection.js"></script>
-  <script src="header-brand.js"></script>
+  <script src="drugs.js" defer></script>
+  <script src="outpatient-loader.js" defer></script>
+  <script src="outpatient-web-verification.js" defer></script>
+  <script src="drug-lookup.js" defer></script>
+  <script src="pharmacy-scope.js" defer></script>
+  <script src="catalog-data-loader.js" defer></script>
+  <script src="app.js" defer></script>
+  <script src="outpatient-metadata-ui.js" defer></script>
+  <script src="fast-search-ui.js" defer></script>
+  <script src="smart-add-fix.js" defer></script>
+  <script src="free-smart-source-v11.js" defer></script>
+  <script src="notebook-scroll-fix.js" defer></script>
+  <script src="mark-notebook-ui.js" defer></script>
+  <script src="mark-menu-below-selection.js" defer></script>
+  <script src="header-brand.js" defer></script>
 </body>
 </html>

@@ -8,6 +8,7 @@
 - 内置用户提供的药品目录，并将“院内目录字段”与“说明书临床字段”分开保存。
 - 已建立病房/门诊双药库：病房药库现有 164 个品规；丹七片、格列吡嗪片和格列齐特片(II)及其核验资料已永久删除，其余药品继续使用原有历史 ID。门诊药库已独立导入首批 395 个品规。
 - 门诊目录按需加载：首次切换到门诊药库时再载入，不阻塞病房药库首屏；加载失败可直接重试，离线应用仍预缓存门诊目录。
+- 病房首屏不再等待中文核验库下载；核验库由全站单例加载器复用，搜索与全部药物页分别首批渲染 40/60 个品规，后续按需显示更多。外部脚本使用 `defer` 并行下载，已安装应用的同源静态资源优先读取缓存。
 - 顶部药库切换会独立过滤首页、分类、全部药物、闪卡和缓存；搜索默认限于当前药库，也可切换为搜索全部药库。
 - 支持模糊搜索、分类/剂型筛选、收藏分组、药品笔记、自定义药品、自定义禁忌、闪卡、JSON 导出和离线应用外壳。
 - 药品列表支持左滑显示收藏、缓存或删除操作。
@@ -71,6 +72,7 @@ Worker 使用 Cloudflare Workers 与 Browser Run 读取项目内置索引中的�
 
 ```bash
 node --check app.js
+node --check catalog-data-loader.js
 node --check outpatient-loader.js
 node --check outpatient-web-verification.js
 node --check pharmacy-scope.js
@@ -83,6 +85,7 @@ node scripts/test-catalog-deletions.mjs
 node scripts/test-drug-lookup.mjs
 node scripts/test-pharmacy-scope.mjs
 node scripts/test-outpatient-loader.mjs
+node scripts/test-response-performance.mjs
 node worker/test.mjs
 ```
 

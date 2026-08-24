@@ -166,6 +166,7 @@ button { cursor: pointer; }
 .btn.ghost { color: var(--ink); background: #eef4f3; }
 .btn.danger { color: white; background: var(--danger); }
 .btn.small { padding: 7px 10px; font-size: 12px; }
+.btn.load-more { width: 100%; margin-top: 12px; }
 .star-btn { border: 0; color: #94a3b8; font-size: 23px; background: transparent; }
 .star-btn.active { color: #f59e0b; }
 
