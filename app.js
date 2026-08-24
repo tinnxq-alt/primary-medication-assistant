@@ -63,6 +63,7 @@
   const BACKUP_KEYS = [...BACKUP_ARRAY_KEYS, ...BACKUP_OBJECT_KEYS];
   let deferredInstallPrompt = null;
   let tradeNameAliases = [];
+  let categoryBrowseActive = false;
   const { directlyMatchesDrug, normalize, normalizeTradeNameAliases, tradeNameAliasForDrug: findTradeNameAliasForDrug } = window.DRUG_LOOKUP;
   const tradeNameAliasForDrug = (query, drug, aliases = tradeNameAliases) => findTradeNameAliasForDrug(query, drug, aliases);
 
@@ -297,6 +298,7 @@
   }
 
   function navigate(route, param = "", replace = false) {
+    categoryBrowseActive = false;
     const hash = `#/${route}${param ? `/${encodeURIComponent(param)}` : ""}`;
     if (replace) history.replaceState(null, "", hash);
     else location.hash = hash;
@@ -305,6 +307,24 @@
   function currentRoute() {
     const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
     return { route: parts[0] || "home", param: decodeURIComponent(parts.slice(1).join("/")) };
+  }
+
+  function openCategoryDrugList(filterAction = "", filterForm = "", filterAttribute = "") {
+    navigate("all");
+    categoryBrowseActive = true;
+    setTimeout(() => renderAll(filterAction, filterForm, filterAttribute));
+  }
+
+  function openDrugDetail(id) {
+    if (!(categoryBrowseActive && currentRoute().route === "all")) {
+      navigate("detail", id);
+      return;
+    }
+
+    categoryBrowseActive = false;
+    const hash = `#/detail/${encodeURIComponent(id)}`;
+    history.replaceState(history.state, "", hash);
+    render();
   }
 
   function updateChrome(route) {
@@ -437,7 +457,7 @@
       ["pointerup", "pointercancel", "pointerleave"].forEach(type => card.addEventListener(type, () => clearTimeout(timer)));
       card.addEventListener("click", event => {
         if (longPressed) { event.preventDefault(); return; }
-        navigate("all"); setTimeout(() => renderAll("", "", card.dataset.customCategory));
+        openCategoryDrugList("", "", card.dataset.customCategory);
       });
     });
   }
@@ -1584,13 +1604,13 @@
     const swipedContent = event.target.closest(".swipe-row.swiped .swipe-content");
     if (swipedContent) { event.preventDefault(); swipedContent.closest(".swipe-row").classList.remove("swiped"); return; }
     const drug = event.target.closest("[data-open-drug]");
-    if (drug) return navigate("detail", drug.dataset.openDrug);
+    if (drug) return openDrugDetail(drug.dataset.openDrug);
     const actionClass = event.target.closest("[data-action-class]");
-    if (actionClass) { navigate("all"); setTimeout(() => renderAll(actionClass.dataset.actionClass, "", "")); }
+    if (actionClass) return openCategoryDrugList(actionClass.dataset.actionClass, "", "");
     const attribute = event.target.closest("[data-attribute]");
-    if (attribute) { navigate("all"); setTimeout(() => renderAll("", "", attribute.dataset.attribute)); }
+    if (attribute) return openCategoryDrugList("", "", attribute.dataset.attribute);
     const form = event.target.closest("[data-form]");
-    if (form) { navigate("all"); setTimeout(() => renderAll("", form.dataset.form, "")); }
+    if (form) return openCategoryDrugList("", form.dataset.form, "");
     const note = event.target.closest("[data-delete-note]");
     if (note) confirmModal("确认删除这条笔记？", () => { state.notes = state.notes.filter(n => n.id !== note.dataset.deleteNote); saveState("notes"); render(); toast("笔记已删除"); });
     const editNote = event.target.closest("[data-edit-note]");
