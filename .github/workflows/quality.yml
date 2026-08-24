@@ -41,6 +41,7 @@ jobs:
           node --check header-brand.js
           node --check outpatient-loader.js
           node --check outpatient-web-verification.js
+          node --check outpatient-clinical-hydration.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drugs.js
@@ -73,6 +74,8 @@ jobs:
         run: node scripts/test-pharmacy-scope.mjs
       - name: Outpatient lazy loading tests
         run: node scripts/test-outpatient-loader.mjs
+      - name: Outpatient instruction hydration tests
+        run: node scripts/test-outpatient-clinical-hydration.mjs
       - name: Response performance tests
         run: node scripts/test-response-performance.mjs
       - name: Text mark and notebook tests

@@ -1604,6 +1604,11 @@
   window.addEventListener("offline", updateNetwork);
   window.addEventListener("beforeinstallprompt", event => { event.preventDefault(); deferredInstallPrompt = event; updateInstallControls(); });
   window.addEventListener("appinstalled", () => { deferredInstallPrompt = null; updateInstallControls(); toast("应用已安装到桌面"); });
+  window.addEventListener("outpatient-clinical-hydrated", () => {
+    if (state.activePharmacy !== "outpatient") return;
+    const route = currentRoute().route;
+    if (["home", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();
+  });
   updateNetwork();
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

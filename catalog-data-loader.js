@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const CATALOG_URL = "./chinese-drug-labels.json?v=13";
+  const CATALOG_URL = "./chinese-drug-labels.json?v=14";
   let loadingPromise = null;
 
   function validateCatalog(payload) {

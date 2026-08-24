@@ -59,22 +59,27 @@
     document.querySelectorAll(".outpatient-metadata-notice").forEach(node => node.remove());
 
     const drug = currentDrug();
-    if (!drug?.metadataVerification) return;
+    if (!drug?.metadataVerification && !drug?.outpatientClinicalReference) return;
     const grid = document.querySelector(".detail-grid");
     if (!grid) return;
 
-    if (drug.approvalNumber) grid.append(makeItem("批准文号", drug.approvalNumber));
-    if (drug.marketingAuthorizationHolder) grid.append(makeItem("上市许可持有人", drug.marketingAuthorizationHolder));
-    if (Array.isArray(drug.components) && drug.components.length) grid.append(makeItem("主要成分/规格", drug.components.join("；")));
-    if (drug.packagingNote) grid.append(makeItem("包装核对说明", drug.packagingNote));
-    grid.append(makeItem("主数据核验", `${drug.metadataVerification.status === "verified" ? "已核验" : "已核验，包装待确认"} · ${drug.metadataVerification.checkedAt || ""}`));
-    grid.append(makeSources(drug.metadataVerification.sources));
+    if (drug.outpatientClinicalReference) grid.append(makeItem("说明书资料匹配", `${drug.outpatientClinicalReference.scope} · ${drug.outpatientClinicalReference.hydratedAt || ""}`));
+    if (drug.metadataVerification) {
+      if (drug.approvalNumber) grid.append(makeItem("批准文号", drug.approvalNumber));
+      if (drug.marketingAuthorizationHolder) grid.append(makeItem("上市许可持有人", drug.marketingAuthorizationHolder));
+      if (Array.isArray(drug.components) && drug.components.length) grid.append(makeItem("主要成分/规格", drug.components.join("；")));
+      if (drug.packagingNote) grid.append(makeItem("包装核对说明", drug.packagingNote));
+      grid.append(makeItem("主数据核验", `${drug.metadataVerification.status === "verified" ? "已核验" : "已核验，包装待确认"} · ${drug.metadataVerification.checkedAt || ""}`));
+      grid.append(makeSources(drug.metadataVerification.sources));
+    }
 
     const heading = grid.previousElementSibling;
     const notice = document.createElement("div");
     notice.className = "notice outpatient-metadata-notice";
     notice.style.marginTop = "14px";
-    notice.textContent = "药品主数据已通过公开注册/政府目录/生产企业资料核验；适应症、用法用量、不良反应等临床字段仍以对应厂家现行说明书为准。";
+    notice.textContent = drug.metadataVerification
+      ? "药品主数据已通过公开注册/政府目录/生产企业资料核验；适应症、用法用量、不良反应等临床字段仍以对应厂家现行说明书为准。"
+      : "临床摘要来自同药品名称（含剂型）及同成分规格的已核验资料；包装数量和生产企业仍以门诊药库主数据为准。";
     if (heading?.parentNode) heading.parentNode.insertBefore(notice, grid);
     else grid.parentNode?.insertBefore(notice, grid);
   };

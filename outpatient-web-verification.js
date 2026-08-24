@@ -32,14 +32,14 @@
     "SX1854":{"drugName":"碳酸钙D3片(Ⅰ)","genericName":"碳酸钙D3片(Ⅰ)","tradeName":"钙尔奇D","specification":"钙600mg:维生素D3 125IU*30片/瓶","dosageForm":"片剂","manufacturer":"惠氏制药有限公司","marketingAuthorizationHolder":"赫力昂（苏州）制药有限公司","approvalNumber":"国药准字H10950029","components":["碳酸钙1.5g（相当于钙600mg）","维生素D3 125IU"],"therapeuticClass":"矿物质类","sources":["https://www.yantai.gov.cn/art/2024/11/18/art_90118_3228297.html","https://www.yaopinnet.com/H/H29/H10950029.htm"]},
     "FX3821":{"drugName":"吡格列酮二甲双胍片","genericName":"吡格列酮二甲双胍片","tradeName":"卡双平","specification":"15mg:500mg*30片/瓶","dosageForm":"片剂","manufacturer":"杭州中美华东制药有限公司","marketingAuthorizationHolder":"杭州中美华东制药有限公司","approvalNumber":"国药准字H20100180","components":["盐酸吡格列酮15mg（以吡格列酮计）","盐酸二甲双胍500mg"],"therapeuticClass":"降糖药","sources":["https://www.yantai.gov.cn/art/2025/5/27/art_74173_3263943.html"]},
     "FZ1172":{"drugName":"麝香海马追风膏","genericName":"麝香海马追风膏","tradeName":"希尔安/伍舒芳","specification":"8cm*13cm*6贴/盒","dosageForm":"贴膏剂","manufacturer":"重庆希尔安药业有限公司","marketingAuthorizationHolder":"重庆希尔安药业有限公司","approvalNumber":"国药准字Z50020097","therapeuticClass":"外科用药（中）","sources":["https://www.hilan.cn/html/content/25/10/1941.shtml","https://www.315jiage.cn/n265301"]},
-    "FX5882":{"drugName":"二甲双胍格列吡嗪片","genericName":"二甲双胍格列吡嗪片","tradeName":"","specification":"250mg:2.5mg*24片/盒","dosageForm":"片剂","manufacturer":"北京四环科宝制药股份有限公司","marketingAuthorizationHolder":"北京四环科宝药业有限公司","approvalNumber":"国药准字H20140028","components":["盐酸二甲双胍250mg","格列吡嗪2.5mg"],"therapeuticClass":"降糖药","qualityIssue":"成分规格、批准文号及生产企业已核验；院内截图显示24片/盒，但公开监管/院方资料中该批准文号常见12片或20片包装，24片包装仍需以本院实物药盒或采购主数据最终确认。","sources":["https://yjj.beijing.gov.cn/yjj/xxcx/jdjcxx/fxzxjcxx/543353937/index.html"]}
+    "FX5882":{"drugName":"二甲双胍格列吡嗪片","genericName":"二甲双胍格列吡嗪片","tradeName":"","specification":"250mg:2.5mg*24片/盒","dosageForm":"片剂","manufacturer":"北京四环科宝制药股份有限公司","marketingAuthorizationHolder":"北京四环科宝药业有限公司","approvalNumber":"国药准字H20140028","components":["盐酸二甲双胍250mg","格列吡嗪2.5mg"],"therapeuticClass":"降糖药","packagingNote":"院内包装数量已确认：24片/盒。公开说明书资料用于核对药品成分、规格与批准信息，不替代本院包装主数据。","verifiedAt":"2026-08-24","sources":["https://yjj.beijing.gov.cn/yjj/xxcx/jdjcxx/fxzxjcxx/543353937/index.html","https://www.315jiage.cn/n222749","https://drugs.dxy.cn/pc/drug/ol07A4SHFUflogXbVtBqVw%3D%3D"]}
   };
 
   const applyOutpatientWebVerification = catalog => (Array.isArray(catalog) ? catalog : []).map(drug => {
     const patch = verifiedMetadata[drug.internalCode];
     if (!patch) return drug;
 
-    const { sources = [], qualityIssue = "", packagingNote = "", ...masterData } = patch;
+    const { sources = [], qualityIssue = "", packagingNote = "", verifiedAt = VERIFIED_AT, ...masterData } = patch;
     return {
       ...drug,
       ...masterData,
@@ -49,7 +49,7 @@
       metadataVerification: {
         status: qualityIssue ? "verified-with-package-review" : "verified",
         scope: "药品主数据（名称、规格、剂型、生产/持有人、批准文号、主要成分）",
-        checkedAt: VERIFIED_AT,
+        checkedAt: verifiedAt,
         sources
       },
       source: {
@@ -58,7 +58,7 @@
         label: qualityIssue
           ? "用户提供的门诊药库截图；药品主数据已网络核验，包装仍待院内实物确认"
           : "用户提供的门诊药库截图；药品主数据已通过公开药品注册/政府目录/生产企业资料核验",
-        checkedAt: VERIFIED_AT
+        checkedAt: verifiedAt
       }
     };
   });
