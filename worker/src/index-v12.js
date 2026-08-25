@@ -12,6 +12,7 @@ const CANDIDATE_LIMIT = 3;
 const SOURCE_PARSE_ATTEMPT_LIMIT = 5;
 const MAX_BODY_BYTES = 4096;
 const USER_PASTE_HOSTS = new Set(["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"]);
+const DRUG_CATEGORIES = new Set(["西药", "中成药"]);
 
 function allowedOrigins(env) {
   return String(env.ALLOWED_ORIGINS || "").split(",").map(item => item.trim()).filter(Boolean);
@@ -46,6 +47,42 @@ function candidateKey(candidate) {
 
 function uniqueUrls(values) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function drugCategoryFromCandidate(candidate) {
+  const legacyCategory = String(candidate?.category || "").trim();
+  if (DRUG_CATEGORIES.has(legacyCategory)) return legacyCategory;
+  const approvalNumber = String(candidate?.approvalNumber || "").trim().toUpperCase();
+  const sourceUrl = String(candidate?.sourceUrl || "").trim().toLowerCase();
+  const text = `${candidate?.drugName || ""} ${candidate?.clinical?.indication || ""}`;
+  if (/国药准字\s*Z/i.test(approvalNumber) || /\/zhongyao\//.test(sourceUrl) || legacyCategory === "中成药") return "中成药";
+  if (/国药准字\s*[A-Y]/i.test(approvalNumber) || /\/huayao\//.test(sourceUrl)) return "西药";
+  if (/清热解毒|活血化瘀|益气|补肾|疏肝|健脾|通络|祛风|养血|滋阴|温阳|扶正|散寒/.test(text)) return "中成药";
+  return "西药";
+}
+
+function therapeuticClassFromCandidate(candidate, category) {
+  const legacyClass = String(candidate?.therapeuticClass || candidate?.category || "").trim();
+  if (legacyClass && !DRUG_CATEGORIES.has(legacyClass) && !["其他", "未分类", "作用待分类"].includes(legacyClass)) return legacyClass;
+  const text = `${candidate?.drugName || ""} ${candidate?.clinical?.indication || ""}`;
+  if (category === "中成药") {
+    if (/骨伤|跌打|扭伤|风湿|关节|筋骨/.test(text)) return "骨伤科用药";
+    if (/眼|结膜|角膜/.test(text)) return "眼科用药（中）";
+    if (/口腔|咽|喉|鼻/.test(text)) return "耳鼻喉/口腔用药";
+    if (/皮肤|湿疹|瘙痒|疮|癣/.test(text)) return "外科用药（中）";
+    return "内科用药（中）";
+  }
+  if (/氯米帕明|米氮平|舍曲林|帕罗西汀|氟西汀|西酞普兰|文拉法辛|度洛西汀|曲唑酮|阿戈美拉汀|抑郁症|强迫症/.test(text)) return "抗抑郁药";
+  return "作用待分类";
+}
+
+function normalizeCandidateClassification(candidate) {
+  const category = drugCategoryFromCandidate(candidate);
+  return {
+    ...candidate,
+    category,
+    therapeuticClass: therapeuticClassFromCandidate(candidate, category)
+  };
 }
 
 async function readJsonObject(request, allowedKeys) {
@@ -107,6 +144,7 @@ async function parseSources(query, sourceUrls, env) {
     }
     fetchedSourceCount += 1;
     if (!candidate) continue;
+    candidate = normalizeCandidateClassification(candidate);
     const key = candidateKey(candidate);
     if (seen.has(key)) continue;
     seen.add(key);
@@ -130,6 +168,7 @@ function responsePayload({ query, discovery, discoveryMethods, sourceUrls, parse
     discoveredSourceHosts: hosts,
     discoveryMethods,
     diagnostics: parsed.diagnostics,
+    classificationSchema: "separate-category-therapeutic-class-v1",
     sourcePriority: ["本地可信说明书索引", "39药品通站内检索", "限定可信域名的联网检索", "用户粘贴的可信说明书"],
     sourceGrounded: true,
     generatesClinicalKnowledge: false,
@@ -245,4 +284,13 @@ export default {
   }
 };
 
-export { handleManualSource, handleSearch, normalizeUserSourceUrl, parseSources, readJsonObject };
+export {
+  drugCategoryFromCandidate,
+  handleManualSource,
+  handleSearch,
+  normalizeCandidateClassification,
+  normalizeUserSourceUrl,
+  parseSources,
+  readJsonObject,
+  therapeuticClassFromCandidate
+};

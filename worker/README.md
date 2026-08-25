@@ -13,6 +13,7 @@ v12 不依赖 OpenAI API。主流程为：
 5. 索引未命中或页面无法解析时，自动执行 39药品通站内检索和限定可信域名的联网检索，再解析发现的真实说明书页面；
 6. 网页端仍允许粘贴 39药品通或药源网的具体 HTTPS 说明书链接；
 7. 缺失字段保持缺失，不调用模型知识补写。
+8. 候选中的 `category` 仅表示药品属性（`西药`/`中成药`），`therapeuticClass` 独立表示药物作用分类；响应通过 `classificationSchema=separate-category-therapeutic-class-v1` 声明该契约。
 
 当前免费索引由病房和门诊已核验资料自动生成，包含 259 个去重来源条目；可通过维护脚本随目录更新重新生成。
 
@@ -46,7 +47,7 @@ v12 的 `wrangler.jsonc` 不配置 Workers AI binding，也不配置 OpenAI 搜�
 2. 部署 v12；
 3. 检查 `/health` 必须为 `hybrid-source-discovery-v12`、`requiresPaidApi=false`、`usesOpenAI=false`，并已启用可信域名联网发现；
 4. 用“司美”执行真实 smoke test；
-5. 要求返回司美格鲁肽、降糖药、可信来源，以及非空适应症和用法用量；
+5. 要求返回司美格鲁肽、`西药` 属性、`降糖药` 作用分类、可信来源，以及非空适应症和用法用量；
 6. 将脱敏后的结果回写 Issue #45。
 
 网站默认使用 `https://primary-medication-smart-search.tinnxq.workers.dev`。

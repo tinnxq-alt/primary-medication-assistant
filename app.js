@@ -53,11 +53,12 @@
     activePharmacy: normalizePharmacyId(read("activePharmacy", "ward")),
     history: []
   };
-  const DRUG_CATEGORY_IDS = [
-    "心血管", "降压药", "降糖药", "调脂药", "抗凝抗血小板", "抗感染药",
-    "呼吸系统", "消化系统", "神经精神", "镇痛抗炎", "泌尿系统", "内分泌",
-    "皮肤外用", "维生素矿物质", "中成药", "其他"
-  ];
+  const {
+    categories: DRUG_CATEGORY_IDS,
+    classifyCandidate: classifyDrugCandidate,
+    normalizeCategory: normalizeDrugCategory,
+    normalizeTherapeuticClass
+  } = window.DRUG_CLASSIFICATION;
   const BACKUP_ARRAY_KEYS = ["favorites", "groups", "notes", "customDrugs", "customCategories", "contraindications", "marks", "remembered", "cached", "hidden"];
   const BACKUP_OBJECT_KEYS = ["favoriteMap", "categoryOverrides", "drugOverrides"];
   const BACKUP_KEYS = [...BACKUP_ARRAY_KEYS, ...BACKUP_OBJECT_KEYS];
@@ -177,7 +178,9 @@
     const override = state.drugOverrides[drug.id];
     const category = state.categoryOverrides[drug.id];
     const merged = { ...drug, ...(override || {}), ...(category ? { category } : {}) };
-    if (!merged.therapeuticClass) merged.therapeuticClass = normalizeDrugCategory(merged.category, merged.drugName);
+    if (!merged.therapeuticClass) {
+      merged.therapeuticClass = normalizeTherapeuticClass("", merged.drugName, merged.clinical?.indication, merged.category);
+    }
     if (override && !drug.isCustom) {
       merged.qualityIssue = [merged.qualityIssue, "本机药品详情已编辑，须按药盒、批准文号和现行说明书复核。"].filter(Boolean).join(" ");
       merged.localEdited = true;
@@ -716,9 +719,11 @@
     const form = document.getElementById("drugForm");
     const setField = (name, value) => { const field = form.elements.namedItem(name); if (field && value !== undefined && value !== null) field.value = value; };
     const useCandidate = candidate => {
-      ["drugName", "genericName", "tradeName", "specification", "dosageForm", "therapeuticClass", "insuranceClass", "manufacturer", "marketingAuthorizationHolder", "approvalNumber"].forEach(name => setField(name, candidate[name]));
+      const classification = classifyDrugCandidate(candidate);
+      ["drugName", "genericName", "tradeName", "specification", "dosageForm", "insuranceClass", "manufacturer", "marketingAuthorizationHolder", "approvalNumber"].forEach(name => setField(name, candidate[name]));
       if (!candidate.genericName) setField("genericName", candidate.drugName);
-      setField("category", normalizeDrugCategory(candidate.category, candidate.drugName));
+      setField("category", classification.category);
+      setField("therapeuticClass", classification.therapeuticClass);
       ["indication", "dosage", "adverseReactions", "precautions"].forEach(name => setField(name, candidate.clinical?.[name]));
       setField("sourceLabel", candidate.source?.label || "中文联网候选"); setField("sourceUrl", candidate.source?.url || ""); setField("sourceCheckedAt", candidate.source?.checkedAt || "");
       setField("sourceStatus", candidate.source?.status || "needs-review");
@@ -737,6 +742,7 @@
       lookupCandidates.clear();
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
       results.innerHTML = candidates.length ? candidates.map(candidate => {
+        const classification = classifyDrugCandidate(candidate);
         const sourceUrl = safeExternalUrl(candidate.source?.url);
         const tradeNameSourceUrl = safeExternalUrl(candidate.lookupMeta?.tradeNameSource?.url);
         const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
@@ -744,7 +750,7 @@
         const confidence = { high: "高", medium: "中", low: "低" }[candidate.smartMeta?.confidence] || "";
         const meta = [confidence && `可信度：${confidence}`, candidate.smartMeta?.approvalNumber && `批准文号：${candidate.smartMeta.approvalNumber}`].filter(Boolean).join(" · ");
         const sourceBadge = isDraft ? "未核验草稿" : isVerified ? "核验资料" : "联网原文待复核";
-        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(normalizeDrugCategory(candidate.category, candidate.drugName))}</p><p class="drug-sub"><span class="badge ${isVerified ? "ok" : "warn"}">${sourceBadge}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}${candidate.lookupMeta?.matchedByTradeName ? " · 商品名已识别" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${tradeNameSourceUrl ? `<a class="btn ghost small link-btn" href="${esc(tradeNameSourceUrl)}" target="_blank" rel="noopener">查看商品名来源</a>` : ""}${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
+        return `<article class="card lookup-card"><div><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(candidate.tradeName || "无商品名")} · ${esc(candidate.specification || "规格待补充")} · ${esc(classification.category)} · ${esc(classification.therapeuticClass)}</p><p class="drug-sub"><span class="badge ${isVerified ? "ok" : "warn"}">${sourceBadge}</span> ${esc(candidate.source?.label || "中文候选")}${candidate.clinical ? " · 含中文临床字段" : ""}${candidate.lookupMeta?.matchedByTradeName ? " · 商品名已识别" : ""}</p>${meta ? `<p class="drug-sub">${esc(meta)}</p>` : ""}<div class="toolbar">${tradeNameSourceUrl ? `<a class="btn ghost small link-btn" href="${esc(tradeNameSourceUrl)}" target="_blank" rel="noopener">查看商品名来源</a>` : ""}${sourceUrl ? `<a class="btn ghost small link-btn" href="${esc(sourceUrl)}" target="_blank" rel="noopener">查看中文来源</a>` : ""}<button class="btn secondary small" type="button" data-use-lookup="${esc(candidate.lookupId)}">${isDraft ? "填入并编辑" : "自动填充此项"}</button></div></div></article>`;
       }).join("") : empty("暂未生成可自动填充的中文资料。可稍后重试，或使用下方中文搜索入口手动补充。", '<a class="btn ghost link-btn" href="https://www.nmpa.gov.cn/datasearch/home-index.html#category=yp" target="_blank" rel="noopener">打开国家药监局</a>');
     };
     const renderVerificationLinks = links => {
@@ -817,7 +823,7 @@
         specification: data.specification.trim(),
         dosageForm: data.dosageForm.trim(),
         category,
-        therapeuticClass: data.therapeuticClass.trim() || normalizeDrugCategory(category, drugName),
+        therapeuticClass: data.therapeuticClass.trim() || normalizeTherapeuticClass("", drugName, clinicalFields.indication, category),
         manufacturer: data.manufacturer.trim(),
         marketingAuthorizationHolder: data.marketingAuthorizationHolder.trim(),
         approvalNumber: data.approvalNumber.trim(),
@@ -846,28 +852,6 @@
   }
 
   const hasChineseText = value => /[\u3400-\u9fff]/.test(String(value || ""));
-
-  function normalizeDrugCategory(category, drugName = "") {
-    const value = String(category || "").trim();
-    if (DRUG_CATEGORY_IDS.includes(value)) return value;
-    const text = `${drugName}${value}`;
-    if (/中成|丸|口服液|合剂/.test(text) && !/注射液/.test(text)) return "中成药";
-    if (/阿司匹林|氯吡格雷|利伐沙班|抗凝|抗血小板/.test(text)) return "抗凝抗血小板";
-    if (/胰岛素|二甲双胍|阿卡波糖|格列|列净|列汀|降糖/.test(text)) return "降糖药";
-    if (/他汀|依折麦布|降脂/.test(text)) return "调脂药";
-    if (/沙坦|普利|地平|美托洛尔|比索洛尔|多沙唑嗪|降压/.test(text)) return "降压药";
-    if (/乳膏|软膏|凝胶|贴膏|外用|滴眼液/.test(text)) return "皮肤外用";
-    if (/头孢|霉素|沙星|奥司他韦|玛巴洛沙韦|抗感染|抗菌|抗病毒/.test(text)) return "抗感染药";
-    if (/氨酚|伪麻|止咳|祛痰|羧甲司坦|溴己新|乙酰半胱氨酸|宣肺/.test(text)) return "呼吸系统";
-    if (/奥美拉唑|兰索拉唑|凯普拉生|莫沙必利|乳果糖|铝碳酸镁|开塞露|麻仁|洛哌丁胺|小檗碱/.test(text)) return "消化系统";
-    if (/布洛芬|双氯芬|洛索洛芬|吲哚美辛|萘普生|镇痛|止痛/.test(text)) return "镇痛抗炎";
-    if (/唑仑|唑吡坦|佐匹克隆|氯硝西泮|丙戊酸|普瑞巴林|氟桂利嗪|神经|精神/.test(text)) return "神经精神";
-    if (/坦索罗辛|非那雄胺|非布司他|苯溴马隆|呋塞米|螺内酯|泌尿/.test(text)) return "泌尿系统";
-    if (/左甲状腺素|地塞米松|骨化醇|内分泌/.test(text)) return "内分泌";
-    if (/维生素|叶酸|碳酸钙|氯化钾|矿物质/.test(text)) return "维生素矿物质";
-    if (/硝酸|救心|心通|心速宁|曲美他嗪|心血管/.test(text)) return "心血管";
-    return "其他";
-  }
 
   function isChineseCandidate(candidate) {
     if (!hasChineseText(candidate.drugName)) return false;
@@ -920,7 +904,9 @@
     const alias = tradeNameAliasForDrug(query, drug);
     return {
       drugName: drug.genericName || drug.drugName || "", tradeName: alias?.tradeName || drug.tradeName || "",
-      specification: alias ? "" : drug.specification || "", category: normalizeDrugCategory(drug.category, drug.drugName)
+      specification: alias ? "" : drug.specification || "",
+      category: normalizeDrugCategory(drug.category, drug.drugName, drug.approvalNumber, drug.source?.url, drug.clinical?.indication),
+      therapeuticClass: normalizeTherapeuticClass(drug.therapeuticClass, drug.drugName, drug.clinical?.indication, drug.category)
     };
   }
 
@@ -941,23 +927,27 @@
       const qualityLabels = { regulator: "药监部门", manufacturer: "生产企业", hospital: "医疗机构", "medical-database": "医药数据库", other: "其他中文来源" };
       const candidates = payload.candidates.map(candidate => {
         const draft = candidate.draft === true || candidate.verified === false;
-        return ({
-        drugName: candidate.drugName || "", genericName: candidate.drugName || "", tradeName: candidate.tradeName || "",
-        specification: candidate.specification || "", dosageForm: candidate.dosageForm || "",
-        manufacturer: candidate.manufacturer || "", marketingAuthorizationHolder: candidate.manufacturer || "", approvalNumber: candidate.approvalNumber || "",
-        therapeuticClass: normalizeDrugCategory(candidate.category, candidate.drugName),
-        category: normalizeDrugCategory(candidate.category, candidate.drugName),
-        clinical: {
+        const clinical = {
           indication: candidate.indications || candidate.clinical?.indication || "",
           dosage: candidate.dosage || candidate.clinical?.dosage || "",
           adverseReactions: candidate.adverseReactions || candidate.clinical?.adverseReactions || "",
           precautions: candidate.precautions || candidate.clinical?.precautions || ""
-        },
-        source: {
+        };
+        const source = {
           status: draft ? "unverified-draft" : "needs-review",
           label: draft ? `未核验草稿：${candidate.sourceTitle || "中文资料草稿"}` : `免费联网：${candidate.sourceTitle || "中文资料"} · ${qualityLabels[candidate.sourceQuality] || "其他中文来源"}`,
           url: candidate.sourceUrl || "", checkedAt: candidate.sourceCheckedAt || new Date().toISOString().slice(0, 10)
-        },
+        };
+        const normalizedCandidate = {
+          drugName: candidate.drugName || "", genericName: candidate.drugName || "", tradeName: candidate.tradeName || "",
+          specification: candidate.specification || "", dosageForm: candidate.dosageForm || "",
+          manufacturer: candidate.manufacturer || "", marketingAuthorizationHolder: candidate.manufacturer || "", approvalNumber: candidate.approvalNumber || "",
+          category: candidate.category || "", therapeuticClass: candidate.therapeuticClass || "", clinical, source
+        };
+        const classification = classifyDrugCandidate(normalizedCandidate);
+        return ({
+        ...normalizedCandidate,
+        ...classification,
         smartMeta: { confidence: candidate.confidence || "low", sourceQuality: candidate.sourceQuality || "other", approvalNumber: candidate.approvalNumber || "", draft, verified: candidate.verified === true, editable: candidate.editable !== false },
         lookupMeta: {
           matchedByTradeName: candidate.matchType === "trade-name",
@@ -1532,7 +1522,7 @@
         specification: data.specification.trim(),
         dosageForm: data.dosageForm.trim(),
         category,
-        therapeuticClass: data.therapeuticClass.trim() || normalizeDrugCategory(category, data.drugName),
+        therapeuticClass: data.therapeuticClass.trim() || normalizeTherapeuticClass("", data.drugName, clinical.indication, category),
         insuranceClass: data.insuranceClass.trim() || "未标注",
         manufacturer: data.manufacturer.trim(),
         marketingAuthorizationHolder: data.marketingAuthorizationHolder.trim(),

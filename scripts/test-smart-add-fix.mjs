@@ -3,6 +3,10 @@ import fs from "node:fs";
 
 const ui = fs.readFileSync("smart-add-fix.js", "utf8");
 const freeUi = fs.readFileSync("free-smart-source-v11.js", "utf8");
+const classification = fs.readFileSync("drug-classification.js", "utf8");
+const app = fs.readFileSync("app.js", "utf8");
+const html = fs.readFileSync("index.html", "utf8");
+const serviceWorker = fs.readFileSync("service-worker.js", "utf8");
 const worker = fs.readFileSync("worker/src/index-v12.js", "utf8");
 const sourceIndex = fs.readFileSync("worker/src/free-source-index.js", "utf8");
 const core = fs.readFileSync("worker/src/index-v3.js", "utf8");
@@ -18,6 +22,8 @@ assert.match(ui, /查看原说明书/, "候选必须可查看来源");
 assert.match(ui, /选择并自动填充/, "用户选择候选后才自动填充");
 assert.match(ui, /candidate\.clinical\?\.indication/, "自动填充包含适应症");
 assert.match(ui, /candidate\.clinical\?\.dosage/, "自动填充包含用法用量");
+assert.match(ui, /classification\.therapeuticClass/, "说明书候选必须独立填入药物作用分类");
+assert.match(ui, /classification\.category/, "说明书候选必须独立填入药品分类");
 assert.doesNotMatch(ui, /remoteCandidateDetail|\/v1\/drugs\/detail/, "前端不得调用 AI 生成临床详情");
 
 assert.match(freeUi, /\/v1\/drugs\/parse-source/, "索引未命中时必须支持粘贴可信说明书链接");
@@ -25,6 +31,13 @@ assert.match(freeUi, /TRUSTED_HOSTS/, "粘贴链接前端必须限制可信域�
 assert.match(freeUi, /candidate\.clinical\?\.indication/, "粘贴说明书自动填充必须包含适应症");
 assert.match(freeUi, /candidate\.clinical\?\.dosage/, "粘贴说明书自动填充必须包含用法用量");
 assert.match(freeUi, /sourceStatus", "needs-review"/, "网页原文自动填充仍须标记待复核");
+assert.match(freeUi, /classification\.therapeuticClass/, "粘贴说明书也必须独立填入药物作用分类");
+
+assert.match(classification, /Object\.freeze\(\["西药", "中成药"\]\)/, "药品分类选项必须是药品属性，不得混入作用分类");
+assert.match(classification, /function classifyCandidate\(/, "所有添加入口必须复用统一分类器");
+assert.doesNotMatch(app, /therapeuticClass:\s*normalizeDrugCategory/, "主应用不得再用药品分类填充作用分类");
+assert.ok(html.indexOf('src="drug-classification.js"') < html.indexOf('src="app.js"'), "分类器必须先于主应用加载");
+assert.match(serviceWorker, /\.\/drug-classification\.js/, "离线缓存必须包含统一分类器");
 
 assert.match(wrangler, /"main"\s*:\s*"src\/index-v12\.js"/, "必须部署 v12");
 assert.doesNotMatch(wrangler, /OPENAI_SEARCH_MODEL|"ai"\s*:/, "v12 生产配置不得依赖 OpenAI 或 Workers AI");
@@ -37,6 +50,7 @@ assert.match(worker, /application\/json/, "请求必须校验 JSON 内容类型"
 assert.match(worker, /requiresPaidApi:\s*false/, "v12 必须明确无需收费 API");
 assert.match(worker, /usesOpenAI:\s*false/, "v12 必须明确不使用 OpenAI");
 assert.match(worker, /generatesClinicalKnowledge:\s*false/, "v12 必须明确不生成临床知识");
+assert.match(worker, /classificationSchema:\s*"separate-category-therapeutic-class-v1"/, "Worker 必须声明药品分类与作用分类已分离");
 assert.doesNotMatch(worker, /api\.openai\.com|web_search|env\.AI\.run/, "v12 运行代码不得调用 OpenAI、Web Search 或 Workers AI");
 assert.match(sourceIndex, /司美格鲁肽注射液/, "免费来源索引必须包含司美格鲁肽验收条目");
 assert.match(sourceIndex, /https:\/\/ypk\.39\.net\/2310025\/manual\//, "司美格鲁肽必须绑定真实 39 说明书 URL");
