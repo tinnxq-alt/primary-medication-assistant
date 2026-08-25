@@ -71,6 +71,7 @@ assert.equal(health.status, 200);
 const healthPayload = await health.json();
 assert.equal(healthPayload.discovery, "hybrid-source-discovery-v12");
 assert.equal(healthPayload.trustedOnlineDiscoverySupported, true);
+assert.equal(healthPayload.classificationSchema, "separate-category-therapeutic-class-v1");
 assert.equal(healthPayload.sourceGrounded, true);
 
 const indexed = await worker.fetch(request("/v1/drugs/search", { query: "司美" }), env);

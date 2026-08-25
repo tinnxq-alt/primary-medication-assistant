@@ -63,6 +63,7 @@ jobs:
             const valid = payload.discovery === 'hybrid-source-discovery-v12'
               && payload.mode === 'free-verified'
               && payload.trustedOnlineDiscoverySupported === true
+              && payload.classificationSchema === 'separate-category-therapeutic-class-v1'
               && payload.requiresPaidApi === false
               && payload.usesOpenAI === false
               && payload.sourceGrounded === true

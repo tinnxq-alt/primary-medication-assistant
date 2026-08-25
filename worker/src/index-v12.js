@@ -272,6 +272,7 @@ export default {
         indexEntriesAvailable: true,
         trustedOnlineDiscoverySupported: true,
         manualTrustedSourceSupported: true,
+        classificationSchema: "separate-category-therapeutic-class-v1",
         requiresPaidApi: false,
         usesOpenAI: false,
         sourceGrounded: true,
