@@ -19,7 +19,7 @@ v12 不依赖 OpenAI API。主流程为：
 
 ## 接口
 
-- `GET /health`：返回 v12 混合可信来源模式状态；`requiresPaidApi=false`、`usesOpenAI=false`。
+- `GET /health`：返回 v12 混合可信来源模式状态及分类契约版本；`requiresPaidApi=false`、`usesOpenAI=false`。
 - `POST /v1/drugs/search`：按药名片段先查询本地可信来源索引，未取得候选时自动联网发现并解析真实说明书。
 - `POST /v1/drugs/parse-source`：解析用户粘贴的可信说明书 URL；当前只接受 39药品通和药源网 HTTPS 页面。
 
