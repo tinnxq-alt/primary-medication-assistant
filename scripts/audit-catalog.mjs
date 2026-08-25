@@ -4,10 +4,10 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const EXPECTED_CATALOG_COUNT = 164;
-const EXPECTED_OUTPATIENT_CATALOG_COUNT = 395;
+const EXPECTED_OUTPATIENT_CATALOG_COUNT = 392;
 const EXPECTED_OUTPATIENT_VERIFICATION_COUNT = 33;
-const EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT = 129;
-const EXPECTED_OUTPATIENT_CLINICAL_SUPPLEMENT_COUNT = 266;
+const EXPECTED_OUTPATIENT_CLINICAL_REUSE_COUNT = 128;
+const EXPECTED_OUTPATIENT_CLINICAL_SUPPLEMENT_COUNT = 264;
 const EXPECTED_THERAPEUTIC_CLASS_COUNT = 44;
 const EXPECTED_TRADE_NAME_ALIAS_COUNT = 13;
 const VERIFIED_STATUSES = new Set([
@@ -18,6 +18,8 @@ const VERIFIED_STATUSES = new Set([
 ]);
 const CLINICAL_FIELDS = ["indication", "dosage", "adverseReactions", "precautions"];
 const DELETED_WARD_DRUG_NAMES = new Set(["丹七片", "格列吡嗪片", "格列齐特片(II)"]);
+const REMOVED_OUTPATIENT_DUPLICATE_CODES = new Set(["DL2511", "DL2789", "GZ0870"]);
+const RETAINED_OUTPATIENT_DUPLICATE_CODES = new Set(["GX2510", "GX2785", "GX1910"]);
 const errors = [];
 
 function fail(message) {
@@ -162,6 +164,7 @@ for (const [index, drug] of (catalog || []).entries()) {
   if (drug.therapeuticClass === "作用待分类") fail(`${label}尚未分配作用分类`);
 }
 
+const outpatientNameSpecKeys = new Map();
 for (const [index, drug] of (outpatientCatalog || []).entries()) {
   const label = `门诊目录第 ${index + 1} 条（${drug.drugName || "未命名"}）`;
   for (const field of ["id", "drugName", "genericName", "specification", "category", "dosageForm", "therapeuticClass"]) {
@@ -170,6 +173,17 @@ for (const [index, drug] of (outpatientCatalog || []).entries()) {
   if (catalogIds.has(drug.id)) fail(`${label}与其他药库使用了重复 ID：${drug.id}`);
   catalogIds.add(drug.id);
   if (!Array.isArray(drug.pharmacyScopes) || !drug.pharmacyScopes.includes("outpatient")) fail(`${label}必须属于门诊药库`);
+  const nameSpecKey = `${drug.drugName}\u0000${drug.specification}`;
+  const existingCode = outpatientNameSpecKeys.get(nameSpecKey);
+  if (existingCode) fail(`门诊目录存在完全同名同规格重复记录：${existingCode}、${drug.internalCode}｜${drug.drugName}｜${drug.specification}`);
+  else outpatientNameSpecKeys.set(nameSpecKey, drug.internalCode);
+}
+
+for (const code of REMOVED_OUTPATIENT_DUPLICATE_CODES) {
+  if ((outpatientCatalog || []).some(drug => drug.internalCode === code)) fail(`已合并的门诊重复代码 ${code} 不得重新出现`);
+}
+for (const code of RETAINED_OUTPATIENT_DUPLICATE_CODES) {
+  if (!(outpatientCatalog || []).some(drug => drug.internalCode === code)) fail(`门诊去重后保留代码 ${code} 缺失`);
 }
 
 const verifiedOutpatient = (outpatientCatalog || []).filter(drug => drug.metadataVerification);

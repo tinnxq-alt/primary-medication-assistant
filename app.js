@@ -364,7 +364,7 @@
       const count = button.querySelector("[data-pharmacy-count]");
       if (count) {
         const outpatientNotLoaded = pharmacyId === "outpatient" && !Array.isArray(window.OUTPATIENT_DRUG_CATALOG);
-        const expectedOutpatientCount = Number(window.OUTPATIENT_CATALOG_EXPECTED_COUNT) || 395;
+        const expectedOutpatientCount = Number(window.OUTPATIENT_CATALOG_EXPECTED_COUNT) || 392;
         count.textContent = String(outpatientNotLoaded ? expectedOutpatientCount : views.counts[pharmacyId]);
       }
     });
@@ -379,8 +379,8 @@
     if (typeof window.hydrateOutpatientClinicalCatalog === "function") {
       catalog = await window.hydrateOutpatientClinicalCatalog(catalog);
     }
-    if (!Array.isArray(catalog) || catalog.length !== 395) {
-      throw new Error(`门诊药库临床资料加载异常：应为 395，实际为 ${Array.isArray(catalog) ? catalog.length : 0}`);
+    if (!Array.isArray(catalog) || catalog.length !== 392) {
+      throw new Error(`门诊药库临床资料加载异常：应为 392，实际为 ${Array.isArray(catalog) ? catalog.length : 0}`);
     }
     return catalog;
   }

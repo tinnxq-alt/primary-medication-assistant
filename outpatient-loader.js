@@ -2,7 +2,7 @@
   "use strict";
 
   let loadingPromise = null;
-  const EXPECTED_CATALOG_COUNT = 395;
+  const EXPECTED_CATALOG_COUNT = 392;
   const REQUIRED_SCRIPTS = Object.freeze([
     { id: "outpatient-clinical-supplement-script", src: "outpatient-clinical-supplement.js", ready: () => typeof window.applyOutpatientClinicalSupplement === "function" },
     { id: "outpatient-drug-catalog-script", src: "outpatient-drugs.js", ready: () => Array.isArray(window.OUTPATIENT_DRUG_CATALOG) }

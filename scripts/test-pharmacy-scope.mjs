@@ -37,7 +37,7 @@ assert.equal(wardCatalog.length, 164);
 assert.ok(!wardCatalog.some(drug => ["丹七片", "格列吡嗪片", "格列齐特片(II)"].includes(drug.drugName)), "3 个品种必须从病房药库永久删除");
 assert.ok(wardCatalog.every(drug => drug.pharmacyScopes?.length === 1 && drug.pharmacyScopes[0] === "ward"), "现有 164 条必须全部属于病房药库");
 assert.ok(Array.isArray(outpatientCatalog));
-assert.equal(outpatientCatalog.length, 395, "首批门诊目录应为 395 条");
+assert.equal(outpatientCatalog.length, 392, "门诊目录去重后应为 392 条");
 assert.ok(outpatientCatalog.every(drug => drug.pharmacyScopes?.includes("outpatient")), "门诊目录条目必须属于门诊药库");
 
 const htmlSource = fs.readFileSync(path.join(root, "index.html"), "utf8");

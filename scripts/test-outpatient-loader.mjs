@@ -41,7 +41,7 @@ vm.runInContext(verificationSource, successful.context);
 assert.equal(successful.window.OUTPATIENT_DRUG_CATALOG, undefined, "核验补丁不得把尚未加载的门诊目录写成空数组");
 assert.equal(typeof successful.window.applyOutpatientWebVerification, "function");
 vm.runInContext(loaderSource, successful.context);
-assert.equal(successful.window.OUTPATIENT_CATALOG_EXPECTED_COUNT, 395, "未加载目录前必须公开已审计的门诊总数");
+assert.equal(successful.window.OUTPATIENT_CATALOG_EXPECTED_COUNT, 392, "未加载目录前必须公开已审计的门诊总数");
 
 const firstLoad = successful.window.loadOutpatientDrugCatalog();
 const concurrentLoad = successful.window.loadOutpatientDrugCatalog();
@@ -52,7 +52,7 @@ assert.ok(successful.appended.every(script => script.async === true));
 
 successful.window.applyOutpatientClinicalSupplement = catalog => ({ catalog, supplementedCount: 0 });
 successful.appended[0].onload();
-successful.window.OUTPATIENT_DRUG_CATALOG = Array.from({ length: 395 }, (_, index) => ({
+successful.window.OUTPATIENT_DRUG_CATALOG = Array.from({ length: 392 }, (_, index) => ({
   id: `outpatient-${index}`,
   internalCode: index === 0 ? "FX0752" : `TEST${index}`,
   drugName: index === 0 ? "待核验名称" : `测试药品${index}`,
@@ -60,11 +60,11 @@ successful.window.OUTPATIENT_DRUG_CATALOG = Array.from({ length: 395 }, (_, inde
 }));
 successful.appended[1].onload();
 const loadedCatalog = await firstLoad;
-assert.equal(loadedCatalog.length, 395);
+assert.equal(loadedCatalog.length, 392);
 assert.equal(loadedCatalog[0].drugName, "阿利沙坦酯吲达帕胺缓释片", "目录加载后必须应用网络主数据核验补丁");
 assert.equal(loadedCatalog[0].metadataVerification?.status, "verified");
 assert.equal(successful.events[0]?.type, "outpatient-catalog-loaded");
-assert.equal(successful.events[0]?.detail?.count, 395);
+assert.equal(successful.events[0]?.detail?.count, 392);
 
 const failed = makeContext();
 vm.runInContext(loaderSource, failed.context);
@@ -75,9 +75,9 @@ assert.ok(failed.appended.every(script => script.removed), "任一脚本失败�
 const retryLoad = failed.window.loadOutpatientDrugCatalog();
 assert.equal(failed.appended.length, 4, "加载失败后必须允许重新插入两份脚本重试");
 failed.window.applyOutpatientClinicalSupplement = catalog => ({ catalog, supplementedCount: 0 });
-failed.window.OUTPATIENT_DRUG_CATALOG = Array.from({ length: 395 }, (_, index) => ({ id: `retry-${index}` }));
+failed.window.OUTPATIENT_DRUG_CATALOG = Array.from({ length: 392 }, (_, index) => ({ id: `retry-${index}` }));
 failed.appended[2].onload(); failed.appended[3].onload();
-assert.equal((await retryLoad).length, 395);
+assert.equal((await retryLoad).length, 392);
 
 const wrongCount = makeContext();
 vm.runInContext(loaderSource, wrongCount.context);
@@ -85,7 +85,7 @@ const wrongCountLoad = wrongCount.window.loadOutpatientDrugCatalog();
 wrongCount.window.applyOutpatientClinicalSupplement = catalog => ({ catalog, supplementedCount: 0 });
 wrongCount.window.OUTPATIENT_DRUG_CATALOG = [];
 wrongCount.appended[0].onload(); wrongCount.appended[1].onload();
-await assert.rejects(wrongCountLoad, /门诊药库数量异常：应为 395，实际为 0/);
+await assert.rejects(wrongCountLoad, /门诊药库数量异常：应为 392，实际为 0/);
 assert.ok(wrongCount.appended.every(script => script.removed), "数量异常时本批脚本必须移除");
 
 const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
@@ -94,7 +94,7 @@ const serviceWorker = fs.readFileSync(path.join(root, "service-worker.js"), "utf
 assert.ok(!html.includes('src="outpatient-drugs.js"'), "门诊目录必须保持按需加载");
 assert.ok(!html.includes('src="outpatient-clinical-supplement.js"'), "门诊临床补充资料必须与门诊目录一起按需加载");
 assert.match(loaderSource, /outpatient-clinical-supplement\.js/, "门诊加载器必须并发加载临床补充资料");
-assert.match(html, /data-pharmacy-switch="outpatient"[\s\S]*?<strong data-pharmacy-count>395<\/strong>/, "首屏必须直接显示已审计的 395 条");
+assert.match(html, /data-pharmacy-switch="outpatient"[\s\S]*?<strong data-pharmacy-count>392<\/strong>/, "首屏必须直接显示已审计的 392 条");
 assert.ok(html.indexOf('src="outpatient-loader.js"') < html.indexOf('src="outpatient-web-verification.js"'));
 assert.ok(html.indexOf('src="outpatient-web-verification.js"') < html.indexOf('src="app.js"'));
 assert.match(app, /pharmacyId === "outpatient"[\s\S]*?ensureOutpatientCatalogLoaded\(\)/, "点击门诊药库必须触发加载");
