@@ -11,7 +11,12 @@ const context = {
       category: "西药",
       therapeuticClass: "抗菌药"
     }],
-    OUTPATIENT_DRUG_CATALOG: []
+    OUTPATIENT_DRUG_CATALOG: [{
+      drugName: "阿奇霉素片",
+      genericName: "阿奇霉素",
+      category: "西药",
+      therapeuticClass: "大环内酯类"
+    }]
   }
 };
 vm.createContext(context);
@@ -56,6 +61,12 @@ assert.deepEqual(
   { ...classification.classifyCandidate({ drugName: "阿奇霉素片", category: "抗感染药" }) },
   { category: "西药", therapeuticClass: "抗菌药" },
   "本地目录有精确匹配时必须优先复用已核验分类"
+);
+
+assert.deepEqual(
+  { ...classification.classifyCandidate({ drugName: "阿奇霉素片", category: "抗感染药" }, "outpatient") },
+  { category: "西药", therapeuticClass: "大环内酯类" },
+  "联网候选必须优先复用当前目标药库的既有分类"
 );
 
 console.log("添加药物分类：药品属性与药物作用分类分离测试通过");

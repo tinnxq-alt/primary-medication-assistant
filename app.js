@@ -719,7 +719,7 @@
     const form = document.getElementById("drugForm");
     const setField = (name, value) => { const field = form.elements.namedItem(name); if (field && value !== undefined && value !== null) field.value = value; };
     const useCandidate = candidate => {
-      const classification = classifyDrugCandidate(candidate);
+      const classification = classifyDrugCandidate(candidate, form.elements.namedItem("pharmacyScope")?.value);
       ["drugName", "genericName", "tradeName", "specification", "dosageForm", "insuranceClass", "manufacturer", "marketingAuthorizationHolder", "approvalNumber"].forEach(name => setField(name, candidate[name]));
       if (!candidate.genericName) setField("genericName", candidate.drugName);
       setField("category", classification.category);
@@ -742,7 +742,7 @@
       lookupCandidates.clear();
       candidates.forEach((candidate, index) => { candidate.lookupId ||= `lookup-${Date.now()}-${index}`; lookupCandidates.set(candidate.lookupId, candidate); });
       results.innerHTML = candidates.length ? candidates.map(candidate => {
-        const classification = classifyDrugCandidate(candidate);
+        const classification = classifyDrugCandidate(candidate, form.elements.namedItem("pharmacyScope")?.value);
         const sourceUrl = safeExternalUrl(candidate.source?.url);
         const tradeNameSourceUrl = safeExternalUrl(candidate.lookupMeta?.tradeNameSource?.url);
         const isDraft = candidate.source?.status === "unverified-draft" || candidate.smartMeta?.draft;
@@ -944,7 +944,8 @@
           manufacturer: candidate.manufacturer || "", marketingAuthorizationHolder: candidate.manufacturer || "", approvalNumber: candidate.approvalNumber || "",
           category: candidate.category || "", therapeuticClass: candidate.therapeuticClass || "", clinical, source
         };
-        const classification = classifyDrugCandidate(normalizedCandidate);
+        const addForm = document.getElementById("drugForm");
+        const classification = classifyDrugCandidate(normalizedCandidate, addForm?.elements.namedItem("pharmacyScope")?.value || state.activePharmacy);
         return ({
         ...normalizedCandidate,
         ...classification,

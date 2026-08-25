@@ -11,6 +11,8 @@ import { findIndexedSources } from "./free-source-index.js";
 const CANDIDATE_LIMIT = 3;
 const SOURCE_PARSE_ATTEMPT_LIMIT = 5;
 const MAX_BODY_BYTES = 4096;
+const SEARCH_CACHE_SECONDS = 6 * 60 * 60;
+const SEARCH_CACHE_SCHEMA = "source-grounded-parallel-cache-v1";
 const USER_PASTE_HOSTS = new Set(["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"]);
 const DRUG_CATEGORIES = new Set(["西药", "中成药"]);
 
@@ -42,7 +44,7 @@ function normalizeUserSourceUrl(value) {
 }
 
 function candidateKey(candidate) {
-  return [candidate?.drugName, candidate?.specification, candidate?.manufacturer, candidate?.sourceUrl].join("|");
+  return [candidate?.drugName, candidate?.specification, candidate?.manufacturer].join("|");
 }
 
 function uniqueUrls(values) {
@@ -110,21 +112,37 @@ async function parseSources(query, sourceUrls, env) {
   const diagnostics = [];
   let fetchedSourceCount = 0;
 
-  for (const sourceUrl of sourceUrls.slice(0, SOURCE_PARSE_ATTEMPT_LIMIT)) {
-    if (candidates.length >= CANDIDATE_LIMIT) break;
-    let candidate = null;
+  const attemptedUrls = sourceUrls.slice(0, SOURCE_PARSE_ATTEMPT_LIMIT);
+  const directResults = await Promise.all(attemptedUrls.map(async sourceUrl => {
     try {
       const page = await fetchSourcePage(sourceUrl, trustedSourceUrl);
-      candidate = parseInstructionPage(page, query);
-      diagnostics.push({ stage: "trusted-direct-fetch", sourceHost: new URL(page.url).hostname, ok: Boolean(candidate) });
+      const candidate = parseInstructionPage(page, query);
+      return {
+        sourceUrl,
+        candidate,
+        diagnostic: { stage: "trusted-direct-fetch", sourceHost: new URL(page.url).hostname, ok: Boolean(candidate) }
+      };
     } catch (error) {
-      diagnostics.push({
-        stage: "trusted-direct-fetch",
-        sourceHost: (() => { try { return new URL(sourceUrl).hostname; } catch { return "invalid"; } })(),
-        ok: false,
-        error: String(error?.message || error).slice(0, 160)
-      });
+      return {
+        sourceUrl,
+        candidate: null,
+        diagnostic: {
+          stage: "trusted-direct-fetch",
+          sourceHost: (() => { try { return new URL(sourceUrl).hostname; } catch { return "invalid"; } })(),
+          ok: false,
+          error: String(error?.message || error).slice(0, 160)
+        }
+      };
     }
+  }));
+
+  fetchedSourceCount = attemptedUrls.length;
+  diagnostics.push(...directResults.map(result => result.diagnostic));
+
+  for (const result of directResults) {
+    if (candidates.length >= CANDIDATE_LIMIT) break;
+    const { sourceUrl } = result;
+    let candidate = result.candidate;
     if (!candidate) {
       try {
         candidate = await parseTrustedSource(sourceUrl, query, env.BROWSER);
@@ -137,12 +155,10 @@ async function parseSources(query, sourceUrls, env) {
           ok: false,
           error: message
         });
-        fetchedSourceCount += 1;
         if (/BROWSER_CONTENT_429|rate limit/i.test(message)) break;
         continue;
       }
     }
-    fetchedSourceCount += 1;
     if (!candidate) continue;
     candidate = normalizeCandidateClassification(candidate);
     const key = candidateKey(candidate);
@@ -151,6 +167,42 @@ async function parseSources(query, sourceUrls, env) {
     candidates.push(candidate);
   }
   return { candidates, fetchedSourceCount, diagnostics };
+}
+
+function searchCacheRequest(query) {
+  const key = encodeURIComponent(cleanQuery(query));
+  return new Request(`https://worker-cache.invalid/drug-search/${SEARCH_CACHE_SCHEMA}?query=${key}`);
+}
+
+async function readSearchCache(query) {
+  const cache = globalThis.caches?.default;
+  if (!cache) return null;
+  const response = await cache.match(searchCacheRequest(query));
+  if (!response) return null;
+  try {
+    const payload = await response.json();
+    return payload && Array.isArray(payload.candidates) ? payload : null;
+  } catch {
+    return null;
+  }
+}
+
+async function writeSearchCache(query, payload, ctx) {
+  const cache = globalThis.caches?.default;
+  if (!cache || !payload.candidates?.length) return;
+  const write = cache.put(searchCacheRequest(query), new Response(JSON.stringify(payload), {
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": `public, max-age=${SEARCH_CACHE_SECONDS}`
+    }
+  })).catch(error => {
+    console.error(JSON.stringify({ message: "drug search cache write failed", error: String(error?.message || error).slice(0, 160) }));
+  });
+  if (ctx?.waitUntil) {
+    ctx.waitUntil(write);
+    return;
+  }
+  await write;
 }
 
 function responsePayload({ query, discovery, discoveryMethods, sourceUrls, parsed, startedAt, warning }) {
@@ -168,6 +220,8 @@ function responsePayload({ query, discovery, discoveryMethods, sourceUrls, parse
     discoveredSourceHosts: hosts,
     discoveryMethods,
     diagnostics: parsed.diagnostics,
+    cacheStatus: "miss",
+    searchOptimization: SEARCH_CACHE_SCHEMA,
     classificationSchema: "separate-category-therapeutic-class-v1",
     sourcePriority: ["本地可信说明书索引", "39药品通站内检索", "限定可信域名的联网检索", "用户粘贴的可信说明书"],
     sourceGrounded: true,
@@ -178,12 +232,17 @@ function responsePayload({ query, discovery, discoveryMethods, sourceUrls, parse
   };
 }
 
-async function handleSearch(request, env, origin) {
+async function handleSearch(request, env, origin, ctx) {
   const startedAt = Date.now();
   const body = await readJsonObject(request, ["query"]);
   if (body.error) return json({ error: body.error }, 400, origin, env);
   const query = cleanQuery(body.value.query);
   if (!query) return json({ error: "请输入至少 2 个汉字的药名片段" }, 400, origin, env);
+
+  const cached = await readSearchCache(query);
+  if (cached) {
+    return json({ ...cached, elapsedMs: Date.now() - startedAt, cacheStatus: "hit" }, 200, origin, env);
+  }
 
   const indexed = findIndexedSources(query);
   let sourceUrls = indexed.map(item => item.url);
@@ -214,7 +273,7 @@ async function handleSearch(request, env, origin) {
     }
   }
 
-  return json(responsePayload({
+  const payload = responsePayload({
     query,
     discovery,
     discoveryMethods,
@@ -222,7 +281,9 @@ async function handleSearch(request, env, origin) {
     parsed,
     startedAt,
     warning: "暂未从可信说明书网页安全提取到完整候选。请补充完整药名后重试，或粘贴 39药品通/药源网的具体说明书链接；系统不会猜测临床字段。"
-  }), 200, origin, env);
+  });
+  await writeSearchCache(query, payload, ctx);
+  return json(payload, 200, origin, env);
 }
 
 async function handleManualSource(request, env, origin) {
@@ -247,7 +308,7 @@ async function handleManualSource(request, env, origin) {
 }
 
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const origin = request.headers.get("Origin") || "";
     if (!isAllowedOrigin(origin, env)) return json({ error: "不允许的网页来源" }, 403, "", env);
@@ -273,13 +334,14 @@ export default {
         trustedOnlineDiscoverySupported: true,
         manualTrustedSourceSupported: true,
         classificationSchema: "separate-category-therapeutic-class-v1",
+        searchOptimization: SEARCH_CACHE_SCHEMA,
         requiresPaidApi: false,
         usesOpenAI: false,
         sourceGrounded: true,
         generatesClinicalKnowledge: false
       }, 200, origin, env);
     }
-    if (request.method === "POST" && url.pathname === "/v1/drugs/search") return handleSearch(request, env, origin);
+    if (request.method === "POST" && url.pathname === "/v1/drugs/search") return handleSearch(request, env, origin, ctx);
     if (request.method === "POST" && url.pathname === "/v1/drugs/parse-source") return handleManualSource(request, env, origin);
     return json({ error: "未找到接口" }, 404, origin, env);
   }
@@ -293,5 +355,7 @@ export {
   normalizeUserSourceUrl,
   parseSources,
   readJsonObject,
+  readSearchCache,
+  searchCacheRequest,
   therapeuticClassFromCandidate
 };

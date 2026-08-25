@@ -57,8 +57,19 @@
     if (field && value !== undefined && value !== null) field.value = String(value);
   }
 
+  function selectedPharmacyScope(form) {
+    return String(form?.elements.namedItem("pharmacyScope")?.value || "ward") === "outpatient"
+      ? "outpatient"
+      : "ward";
+  }
+
+  async function ensureClassificationCatalog(form) {
+    if (selectedPharmacyScope(form) !== "outpatient" || Array.isArray(window.OUTPATIENT_DRUG_CATALOG)) return;
+    if (typeof window.loadOutpatientDrugCatalog === "function") await window.loadOutpatientDrugCatalog();
+  }
+
   function fillCandidate(candidate, form) {
-    const classification = classifyCandidate(candidate);
+    const classification = classifyCandidate(candidate, selectedPharmacyScope(form));
     setField(form, "drugName", candidate.drugName || "");
     setField(form, "genericName", candidate.drugName || "");
     setField(form, "tradeName", candidate.tradeName || "");
@@ -113,6 +124,7 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 35000);
     try {
+      await ensureClassificationCatalog(form);
       const response = await fetch(`${endpoint()}/v1/drugs/parse-source`, {
         method: "POST",
         cache: "no-store",

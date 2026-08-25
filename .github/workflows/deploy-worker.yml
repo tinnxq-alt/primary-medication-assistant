@@ -64,6 +64,7 @@ jobs:
               && payload.mode === 'free-verified'
               && payload.trustedOnlineDiscoverySupported === true
               && payload.classificationSchema === 'separate-category-therapeutic-class-v1'
+              && payload.searchOptimization === 'source-grounded-parallel-cache-v1'
               && payload.requiresPaidApi === false
               && payload.usesOpenAI === false
               && payload.sourceGrounded === true
@@ -107,6 +108,9 @@ jobs:
           if (payload.discovery !== 'local-source-index-v12' || payload.requiresPaidApi !== false || payload.usesOpenAI !== false) {
             console.error(JSON.stringify(payload, null, 2));
             throw new Error('hybrid trusted-source v12 mode is not active');
+          }
+          if (payload.searchOptimization !== 'source-grounded-parallel-cache-v1' || !['miss', 'hit'].includes(payload.cacheStatus)) {
+            throw new Error('parallel source fetch and cache optimization is not active');
           }
           if (payload.generatesClinicalKnowledge !== false || payload.sourceGrounded !== true) {
             throw new Error('Worker must remain source-grounded and must not generate clinical knowledge');
