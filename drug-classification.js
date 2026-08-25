@@ -12,15 +12,21 @@
   const clean = value => String(value || "").normalize("NFKC").trim();
   const normalizeName = value => clean(value).toLowerCase().replace(/[\s()（）【】\[\]·•\-_]/g, "");
 
-  function catalogClassification(candidate) {
+  function catalogForScope(scope) {
+    if (scope === "outpatient") {
+      return Array.isArray(window.OUTPATIENT_DRUG_CATALOG) ? window.OUTPATIENT_DRUG_CATALOG : [];
+    }
+    return Array.isArray(window.DRUG_CATALOG) ? window.DRUG_CATALOG : [];
+  }
+
+  function catalogClassification(candidate, preferredPharmacyScope = "") {
     const names = [candidate?.drugName, candidate?.genericName]
       .map(normalizeName)
       .filter(Boolean);
     if (!names.length) return null;
-    const knownDrugs = [
-      ...(Array.isArray(window.DRUG_CATALOG) ? window.DRUG_CATALOG : []),
-      ...(Array.isArray(window.OUTPATIENT_DRUG_CATALOG) ? window.OUTPATIENT_DRUG_CATALOG : [])
-    ];
+    const preferred = preferredPharmacyScope === "outpatient" ? "outpatient" : "ward";
+    const other = preferred === "outpatient" ? "ward" : "outpatient";
+    const knownDrugs = [...catalogForScope(preferred), ...catalogForScope(other)];
     return knownDrugs.find(drug => [drug.drugName, drug.genericName]
       .map(normalizeName)
       .filter(Boolean)
@@ -107,8 +113,8 @@
     return UNKNOWN_CLASSES.has(value) ? inferred : value;
   }
 
-  function classifyCandidate(candidate = {}) {
-    const known = catalogClassification(candidate);
+  function classifyCandidate(candidate = {}, preferredPharmacyScope = "") {
+    const known = catalogClassification(candidate, preferredPharmacyScope);
     const sourceUrl = candidate.source?.url || candidate.sourceUrl || "";
     const indication = candidate.clinical?.indication || candidate.indications || "";
     const approvalNumber = candidate.approvalNumber || "";

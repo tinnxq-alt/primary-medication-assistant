@@ -144,6 +144,17 @@
     return node && document.getElementById("lookupDrugBtn") ? node : null;
   }
 
+  function selectedPharmacyScope(node = currentForm()) {
+    return String(node?.elements.namedItem("pharmacyScope")?.value || "ward") === "outpatient"
+      ? "outpatient"
+      : "ward";
+  }
+
+  async function ensureClassificationCatalog(node = currentForm()) {
+    if (selectedPharmacyScope(node) !== "outpatient" || Array.isArray(window.OUTPATIENT_DRUG_CATALOG)) return;
+    if (typeof window.loadOutpatientDrugCatalog === "function") await window.loadOutpatientDrugCatalog();
+  }
+
   function setField(node, name, value) {
     const field = node.elements.namedItem(name);
     if (field && value !== undefined && value !== null) field.value = value;
@@ -151,7 +162,7 @@
 
   function fill(candidate, node = currentForm(), { silent = false } = {}) {
     if (!candidate || !node) return;
-    const classification = classifyCandidate(candidate);
+    const classification = classifyCandidate(candidate, selectedPharmacyScope(node));
     setField(node, "drugName", candidate.drugName || "");
     setField(node, "genericName", candidate.genericName || candidate.drugName || "");
     setField(node, "tradeName", candidate.tradeName || "");
@@ -188,7 +199,7 @@
       candidateMap.set(candidate.lookupId, candidate);
     });
     results.innerHTML = candidates.length ? candidates.map((candidate, index) => {
-      const classification = classifyCandidate(candidate);
+      const classification = classifyCandidate(candidate, selectedPharmacyScope());
       const meta = [candidate.tradeName, candidate.specification, candidate.manufacturer].filter(Boolean).join(" · ");
       const sourceLink = candidate.source?.url ? `<a class="btn ghost small link-btn" href="${esc(candidate.source.url)}" target="_blank" rel="noopener">查看原说明书</a>` : "";
       return `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">说明书候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(meta || "规格/厂家以来源页为准")} · ${esc(classification.category)} · ${esc(classification.therapeuticClass)}</p><p class="drug-sub"><span class="badge ok">网页原文摘录</span> ${esc(candidate.source?.quality || "网页来源")}：${esc(candidate.source?.host || candidate.source?.label || "")}</p><div class="toolbar">${sourceLink}<button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并自动填充</button></div></div></article>`;
@@ -236,7 +247,7 @@
     if (status) status.textContent = "正在联网搜索药品说明书并读取网页原文…";
 
     try {
-      const aliases = await loadAliases();
+      const [aliases] = await Promise.all([loadAliases(), ensureClassificationCatalog(node)]);
       if (id !== requestId) return;
       const duplicate = exactDuplicate(query, aliases);
       if (duplicate) {
@@ -325,7 +336,15 @@
           autoLookupTimer = setTimeout(() => {
             if (currentForm() !== input.form || input.value.trim() !== query || query === lastAutoQuery) return;
             run({ automatic: true });
-          }, 900);
+          }, 500);
+        });
+      }
+      const pharmacyScope = input?.form?.elements.namedItem("pharmacyScope");
+      if (pharmacyScope && pharmacyScope.dataset.onlineClassificationBound !== "true") {
+        pharmacyScope.dataset.onlineClassificationBound = "true";
+        pharmacyScope.addEventListener("change", async () => {
+          try { await ensureClassificationCatalog(input.form); } catch {}
+          if (candidateMap.size) renderCandidates([...candidateMap.values()]);
         });
       }
     });

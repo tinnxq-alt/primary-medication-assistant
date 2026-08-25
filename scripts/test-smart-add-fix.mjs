@@ -17,6 +17,9 @@ assert.match(ui, /chineseCount\(query\) < 2/, "两个汉字片段即可识别");
 assert.match(ui, /remoteInstructionCandidates\(query\)/, "必须调用说明书候选接口");
 assert.match(ui, /input\.addEventListener\("input"/, "输入药名后必须自动触发防抖联网检索");
 assert.match(ui, /run\(\{ automatic: true \}\)/, "自动检索必须复用安全的说明书检索流程");
+assert.match(ui, /}, 500\);/, "输入停顿 500ms 后应开始联网检索");
+assert.match(ui, /ensureClassificationCatalog\(node\)/, "检索门诊药时必须先加载门诊药库分类");
+assert.match(ui, /classifyCandidate\(candidate, selectedPharmacyScope/, "联网候选必须按目标药库分类");
 assert.match(ui, /result\.candidates\.length === 1/, "唯一完整候选应自动填充");
 assert.match(ui, /查看原说明书/, "候选必须可查看来源");
 assert.match(ui, /选择并自动填充/, "用户选择候选后才自动填充");
@@ -32,6 +35,7 @@ assert.match(freeUi, /candidate\.clinical\?\.indication/, "粘贴说明书自动
 assert.match(freeUi, /candidate\.clinical\?\.dosage/, "粘贴说明书自动填充必须包含用法用量");
 assert.match(freeUi, /sourceStatus", "needs-review"/, "网页原文自动填充仍须标记待复核");
 assert.match(freeUi, /classification\.therapeuticClass/, "粘贴说明书也必须独立填入药物作用分类");
+assert.match(freeUi, /ensureClassificationCatalog\(form\)/, "粘贴说明书填充也必须加载目标药库分类");
 
 assert.match(classification, /Object\.freeze\(\["西药", "中成药"\]\)/, "药品分类选项必须是药品属性，不得混入作用分类");
 assert.match(classification, /function classifyCandidate\(/, "所有添加入口必须复用统一分类器");
@@ -51,6 +55,9 @@ assert.match(worker, /requiresPaidApi:\s*false/, "v12 必须明确无需收费 A
 assert.match(worker, /usesOpenAI:\s*false/, "v12 必须明确不使用 OpenAI");
 assert.match(worker, /generatesClinicalKnowledge:\s*false/, "v12 必须明确不生成临床知识");
 assert.match(worker, /classificationSchema:\s*"separate-category-therapeutic-class-v1"/, "Worker 必须声明药品分类与作用分类已分离");
+assert.match(worker, /Promise\.all\(attemptedUrls\.map/, "可信说明书直读必须并发执行");
+assert.match(worker, /globalThis\.caches\?\.default/, "重复联网检索必须使用边缘缓存");
+assert.match(worker, /searchOptimization:\s*SEARCH_CACHE_SCHEMA/, "Worker 必须暴露检索优化契约");
 assert.doesNotMatch(worker, /api\.openai\.com|web_search|env\.AI\.run/, "v12 运行代码不得调用 OpenAI、Web Search 或 Workers AI");
 assert.match(sourceIndex, /司美格鲁肽注射液/, "免费来源索引必须包含司美格鲁肽验收条目");
 assert.match(sourceIndex, /https:\/\/ypk\.39\.net\/2310025\/manual\//, "司美格鲁肽必须绑定真实 39 说明书 URL");

@@ -39,6 +39,9 @@ const onlineSearchHtml = onlineClomipramine.map((url, index) =>
   `<a href="${url.replace(/manual\/$/, "")}">氯米帕明片说明书${index + 1}</a>`).join("");
 
 const browserUrls = [];
+let directFetchCount = 0;
+let activeDirectFetches = 0;
+let maxActiveDirectFetches = 0;
 const BROWSER = {
   async quickAction(action, input) {
     assert.equal(action, "content");
@@ -55,10 +58,34 @@ const BROWSER = {
 const nativeFetch = globalThis.fetch;
 globalThis.fetch = async (input, init) => {
   const url = String(input instanceof Request ? input.url : input);
-  if (url === semaglutide39) return new Response(semaglutideHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-  if (onlineClomipramine.includes(url)) return new Response(clomipramineHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  if (url === semaglutide39) {
+    directFetchCount += 1;
+    return new Response(semaglutideHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  }
+  if (onlineClomipramine.includes(url)) {
+    directFetchCount += 1;
+    activeDirectFetches += 1;
+    maxActiveDirectFetches = Math.max(maxActiveDirectFetches, activeDirectFetches);
+    await new Promise(resolve => setTimeout(resolve, 40));
+    activeDirectFetches -= 1;
+    return new Response(clomipramineHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  }
   return nativeFetch(input, init);
 };
+const nativeCaches = globalThis.caches;
+const cachedResponses = new Map();
+globalThis.caches = {
+  default: {
+    async match(key) {
+      return cachedResponses.get(String(key instanceof Request ? key.url : key))?.clone();
+    },
+    async put(key, response) {
+      cachedResponses.set(String(key instanceof Request ? key.url : key), response.clone());
+    }
+  }
+};
+const backgroundWrites = [];
+const ctx = { waitUntil(promise) { backgroundWrites.push(promise); } };
 const env = { ALLOWED_ORIGINS: origin, BROWSER };
 const request = (path, body, headers = {}) => new Request(`https://worker.example${path}`, {
   method: "POST",
@@ -72,9 +99,10 @@ const healthPayload = await health.json();
 assert.equal(healthPayload.discovery, "hybrid-source-discovery-v12");
 assert.equal(healthPayload.trustedOnlineDiscoverySupported, true);
 assert.equal(healthPayload.classificationSchema, "separate-category-therapeutic-class-v1");
+assert.equal(healthPayload.searchOptimization, "source-grounded-parallel-cache-v1");
 assert.equal(healthPayload.sourceGrounded, true);
 
-const indexed = await worker.fetch(request("/v1/drugs/search", { query: "司美" }), env);
+const indexed = await worker.fetch(request("/v1/drugs/search", { query: "司美" }), env, ctx);
 assert.equal(indexed.status, 200);
 const indexedPayload = await indexed.json();
 assert.equal(indexedPayload.discovery, "local-source-index-v12");
@@ -82,8 +110,16 @@ assert.equal(indexedPayload.candidates[0].drugName, "司美格鲁肽注射液");
 assert.equal(indexedPayload.candidates[0].category, "西药");
 assert.equal(indexedPayload.candidates[0].therapeuticClass, "降糖药");
 assert.equal(indexedPayload.classificationSchema, "separate-category-therapeutic-class-v1");
+assert.equal(indexedPayload.cacheStatus, "miss");
+assert.equal(indexedPayload.searchOptimization, "source-grounded-parallel-cache-v1");
 assert.match(indexedPayload.candidates[0].clinical.indication, /2型糖尿病/);
 assert.ok(indexedPayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
+await Promise.all(backgroundWrites.splice(0));
+const indexedFetchCount = directFetchCount;
+const cachedIndexed = await worker.fetch(request("/v1/drugs/search", { query: "司美" }), env, ctx);
+const cachedIndexedPayload = await cachedIndexed.json();
+assert.equal(cachedIndexedPayload.cacheStatus, "hit");
+assert.equal(directFetchCount, indexedFetchCount, "重复检索命中缓存时不得再次抓取说明书");
 
 const online = await worker.fetch(request("/v1/drugs/search", { query: "氯米帕明" }), env);
 assert.equal(online.status, 200);
@@ -96,6 +132,8 @@ assert.equal(onlinePayload.candidates[0].therapeuticClass, "抗抑郁药");
 assert.match(onlinePayload.candidates[0].clinical.dosage, /遵医嘱/);
 assert.ok(onlinePayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
 assert.ok(onlinePayload.fetchedSourceCount <= 5, "单次检索不得读取过多来源页面");
+assert.equal(onlinePayload.candidates.length, 1, "同名同规格同厂家候选跨来源时只保留一条");
+assert.ok(maxActiveDirectFetches >= 2, "多个可信说明书来源必须并发直读");
 
 const parsed = await worker.fetch(request("/v1/drugs/parse-source", {
   query: "司美", sourceUrl: "https://ypk.39.net/2310025/"
@@ -120,4 +158,5 @@ assert.match((await tooLarge.json()).error, /过大/);
 assert.ok(!browserUrls.includes(semaglutide39), "可信说明书可直接读取时不应消耗 Browser Run 配额");
 assert.ok(browserUrls.some(url => url.includes("/search/") && decodeURIComponent(url).includes("氯米帕明")), "未命中索引时应联网发现可信说明书");
 globalThis.fetch = nativeFetch;
+globalThis.caches = nativeCaches;
 console.log("Worker hybrid trusted-source v12 tests passed");
