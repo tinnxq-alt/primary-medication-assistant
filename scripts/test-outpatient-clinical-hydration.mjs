@@ -36,11 +36,11 @@ run("outpatient-web-verification.js");
 const labels = JSON.parse(fs.readFileSync(path.join(root, "chinese-drug-labels.json"), "utf8"));
 const result = context.window.applyOutpatientClinicalReferences(context.window.OUTPATIENT_DRUG_CATALOG, labels);
 
-assert.equal(result.catalog.length, 395, "门诊说明书匹配不得改变目录总数");
-assert.equal(result.hydratedCount, 129, "应只复用 129 条同药品名称（含剂型）、同成分规格的已核验资料");
+assert.equal(result.catalog.length, 392, "门诊说明书匹配不得改变目录总数");
+assert.equal(result.hydratedCount, 128, "应只复用 128 条同药品名称（含剂型）、同成分规格的已核验资料");
 
 const hydrated = result.catalog.filter(drug => drug.outpatientClinicalReference);
-assert.equal(hydrated.length, 129, "匹配标记数量应与复用计数一致");
+assert.equal(hydrated.length, 128, "匹配标记数量应与复用计数一致");
 for (const drug of hydrated) {
   assert.equal(drug.outpatientClinicalReference.status, "matched-existing-verified-source");
   assert.equal(drug.outpatientClinicalReference.hydratedAt, "2026-08-25");
@@ -68,9 +68,9 @@ assert.ok(byCode("FX6121").clinical, "200mg 同名同成分规格品规应复用
 assert.equal(result.catalog.filter(drug => drug.source?.status === "needs-review").length, 0, "门诊目录不应再有待核验状态");
 
 const coverage = context.window.applyOutpatientClinicalCoverage(context.window.OUTPATIENT_DRUG_CATALOG, labels);
-assert.equal(coverage.hydratedCount, 129);
-assert.equal(coverage.supplementedCount, 266, "剩余 266 条门诊药应由逐条核验的公开说明书摘要补齐");
-assert.equal(coverage.totalClinicalCount, 395, "门诊 395 条药品均应具备临床四字段");
+assert.equal(coverage.hydratedCount, 128);
+assert.equal(coverage.supplementedCount, 264, "剩余 264 条门诊药应由逐条核验的公开说明书摘要补齐");
+assert.equal(coverage.totalClinicalCount, 392, "门诊 392 条药品均应具备临床四字段");
 assert.equal(coverage.catalog.filter(drug => !drug.clinical).length, 0);
 for (const drug of coverage.catalog) {
   for (const field of ["indication", "dosage", "adverseReactions", "precautions"]) {
@@ -104,7 +104,7 @@ assert.match(fs.readFileSync(path.join(root, "outpatient-loader.js"), "utf8"), /
 assert.match(
   app,
   /catalog = await window\.hydrateOutpatientClinicalCatalog\(catalog\)/,
-  "切换或恢复门诊药库时必须等待 395 条临床资料全部装载后再渲染"
+  "切换或恢复门诊药库时必须等待 392 条临床资料全部装载后再渲染"
 );
 
 const serviceWorker = fs.readFileSync(path.join(root, "service-worker.js"), "utf8");
@@ -117,4 +117,4 @@ const metadataUi = fs.readFileSync(path.join(root, "outpatient-metadata-ui.js"),
 assert.match(metadataUi, /!drug\?\.metadataVerification && !drug\?\.outpatientClinicalReference/);
 assert.match(metadataUi, /说明书资料匹配/);
 
-console.log("门诊说明书覆盖测试通过：129 条安全复用 + 266 条逐条补充 = 395 条完整资料");
+console.log("门诊说明书覆盖测试通过：128 条安全复用 + 264 条逐条补充 = 392 条完整资料");
