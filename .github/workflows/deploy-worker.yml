@@ -86,25 +86,23 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          HTTP_CODE=$(curl --silent --show-error \
-            --max-time 75 \
-            -X POST "$WORKER_URL/v1/drugs/search" \
-            -H 'Origin: https://tinnxq-alt.github.io' \
-            -H 'Content-Type: application/json' \
-            --data '{"query":"司美"}' \
-            --output /tmp/smart-search-smoke.json \
-            --write-out '%{http_code}')
-          echo "live HTTP status: $HTTP_CODE"
-          cat /tmp/smart-search-smoke.json || true
-          echo
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "Live Worker returned HTTP $HTTP_CODE" >&2
-            exit 1
-          fi
-
-          node - <<'NODE'
+          for attempt in $(seq 1 20); do
+            HTTP_CODE=$(curl --silent --show-error \
+              --max-time 75 \
+              -X POST "$WORKER_URL/v1/drugs/search" \
+              -H 'Origin: https://tinnxq-alt.github.io' \
+              -H 'Content-Type: application/json' \
+              --data '{"query":"司美"}' \
+              --output /tmp/smart-search-smoke.json \
+              --write-out '%{http_code}' || true)
+            echo "smoke attempt $attempt: HTTP ${HTTP_CODE:-curl-error}"
+            cat /tmp/smart-search-smoke.json 2>/dev/null || true
+            echo
+            if [ "$HTTP_CODE" = "200" ] && node - <<'NODE'
           const fs = require('fs');
-          const payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8'));
+          let payload;
+          try { payload = JSON.parse(fs.readFileSync('/tmp/smart-search-smoke.json', 'utf8')); }
+          catch { process.exit(1); }
           if (payload.discovery !== 'local-source-index-v12' || payload.requiresPaidApi !== false || payload.usesOpenAI !== false) {
             console.error(JSON.stringify(payload, null, 2));
             throw new Error('hybrid trusted-source v12 mode is not active');
@@ -135,6 +133,13 @@ jobs:
           }
           console.log(`free indexed candidate ok: ${target.drugName} | ${target.sourceUrl} | ${payload.elapsedMs}ms`);
           NODE
+            then
+              exit 0
+            fi
+            sleep 4
+          done
+          echo "Timed out waiting for optimized Worker search response" >&2
+          exit 1
 
       - name: Report live verification to tracking issue
         if: always()
