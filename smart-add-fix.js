@@ -4,6 +4,7 @@
   const PREFIX = "primary-medication-pro:v1:";
   const DEFAULT_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
   const lookup = window.DRUG_LOOKUP || {};
+  const classifyCandidate = window.DRUG_CLASSIFICATION.classifyCandidate;
   const normalize = lookup.normalize || (value => String(value || "").normalize("NFKC").toLowerCase().replace(/[\s()（）【】\[\]·•\-_]/g, ""));
   let aliasPromise = null;
   let candidateMap = new Map();
@@ -108,7 +109,8 @@
           manufacturer: String(item.manufacturer || "").trim(),
           dosageForm: String(item.dosageForm || "").trim(),
           approvalNumber: String(item.approvalNumber || "").trim(),
-          category: String(item.category || "其他"),
+          category: String(item.category || "").trim(),
+          therapeuticClass: String(item.therapeuticClass || item.category || "").trim(),
           clinical: {
             indication: String(item.clinical?.indication || "").trim(),
             dosage: String(item.clinical?.dosage || "").trim(),
@@ -149,16 +151,17 @@
 
   function fill(candidate, node = currentForm(), { silent = false } = {}) {
     if (!candidate || !node) return;
+    const classification = classifyCandidate(candidate);
     setField(node, "drugName", candidate.drugName || "");
     setField(node, "genericName", candidate.genericName || candidate.drugName || "");
     setField(node, "tradeName", candidate.tradeName || "");
     setField(node, "specification", candidate.specification || "");
     setField(node, "dosageForm", candidate.dosageForm || "");
-    setField(node, "therapeuticClass", candidate.category || "");
+    setField(node, "therapeuticClass", classification.therapeuticClass);
     setField(node, "manufacturer", candidate.manufacturer || "");
     setField(node, "marketingAuthorizationHolder", candidate.manufacturer || "");
     setField(node, "approvalNumber", candidate.approvalNumber || "");
-    setField(node, "category", candidate.category && candidate.category !== "其他" ? candidate.category : "其他");
+    setField(node, "category", classification.category);
     setField(node, "indication", candidate.clinical?.indication || "");
     setField(node, "dosage", candidate.clinical?.dosage || "");
     setField(node, "adverseReactions", candidate.clinical?.adverseReactions || "");
@@ -185,9 +188,10 @@
       candidateMap.set(candidate.lookupId, candidate);
     });
     results.innerHTML = candidates.length ? candidates.map((candidate, index) => {
+      const classification = classifyCandidate(candidate);
       const meta = [candidate.tradeName, candidate.specification, candidate.manufacturer].filter(Boolean).join(" · ");
       const sourceLink = candidate.source?.url ? `<a class="btn ghost small link-btn" href="${esc(candidate.source.url)}" target="_blank" rel="noopener">查看原说明书</a>` : "";
-      return `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">说明书候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(meta || "规格/厂家以来源页为准")} · ${esc(candidate.category || "其他")}</p><p class="drug-sub"><span class="badge ok">网页原文摘录</span> ${esc(candidate.source?.quality || "网页来源")}：${esc(candidate.source?.host || candidate.source?.label || "")}</p><div class="toolbar">${sourceLink}<button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并自动填充</button></div></div></article>`;
+      return `<article class="card lookup-card" data-candidate-card="${esc(candidate.lookupId)}"><div><p class="drug-sub">说明书候选 ${index + 1}</p><h3>${esc(candidate.drugName)}</h3><p class="drug-sub">${esc(meta || "规格/厂家以来源页为准")} · ${esc(classification.category)} · ${esc(classification.therapeuticClass)}</p><p class="drug-sub"><span class="badge ok">网页原文摘录</span> ${esc(candidate.source?.quality || "网页来源")}：${esc(candidate.source?.host || candidate.source?.label || "")}</p><div class="toolbar">${sourceLink}<button class="btn primary small" type="button" data-new-drug-use="${esc(candidate.lookupId)}">选择并自动填充</button></div></div></article>`;
     }).join("") : '<div class="empty"><p>未找到同时含药名、适应症和用法用量的可解析说明书网页。请补充药名后重试。</p></div>';
   }
 

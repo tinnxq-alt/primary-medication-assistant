@@ -118,7 +118,8 @@ jobs:
             let host = '';
             try { host = new URL(String(item.sourceUrl || '')).hostname.toLowerCase(); } catch {}
             return String(item.drugName || '').includes('司美格鲁肽')
-              && item.category === '降糖药'
+              && item.category === '西药'
+              && item.therapeuticClass === '降糖药'
               && trustedHost(host)
               && String(item.clinical?.indication || '').trim()
               && String(item.clinical?.dosage || '').trim();
@@ -174,7 +175,8 @@ jobs:
             let host = '';
             try { host = new URL(String(item.sourceUrl || '')).hostname.toLowerCase(); } catch {}
             return String(item.drugName || '').includes('司美格鲁肽')
-              && item.category === '降糖药'
+              && item.category === '西药'
+              && item.therapeuticClass === '降糖药'
               && trusted.has(host)
               && String(item.clinical?.indication || '').trim()
               && String(item.clinical?.dosage || '').trim();
@@ -190,7 +192,7 @@ jobs:
           console.log(`- generatesClinicalKnowledge: \`${payload.generatesClinicalKnowledge === true}\``);
           console.log(`- 司美格鲁肽可信候选: **${target ? '通过' : '未通过'}**`);
           if (target) {
-            console.log(`- 命中: ${String(target.drugName || '').slice(0, 80)} / ${String(target.category || '').slice(0, 40)} / \`${targetHost}\``);
+            console.log(`- 命中: ${String(target.drugName || '').slice(0, 80)} / ${String(target.category || '').slice(0, 20)} / ${String(target.therapeuticClass || '').slice(0, 40)} / \`${targetHost}\``);
             console.log(`- elapsedMs: \`${Number(payload.elapsedMs) || 0}\``);
           }
           NODE

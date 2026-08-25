@@ -78,6 +78,9 @@ assert.equal(indexed.status, 200);
 const indexedPayload = await indexed.json();
 assert.equal(indexedPayload.discovery, "local-source-index-v12");
 assert.equal(indexedPayload.candidates[0].drugName, "司美格鲁肽注射液");
+assert.equal(indexedPayload.candidates[0].category, "西药");
+assert.equal(indexedPayload.candidates[0].therapeuticClass, "降糖药");
+assert.equal(indexedPayload.classificationSchema, "separate-category-therapeutic-class-v1");
 assert.match(indexedPayload.candidates[0].clinical.indication, /2型糖尿病/);
 assert.ok(indexedPayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
 
@@ -87,6 +90,8 @@ const onlinePayload = await online.json();
 assert.equal(onlinePayload.discovery, "trusted-online-discovery-v12");
 assert.ok(onlinePayload.discoveryMethods.includes("39-site-search"));
 assert.equal(onlinePayload.candidates[0].drugName, "盐酸氯米帕明片");
+assert.equal(onlinePayload.candidates[0].category, "西药");
+assert.equal(onlinePayload.candidates[0].therapeuticClass, "抗抑郁药");
 assert.match(onlinePayload.candidates[0].clinical.dosage, /遵医嘱/);
 assert.ok(onlinePayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
 assert.ok(onlinePayload.fetchedSourceCount <= 5, "单次检索不得读取过多来源页面");

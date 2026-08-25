@@ -47,6 +47,7 @@ jobs:
           node --check drug-interactions.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
+          node --check drug-classification.js
           node --check drugs.js
           node --check outpatient-drugs.js
           node --check service-worker.js
@@ -75,6 +76,8 @@ jobs:
         run: node scripts/test-fast-search.mjs
       - name: Smart add autofill tests
         run: node scripts/test-smart-add-fix.mjs
+      - name: Drug classification separation tests
+        run: node scripts/test-drug-classification.mjs
       - name: Pharmacy scope tests
         run: node scripts/test-pharmacy-scope.mjs
       - name: Outpatient lazy loading tests

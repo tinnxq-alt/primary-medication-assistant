@@ -276,7 +276,7 @@ for (const [relativePath, source] of [["app.js", appSource], ["fast-search-ui.js
   if (/chinese-drug-labels\.json/.test(source)) fail(`${relativePath} 不得绕过中文核验库单例加载器`);
 }
 
-const runtimeFiles = ["app.js", "catalog-data-loader.js", "drug-lookup.js", "pharmacy-scope.js", "drug-interactions.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-supplement.js", "outpatient-clinical-hydration.js", "index.html", "style.css", "worker/src/index.js"];
+const runtimeFiles = ["app.js", "catalog-data-loader.js", "drug-classification.js", "drug-lookup.js", "pharmacy-scope.js", "drug-interactions.js", "outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-supplement.js", "outpatient-clinical-hydration.js", "index.html", "style.css", "worker/src/index.js"];
 const forbiddenRuntimePatterns = [
   { label: "OCR", pattern: /\bocr\b/i },
   { label: "相机调用", pattern: /getUserMedia\s*\(/i },
@@ -304,6 +304,9 @@ if (htmlSource.indexOf('src="catalog-data-loader.js"') < 0 || htmlSource.indexOf
 if (htmlSource.indexOf('src="outpatient-clinical-hydration.js"') < htmlSource.indexOf('src="catalog-data-loader.js"') || htmlSource.indexOf('src="outpatient-clinical-hydration.js"') > htmlSource.indexOf('src="app.js"')) {
   fail("index.html 必须在 catalog-data-loader.js 之后、app.js 之前加载 outpatient-clinical-hydration.js");
 }
+if (htmlSource.indexOf('src="drug-classification.js"') < 0 || htmlSource.indexOf('src="drug-classification.js"') > htmlSource.indexOf('src="app.js"')) {
+  fail("index.html 必须在 app.js 之前加载 drug-classification.js");
+}
 if (htmlSource.includes('src="outpatient-drugs.js"')) fail("index.html 不得同步加载体积较大的门诊目录");
 if (htmlSource.indexOf('src="outpatient-loader.js"') > htmlSource.indexOf('src="outpatient-web-verification.js"')) {
   fail("index.html 必须先加载门诊懒加载器，再加载网络核验补丁");
@@ -311,7 +314,7 @@ if (htmlSource.indexOf('src="outpatient-loader.js"') > htmlSource.indexOf('src="
 if (!/ensureOutpatientCatalogLoaded\(\)/.test(appSource) || !/loadOutpatientDrugCatalog/.test(appSource)) {
   fail("app.js 切换门诊药库时必须触发门诊目录懒加载");
 }
-for (const shellFile of ["outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-hydration.js", "pharmacy-scope.js", "catalog-data-loader.js"]) {
+for (const shellFile of ["outpatient-loader.js", "outpatient-drugs.js", "outpatient-web-verification.js", "outpatient-clinical-hydration.js", "pharmacy-scope.js", "catalog-data-loader.js", "drug-classification.js"]) {
   if (!serviceWorkerSource.includes(`"./${shellFile}"`)) fail(`service-worker.js 必须离线缓存 ${shellFile}`);
 }
 if (/accept\s*=\s*["'][^"']*image/i.test(htmlSource)) fail("index.html 重新引入了图片文件上传入口");

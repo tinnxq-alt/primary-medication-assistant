@@ -4,6 +4,7 @@
   const PREFIX = "primary-medication-pro:v1:";
   const DEFAULT_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
   const TRUSTED_HOSTS = new Set(["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"]);
+  const classifyCandidate = window.DRUG_CLASSIFICATION.classifyCandidate;
   let parsing = false;
 
   function read(key, fallback) {
@@ -57,16 +58,17 @@
   }
 
   function fillCandidate(candidate, form) {
+    const classification = classifyCandidate(candidate);
     setField(form, "drugName", candidate.drugName || "");
     setField(form, "genericName", candidate.drugName || "");
     setField(form, "tradeName", candidate.tradeName || "");
     setField(form, "specification", candidate.specification || "");
     setField(form, "dosageForm", candidate.dosageForm || "");
-    setField(form, "therapeuticClass", candidate.category || "");
+    setField(form, "therapeuticClass", classification.therapeuticClass);
     setField(form, "manufacturer", candidate.manufacturer || "");
     setField(form, "marketingAuthorizationHolder", candidate.manufacturer || "");
     setField(form, "approvalNumber", candidate.approvalNumber || "");
-    setField(form, "category", candidate.category || "其他");
+    setField(form, "category", classification.category);
     setField(form, "indication", candidate.clinical?.indication || "");
     setField(form, "dosage", candidate.clinical?.dosage || "");
     setField(form, "adverseReactions", candidate.clinical?.adverseReactions || "");
