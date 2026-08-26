@@ -3,7 +3,8 @@
 
   const VERSION = "1.0.0-draft";
   const ENTITY_TYPES = Object.freeze({
-    DRUG: "drug",
+    DRUG_CONCEPT: "drug_concept",
+    DRUG_PRODUCT: "drug_product",
     EMERGENCY_PROTOCOL: "emergency_protocol",
     FAVORITE: "favorite",
     NOTE: "note",
@@ -16,15 +17,22 @@
   ]);
 
   const isNonEmptyString = value => typeof value === "string" && value.trim().length > 0;
-  const isDrugId = value => /^drug-[a-z0-9][a-z0-9-]{1,63}$/i.test(String(value || ""));
+  const isDrugId = value => /^drug-concept-[a-z0-9][a-z0-9-]{1,63}$/i.test(String(value || ""));
   const isProtocolId = value => /^protocol-[a-z0-9][a-z0-9-]{1,63}$/i.test(String(value || ""));
 
-  function validateDrug(drug) {
+  function validateDrugConcept(drug) {
     const errors = [];
-    if (!isDrugId(drug?.id)) errors.push("drug.id 必须是稳定的 drug-* 标识");
+    if (!isDrugId(drug?.id)) errors.push("drug.id 必须是稳定的 drug-concept-* 标识");
     if (!isNonEmptyString(drug?.drugName)) errors.push("drug.drugName 不能为空");
-    if (!Array.isArray(drug?.pharmacyScopes)) errors.push("drug.pharmacyScopes 必须是数组");
     if (!isNonEmptyString(drug?.source?.status)) errors.push("drug.source.status 不能为空");
+    return errors;
+  }
+
+  function validateDrugProduct(product) {
+    const errors = [];
+    if (!isNonEmptyString(product?.productId)) errors.push("product.productId 不能为空");
+    if (!isDrugId(product?.drugId)) errors.push("product.drugId 必须引用通用药物身份");
+    if (!Array.isArray(product?.pharmacyScopes)) errors.push("product.pharmacyScopes 必须是数组");
     return errors;
   }
 
@@ -56,9 +64,10 @@
   window.CLINICAL_DATA_CONTRACT = Object.freeze({
     version: VERSION,
     entityTypes: ENTITY_TYPES,
-    publicEntities: Object.freeze([ENTITY_TYPES.DRUG, ENTITY_TYPES.EMERGENCY_PROTOCOL]),
+    publicEntities: Object.freeze([ENTITY_TYPES.DRUG_CONCEPT, ENTITY_TYPES.DRUG_PRODUCT, ENTITY_TYPES.EMERGENCY_PROTOCOL]),
     userEntities: Object.freeze([...USER_ENTITY_TYPES]),
-    validateDrug,
+    validateDrugConcept,
+    validateDrugProduct,
     validateEmergencyProtocol,
     validateUserEntity
   });
