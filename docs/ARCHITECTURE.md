@@ -30,12 +30,15 @@
 
 ### 公共数据
 
-- `drugs`：唯一药品事实来源，稳定主键 `drug_id`。
+- `drug_concepts`：通用药物身份，例如阿司匹林、葡萄糖、肾上腺素；稳定主键 `drug_id`。急救流程只引用这一层。
+- `drug_products`：院内具体品规，保存规格、剂型、厂家和现有目录 ID，并通过 `drug_id` 归属于一个通用药物身份。
 - `drug_categories`：系统分类、药理分类及父子关系。
-- `hospital_inventory`：药品在病房、门诊、抢救车的可获得性；不表达指南优先级。
+- `hospital_inventory`：具体品规在病房、门诊、抢救车的可获得性，通过 `product_id` 关联；不表达指南优先级。
 - `emergency_protocols`：急救流程标题、版本、核验状态、来源和更新时间。
 - `emergency_steps`：有序流程步骤。
 - `emergency_drug_refs`：`protocol_id + drug_id + purpose + administration_context`，不复制药名或完整说明书。
+
+现有病房 `drug-025`、门诊 `outpatient-*` 等 ID 暂时按 `product_id` 处理，不能直接作为急救流程的 `drug_id`。例如阿司匹林的多个病房/门诊品规应共同指向同一个 `drug-concept-aspirin`；急救流程引用该通用身份，页面再根据当前药库显示可用的具体品规。
 
 ### 个人数据
 
