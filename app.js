@@ -679,6 +679,10 @@
   function renderAdd() {
     const lookupCandidates = new Map();
     const categoryOptions = DRUG_CATEGORY_IDS.map(category => `<option value="${esc(category)}">${esc(category)}</option>`).join("");
+    const therapeuticClassOptions = [...new Set([
+      ...visibleDrugs().map(drug => drug.therapeuticClass),
+      "白三烯受体拮抗剂", "平喘药", "作用待分类"
+    ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "zh-CN"));
     const pharmacyOptions = Object.entries(PHARMACIES).map(([id, pharmacy]) =>
       `<option value="${esc(id)}" ${id === state.activePharmacy ? "selected" : ""}>${esc(pharmacy.label)}</option>`
     ).join("");
@@ -700,7 +704,7 @@
             <div class="field"><label>商品名</label><input name="tradeName"></div>
             <div class="field"><label>药品规格</label><input name="specification" placeholder='例如：5mg*28片'></div>
             <div class="field"><label>剂型</label><input name="dosageForm"></div>
-            <div class="field"><label>药物作用分类</label><input name="therapeuticClass"></div>
+            <div class="field"><label>药物作用分类</label><input name="therapeuticClass" list="therapeuticClassOptions" placeholder="可选择或自行填写"><datalist id="therapeuticClassOptions">${therapeuticClassOptions.map(item => `<option value="${esc(item)}"></option>`).join("")}</datalist></div>
             <div class="field"><label>医保标记</label><input name="insuranceClass" value="未标注"></div>
             <div class="field"><label>生产企业</label><input name="manufacturer"></div>
             <div class="field"><label>上市许可持有人</label><input name="marketingAuthorizationHolder"></div>

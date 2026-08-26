@@ -12,7 +12,7 @@ const CANDIDATE_LIMIT = 5;
 const SOURCE_PARSE_ATTEMPT_LIMIT = 8;
 const MAX_BODY_BYTES = 4096;
 const SEARCH_CACHE_SECONDS = 6 * 60 * 60;
-const SEARCH_CACHE_SCHEMA = "source-grounded-fuzzy-parallel-cache-v2";
+const SEARCH_CACHE_SCHEMA = "source-grounded-fuzzy-parallel-cache-v3";
 const USER_PASTE_HOSTS = new Set(["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"]);
 const DRUG_CATEGORIES = new Set(["西药", "中成药"]);
 
@@ -64,6 +64,7 @@ function drugCategoryFromCandidate(candidate) {
 }
 
 function therapeuticClassFromCandidate(candidate, category) {
+  if (/孟鲁司特/.test(String(candidate?.drugName || ""))) return "白三烯受体拮抗剂";
   const legacyClass = String(candidate?.therapeuticClass || candidate?.category || "").trim();
   if (legacyClass && !DRUG_CATEGORIES.has(legacyClass) && !["其他", "未分类", "作用待分类"].includes(legacyClass)) return legacyClass;
   const text = `${candidate?.drugName || ""} ${candidate?.clinical?.indication || ""}`;

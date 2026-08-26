@@ -111,7 +111,7 @@ const healthPayload = await health.json();
 assert.equal(healthPayload.discovery, "hybrid-source-discovery-v12");
 assert.equal(healthPayload.trustedOnlineDiscoverySupported, true);
 assert.equal(healthPayload.classificationSchema, "separate-category-therapeutic-class-v1");
-assert.equal(healthPayload.searchOptimization, "source-grounded-fuzzy-parallel-cache-v2");
+assert.equal(healthPayload.searchOptimization, "source-grounded-fuzzy-parallel-cache-v3");
 assert.equal(healthPayload.sourceGrounded, true);
 
 const indexed = await worker.fetch(request("/v1/drugs/search", { query: "司美" }), env, ctx);
@@ -123,7 +123,7 @@ assert.equal(indexedPayload.candidates[0].category, "西药");
 assert.equal(indexedPayload.candidates[0].therapeuticClass, "降糖药");
 assert.equal(indexedPayload.classificationSchema, "separate-category-therapeutic-class-v1");
 assert.equal(indexedPayload.cacheStatus, "miss");
-assert.equal(indexedPayload.searchOptimization, "source-grounded-fuzzy-parallel-cache-v2");
+assert.equal(indexedPayload.searchOptimization, "source-grounded-fuzzy-parallel-cache-v3");
 assert.match(indexedPayload.candidates[0].clinical.indication, /2型糖尿病/);
 assert.ok(indexedPayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
 await Promise.all(backgroundWrites.splice(0));
@@ -137,6 +137,7 @@ const corrected = await worker.fetch(request("/v1/drugs/search", { query: "孟�
 assert.equal(corrected.status, 200);
 const correctedPayload = await corrected.json();
 assert.equal(correctedPayload.candidates[0].drugName, "孟鲁司特钠片");
+assert.equal(correctedPayload.candidates[0].therapeuticClass, "白三烯受体拮抗剂");
 assert.equal(correctedPayload.correctedQuery, "孟鲁司特钠片");
 assert.equal(correctedPayload.queryCorrection.original, "孟鲁斯特");
 assert.ok(["indexed-alias", "fuzzy-one-edit"].includes(correctedPayload.queryCorrection.method));

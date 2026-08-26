@@ -38,6 +38,16 @@ assert.deepEqual(
 
 assert.deepEqual(
   { ...classification.classifyCandidate({
+    drugName: "孟鲁司特钠片",
+    category: "抗凝抗血小板",
+    clinical: { indication: "治疗对阿司匹林敏感的哮喘患者，并减轻过敏性鼻炎症状。" }
+  }) },
+  { category: "西药", therapeuticClass: "白三烯受体拮抗剂" },
+  "孟鲁司特不得因适应症出现阿司匹林而误判为抗血小板药"
+);
+
+assert.deepEqual(
+  { ...classification.classifyCandidate({
     drugName: "百令胶囊",
     category: "中成药",
     sourceUrl: "https://www.yaopinnet.com/zhongyao/zy37384.htm",
