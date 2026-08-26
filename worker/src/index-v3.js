@@ -288,6 +288,9 @@ function titleFromHtml(html) {
 
 function categoryFromDrugName(drugName, indication = "") {
   const text = `${drugName || ""} ${indication || ""}`;
+  // 适应症原文可能出现其他药名（如“对阿司匹林敏感的哮喘”），
+  // 应先按当前药品的明确名称分类，避免被伴随词污染。
+  if (/孟鲁司特/.test(drugName || "")) return "呼吸系统";
   if (/阿司匹林|氯吡格雷|替格瑞洛|普拉格雷|华法林|利伐沙班|阿哌沙班|依度沙班|达比加群|肝素|依诺肝素/.test(text)) return "抗凝抗血小板";
   if (/胰岛素|二甲双胍|阿卡波糖|伏格列波糖|米格列醇|格列|列净|列汀|格鲁肽|艾塞那肽|利司那肽|替尔泊肽|吡格列酮|罗格列酮|瑞格列奈|那格列奈|2型糖尿病|降血糖/.test(text)) return "降糖药";
   if (/他汀|依折麦布|非诺贝特|苯扎贝特|依洛尤单抗|阿利西尤单抗|高胆固醇血症|血脂/.test(text)) return "调脂药";

@@ -40,6 +40,8 @@ assert.match(freeUi, /ensureClassificationCatalog\(form\)/, "粘贴说明书填�
 assert.match(classification, /Object\.freeze\(\["西药", "中成药"\]\)/, "药品分类选项必须是药品属性，不得混入作用分类");
 assert.match(classification, /function classifyCandidate\(/, "所有添加入口必须复用统一分类器");
 assert.doesNotMatch(app, /therapeuticClass:\s*normalizeDrugCategory/, "主应用不得再用药品分类填充作用分类");
+assert.match(app, /name="therapeuticClass" list="therapeuticClassOptions"/, "添加药物的作用分类必须可从列表选择");
+assert.match(app, /可选择或自行填写/, "作用分类列表必须保留人工修正能力");
 assert.ok(html.indexOf('src="drug-classification.js"') < html.indexOf('src="app.js"'), "分类器必须先于主应用加载");
 assert.match(serviceWorker, /\.\/drug-classification\.js/, "离线缓存必须包含统一分类器");
 
