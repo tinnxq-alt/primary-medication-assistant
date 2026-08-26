@@ -216,6 +216,27 @@ button { cursor: pointer; }
 .bottom-nav span { display: block; margin-bottom: 2px; font-size: 19px; }
 .bottom-nav button.active { color: var(--brand); font-weight: 800; }
 
+.clinical-hero { color: white; background: linear-gradient(145deg, #0f766e, #115e59 58%, #164e63); }
+.clinical-hero h2 { margin: 4px 0 8px; font-size: clamp(25px, 6vw, 38px); }
+.clinical-hero p { color: rgba(255,255,255,.84); }
+.clinical-kicker { margin: 0; font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.clinical-global-search { margin-top: 20px; color: var(--ink); background: white; }
+.clinical-module-grid, .clinical-status-list, .clinical-next-grid { display: grid; gap: 12px; }
+.clinical-module { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; min-height: 116px; padding: 18px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); text-align: left; background: white; box-shadow: var(--shadow); }
+.clinical-module.medication { border-left: 5px solid #0f766e; }
+.clinical-module.emergency { border-left: 5px solid #dc2626; }
+.clinical-module-icon { font-size: 34px; }
+.clinical-module strong, .clinical-module small { display: block; }
+.clinical-module strong { margin-bottom: 7px; font-size: 19px; }
+.clinical-module small { color: var(--muted); line-height: 1.5; }
+.clinical-module b { color: var(--brand); white-space: nowrap; }
+.emergency-hero { background: linear-gradient(145deg, #991b1b, #b91c1c 58%, #7f1d1d); }
+.clinical-actions { margin-top: 18px; margin-bottom: 0; }
+.clinical-actions .btn { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.clinical-status-list .card { border-left: 4px solid #0f766e; }
+.clinical-next-grid .card { min-height: 108px; }
+.pharmacy-switcher[hidden] { display: none; }
+
 .toast { position: fixed; left: 50%; bottom: 90px; z-index: 80; max-width: calc(100% - 32px); padding: 11px 16px; border-radius: 12px; color: white; text-align: center; background: rgba(15, 23, 42, .92); opacity: 0; transform: translate(-50%, 12px); pointer-events: none; transition: .2s; }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 .modal-backdrop { position: fixed; inset: 0; z-index: 70; display: grid; place-items: end center; padding: 16px; background: rgba(15, 23, 42, .48); }
@@ -227,6 +248,8 @@ button { cursor: pointer; }
   .category-grid { grid-template-columns: repeat(4, 1fr); }
   .detail-grid { grid-template-columns: 1fr 1fr; }
   .app-shell { padding-top: 24px; }
+  .clinical-module-grid { grid-template-columns: 1fr 1fr; }
+  .clinical-next-grid, .clinical-status-list { grid-template-columns: repeat(3, 1fr); }
 }
 
 @media (max-width: 480px) {
