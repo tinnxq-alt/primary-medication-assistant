@@ -49,6 +49,7 @@ jobs:
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drug-classification.js
+          node --check clinical-data-contract.js
           node --check drugs.js
           node --check outpatient-drugs.js
           node --check service-worker.js
@@ -103,6 +104,8 @@ jobs:
         run: node scripts/test-notebook-scroll.mjs
       - name: Header layout tests
         run: node scripts/test-header-layout.mjs
+      - name: Clinical shell and data contract tests
+        run: node scripts/test-clinical-shell.mjs
       - name: Worker tests
         working-directory: worker
         run: npm test
