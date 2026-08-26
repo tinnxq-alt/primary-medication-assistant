@@ -20,17 +20,19 @@ vm.runInContext(read('clinical-data-contract.js'), context);
 const contract = context.window.CLINICAL_DATA_CONTRACT;
 if (!contract || contract.version !== '1.0.0-draft') throw new Error('数据契约未加载');
 
-const drugs = new Set(['drug-001']);
+const drugs = new Set(['drug-concept-epinephrine']);
 const validProtocol = {
   id: 'protocol-anaphylaxis',
   title: '过敏性休克',
   version: 'draft-1',
   reviewStatus: 'needs-review',
-  drugRefs: [{ drugId: 'drug-001', purpose: '一线急救药物' }]
+  drugRefs: [{ drugId: 'drug-concept-epinephrine', purpose: '一线急救药物' }]
 };
 if (contract.validateEmergencyProtocol(validProtocol, drugs).length) throw new Error('有效 drug_id 引用被拒绝');
-if (!contract.validateEmergencyProtocol({ ...validProtocol, drugRefs: [{ drugId: 'drug-999' }] }, drugs).length) throw new Error('悬空 drug_id 未被发现');
-if (!contract.validateEmergencyProtocol({ ...validProtocol, drugRefs: [{ drugId: 'drug-001', drugName: '肾上腺素' }] }, drugs).length) throw new Error('重复药名未被拒绝');
+if (!contract.validateEmergencyProtocol({ ...validProtocol, drugRefs: [{ drugId: 'drug-concept-missing' }] }, drugs).length) throw new Error('悬空 drug_id 未被发现');
+if (!contract.validateEmergencyProtocol({ ...validProtocol, drugRefs: [{ drugId: 'drug-concept-epinephrine', drugName: '肾上腺素' }] }, drugs).length) throw new Error('重复药名未被拒绝');
+if (contract.validateDrugProduct({ productId: 'drug-025', drugId: 'drug-concept-aspirin', pharmacyScopes: ['ward'] }).length) throw new Error('有效品规关系被拒绝');
+if (!contract.validateDrugProduct({ productId: 'drug-025', drugId: 'drug-025', pharmacyScopes: ['ward'] }).length) throw new Error('品规 ID 被错误接受为通用药物 ID');
 if (!contract.validateUserEntity({ entityType: 'note', id: 'note-1' }).length) throw new Error('缺少 userId 的个人数据未被拒绝');
 
 console.log('clinical shell and data contract checks passed');
