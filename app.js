@@ -1018,13 +1018,62 @@
   }
 
   function renderSymptoms() {
+    const symptomEngine = window.SYMPTOM_ASSISTANT;
     app.innerHTML = `
       <section class="panel section">
         <h2>症状搜索</h2>
-        <p class="notice danger">仅凭症状自动推荐药物可能延误诊断。此功能必须接入经过审核的知识库、红旗症状分诊和人工复核流程后才能启用。</p>
-        <div class="field" style="margin-top:16px"><label>症状描述</label><textarea rows="5" placeholder="例如：发热3天、伴呼吸困难……"></textarea></div>
-        <button class="btn ghost" disabled>安全检索服务尚未配置</button>
+        <p class="notice danger"><strong>安全边界：</strong>这里按症状检索病房和门诊药库中已有的说明书适应症，仅供医务人员缩小资料核对范围，不诊断、不直接给出处方。抗菌药不会仅凭症状列出。</p>
+        <div class="field" style="margin-top:16px"><label for="symptomInput">症状描述</label><textarea id="symptomInput" rows="5" placeholder="例如：咳嗽有痰；反酸烧心；胸痛并伴大汗……"></textarea></div>
+        <button class="btn primary" id="searchSymptoms" type="button">检索两类药库</button>
+        <div id="symptomResult" style="margin-top:14px" aria-live="polite"></div>
       </section>`;
+    document.getElementById("searchSymptoms")?.addEventListener("click", async () => {
+      const query = String(document.getElementById("symptomInput")?.value || "").trim();
+      const resultNode = document.getElementById("symptomResult");
+      const button = document.getElementById("searchSymptoms");
+      if (!query) {
+        resultNode.innerHTML = '<div class="notice">请先描述主要症状。</div>';
+        return;
+      }
+      if (!symptomEngine?.analyze) {
+        resultNode.innerHTML = '<div class="notice danger">症状检索模块未加载，请刷新后重试。</div>';
+        return;
+      }
+      const preliminary = symptomEngine.analyze(query, []);
+      if (preliminary.redFlags.length) {
+        const sourceLinks = preliminary.sources.map(item => `<a href="${esc(item.url)}" target="_blank" rel="noopener">${esc(item.label)}</a>`).join(" · ");
+        resultNode.innerHTML = `<div class="notice danger"><strong>发现急症警示：</strong>${preliminary.redFlags.map(item => esc(item.label)).join("；")}。不要依赖本页选药，请立即进行急诊评估；情况危急时拨打 120。</div><p class="drug-sub">警示依据：${sourceLinks}</p>`;
+        return;
+      }
+      button.disabled = true;
+      button.textContent = "正在加载门诊药库…";
+      resultNode.innerHTML = '<div class="notice">正在合并病房和门诊药库并筛选说明书适应症…</div>';
+      try {
+        await ensureOutpatientCatalogLoaded();
+        if (currentRoute().route !== "symptoms") return;
+        const result = symptomEngine.analyze(query, visibleDrugs(), 12);
+        if (result.redFlags.length) {
+          resultNode.innerHTML = `<div class="notice danger"><strong>发现急症警示：</strong>${result.redFlags.map(item => esc(item.label)).join("；")}。不要依赖本页选药，请立即进行急诊评估；情况危急时拨打 120。</div>`;
+          return;
+        }
+        if (!result.concepts.length) {
+          resultNode.innerHTML = '<div class="notice">目前无法把描述匹配到已审核的症状类别。请补充主要症状、持续时间、严重程度和伴随表现，并由医师完成诊断；系统不会猜测药物。</div>';
+          return;
+        }
+        if (!result.candidates.length) {
+          resultNode.innerHTML = `<div class="notice">已识别：${result.concepts.map(item => esc(item.label)).join("、")}，但当前药库没有可按说明书适应症安全列出的非抗感染候选。请按诊断和现行说明书人工核对。</div>`;
+          return;
+        }
+        resultNode.innerHTML = `<div class="notice"><strong>药库资料候选 ${result.candidates.length} 项：</strong>仅表示现有说明书适应症与输入症状相关，需结合诊断、禁忌、年龄、妊娠、肝肾功能和相互作用复核。</div><div class="card-list">${result.candidates.map(({ drug, reasons }) => `<article class="card" data-open-drug="${esc(drug.id)}"><div class="detail-head"><h3>${esc(drug.drugName)}</h3>${statusBadge(drug)}</div><p class="drug-sub">匹配：${esc(reasons.join("、"))} · ${esc(drug.therapeuticClass || "作用待分类")}</p><p class="drug-sub"><strong>药库说明书适应症：</strong>${esc(drug.clinical?.indication || "待核验")}</p><div>${pharmacyBadges(drug)}</div><button class="btn ghost small" type="button" data-open-drug="${esc(drug.id)}">查看药品详情</button></article>`).join("")}</div><p class="drug-sub">抗菌药未按症状自动列出；需要先明确感染诊断。</p>`;
+      } catch (error) {
+        resultNode.innerHTML = `<div class="notice danger">门诊药库加载失败：${esc(error?.message || "请检查网络后重试")}</div>`;
+      } finally {
+        if (button && currentRoute().route === "symptoms") {
+          button.disabled = false;
+          button.textContent = "检索两类药库";
+        }
+      }
+    });
   }
 
   function renderFlashcards() {

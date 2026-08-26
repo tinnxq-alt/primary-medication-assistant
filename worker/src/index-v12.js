@@ -8,11 +8,11 @@ import {
 import { fetchSourcePage, parseInstructionPage } from "./index-v3.js";
 import { findIndexedSources } from "./free-source-index.js";
 
-const CANDIDATE_LIMIT = 3;
-const SOURCE_PARSE_ATTEMPT_LIMIT = 5;
+const CANDIDATE_LIMIT = 5;
+const SOURCE_PARSE_ATTEMPT_LIMIT = 8;
 const MAX_BODY_BYTES = 4096;
 const SEARCH_CACHE_SECONDS = 6 * 60 * 60;
-const SEARCH_CACHE_SCHEMA = "source-grounded-parallel-cache-v1";
+const SEARCH_CACHE_SCHEMA = "source-grounded-fuzzy-parallel-cache-v2";
 const USER_PASTE_HOSTS = new Set(["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"]);
 const DRUG_CATEGORIES = new Set(["西药", "中成药"]);
 
@@ -205,10 +205,13 @@ async function writeSearchCache(query, payload, ctx) {
   await write;
 }
 
-function responsePayload({ query, discovery, discoveryMethods, sourceUrls, parsed, startedAt, warning }) {
+function responsePayload({ query, effectiveQuery = query, correction = null, discovery, discoveryMethods, sourceUrls, parsed, startedAt, warning }) {
   const hosts = [...new Set(parsed.candidates.map(item => item.sourceHost).filter(Boolean))];
   return {
     query,
+    effectiveQuery,
+    correctedQuery: correction ? effectiveQuery : "",
+    queryCorrection: correction,
     mode: "free-verified",
     discovery,
     candidates: parsed.candidates,
@@ -245,19 +248,24 @@ async function handleSearch(request, env, origin, ctx) {
   }
 
   const indexed = findIndexedSources(query);
+  const canonicalNames = [...new Set(indexed.map(item => item.drugName).filter(Boolean))];
+  const correction = canonicalNames.length === 1 && cleanQuery(canonicalNames[0]) !== query
+    ? { original: query, corrected: canonicalNames[0], method: indexed.some(item => item.matchType === "fuzzy-one-edit") ? "fuzzy-one-edit" : "indexed-alias" }
+    : null;
+  const effectiveQuery = correction?.corrected || query;
   let sourceUrls = indexed.map(item => item.url);
   let parsed = sourceUrls.length
-    ? await parseSources(query, sourceUrls, env)
+    ? await parseSources(effectiveQuery, sourceUrls, env)
     : { candidates: [], fetchedSourceCount: 0, diagnostics: [] };
   let discovery = "local-source-index-v12";
   let discoveryMethods = indexed.length ? ["local-source-index"] : [];
 
   if (!parsed.candidates.length) {
     try {
-      const online = await trustedDiscovery(query, env.BROWSER);
+      const online = await trustedDiscovery(effectiveQuery, env.BROWSER);
       const onlineUrls = uniqueUrls(online.links.filter(url => !sourceUrls.includes(url)));
       const onlineParsed = onlineUrls.length
-        ? await parseSources(query, onlineUrls, env)
+        ? await parseSources(effectiveQuery, onlineUrls, env)
         : { candidates: [], fetchedSourceCount: 0, diagnostics: [] };
       sourceUrls = uniqueUrls([...sourceUrls, ...online.links]);
       parsed = {
@@ -275,6 +283,8 @@ async function handleSearch(request, env, origin, ctx) {
 
   const payload = responsePayload({
     query,
+    effectiveQuery,
+    correction,
     discovery,
     discoveryMethods,
     sourceUrls,

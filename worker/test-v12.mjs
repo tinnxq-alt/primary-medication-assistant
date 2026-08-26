@@ -10,6 +10,7 @@ assert.ok(
 
 const origin = "https://tinnxq-alt.github.io";
 const semaglutide39 = "https://ypk.39.net/2310025/manual/";
+const montelukast39 = "https://ypk.39.net/2029378/manual/";
 const onlineClomipramine = [
   "https://ypk.39.net/2099564/manual/",
   "https://ypk.39.net/2099565/manual/",
@@ -35,6 +36,11 @@ const clomipramineHtml = manual({
   indication: "用于治疗抑郁症及符合说明书条件的强迫症。",
   dosage: "口服，剂量根据病情和耐受性遵医嘱调整。"
 });
+const montelukastHtml = manual({
+  name: "孟鲁司特钠片",
+  indication: "适用于减轻过敏性鼻炎引起的症状及哮喘的预防和长期治疗。",
+  dosage: "每日一次口服，具体剂量按年龄和现行说明书使用。"
+});
 const onlineSearchHtml = onlineClomipramine.map((url, index) =>
   `<a href="${url.replace(/manual\/$/, "")}">氯米帕明片说明书${index + 1}</a>`).join("");
 
@@ -47,6 +53,7 @@ const BROWSER = {
     assert.equal(action, "content");
     browserUrls.push(input.url);
     if (input.url === semaglutide39) return Response.json({ success: true, result: semaglutideHtml });
+    if (input.url === montelukast39) return Response.json({ success: true, result: montelukastHtml });
     if (onlineClomipramine.includes(input.url)) return Response.json({ success: true, result: clomipramineHtml });
     if (input.url.includes("/search/") && decodeURIComponent(input.url).includes("氯米帕明")) {
       return Response.json({ success: true, result: onlineSearchHtml });
@@ -62,6 +69,11 @@ globalThis.fetch = async (input, init) => {
     directFetchCount += 1;
     return new Response(semaglutideHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
   }
+  if (url === montelukast39) {
+    directFetchCount += 1;
+    return new Response(montelukastHtml, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  }
+  if (url.startsWith("https://www.bing.com/search")) return new Response("<rss><channel></channel></rss>");
   if (onlineClomipramine.includes(url)) {
     directFetchCount += 1;
     activeDirectFetches += 1;
@@ -99,7 +111,7 @@ const healthPayload = await health.json();
 assert.equal(healthPayload.discovery, "hybrid-source-discovery-v12");
 assert.equal(healthPayload.trustedOnlineDiscoverySupported, true);
 assert.equal(healthPayload.classificationSchema, "separate-category-therapeutic-class-v1");
-assert.equal(healthPayload.searchOptimization, "source-grounded-parallel-cache-v1");
+assert.equal(healthPayload.searchOptimization, "source-grounded-fuzzy-parallel-cache-v2");
 assert.equal(healthPayload.sourceGrounded, true);
 
 const indexed = await worker.fetch(request("/v1/drugs/search", { query: "司美" }), env, ctx);
@@ -111,7 +123,7 @@ assert.equal(indexedPayload.candidates[0].category, "西药");
 assert.equal(indexedPayload.candidates[0].therapeuticClass, "降糖药");
 assert.equal(indexedPayload.classificationSchema, "separate-category-therapeutic-class-v1");
 assert.equal(indexedPayload.cacheStatus, "miss");
-assert.equal(indexedPayload.searchOptimization, "source-grounded-parallel-cache-v1");
+assert.equal(indexedPayload.searchOptimization, "source-grounded-fuzzy-parallel-cache-v2");
 assert.match(indexedPayload.candidates[0].clinical.indication, /2型糖尿病/);
 assert.ok(indexedPayload.diagnostics.some(item => item.stage === "trusted-direct-fetch" && item.ok));
 await Promise.all(backgroundWrites.splice(0));
@@ -120,6 +132,14 @@ const cachedIndexed = await worker.fetch(request("/v1/drugs/search", { query: "�
 const cachedIndexedPayload = await cachedIndexed.json();
 assert.equal(cachedIndexedPayload.cacheStatus, "hit");
 assert.equal(directFetchCount, indexedFetchCount, "重复检索命中缓存时不得再次抓取说明书");
+
+const corrected = await worker.fetch(request("/v1/drugs/search", { query: "孟鲁斯特" }), env, ctx);
+assert.equal(corrected.status, 200);
+const correctedPayload = await corrected.json();
+assert.equal(correctedPayload.candidates[0].drugName, "孟鲁司特钠片");
+assert.equal(correctedPayload.correctedQuery, "孟鲁司特钠片");
+assert.equal(correctedPayload.queryCorrection.original, "孟鲁斯特");
+assert.ok(["indexed-alias", "fuzzy-one-edit"].includes(correctedPayload.queryCorrection.method));
 
 const online = await worker.fetch(request("/v1/drugs/search", { query: "氯米帕明" }), env);
 assert.equal(online.status, 200);

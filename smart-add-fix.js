@@ -126,8 +126,10 @@
             checkedAt: String(item.sourceCheckedAt || new Date().toISOString().slice(0, 10))
           }
         })).filter(item => hasChinese(item.drugName)
-          && ["indication", "dosage", "adverseReactions", "precautions"].every(field => item.clinical[field])).slice(0, 3),
+          && ["indication", "dosage", "adverseReactions", "precautions"].every(field => item.clinical[field])).slice(0, 5),
         warnings: Array.isArray(payload.warnings) ? payload.warnings : [],
+        correctedQuery: String(payload.correctedQuery || "").trim(),
+        queryCorrection: payload.queryCorrection || null,
         elapsedMs: Number(payload.elapsedMs) || 0,
         searchResultCount: Number(payload.searchResultCount) || 0
       };
@@ -222,10 +224,10 @@
     if (heading) heading.textContent = "1. 联网自动检索说明书";
     const notice = heading?.nextElementSibling;
     if (notice?.classList.contains("notice")) {
-      notice.textContent = "输入至少 2 个汉字的中文药名片段，停顿后自动先查 259 条可信说明书索引；未命中时仅在可信域名联网发现真实说明书。四项临床摘要完整且候选唯一时自动填充，存在多个厂家或规格时请手动选择，缺失内容不会猜测补写。";
+      notice.textContent = "输入至少 2 个汉字的中文药名片段，停顿后自动先查可信说明书索引；4 字以上药名支持 1 个字的常见输入错误。未命中时会并行扩大到多个可信来源，缺失内容不会猜测补写。";
     }
     const input = document.getElementById("drugNameInput");
-    if (input) input.placeholder = "输入药名片段，如“司美”“孟鲁”“阿奇”";
+    if (input) input.placeholder = "输入药名片段，如“司美”“孟鲁斯特”“阿奇”";
     const button = document.getElementById("lookupDrugBtn");
     if (button && !button.disabled) button.textContent = "立即联网检索";
   }
@@ -268,11 +270,14 @@
         document.querySelector(`[data-candidate-card="${autoCandidate.lookupId}"]`)?.setAttribute("data-selected", "true");
       }
       const timing = result.elapsedMs ? `，耗时 ${(result.elapsedMs / 1000).toFixed(1)} 秒` : "";
+      const correction = result.correctedQuery && normalize(result.correctedQuery) !== normalize(query)
+        ? `已将“${query}”按“${result.correctedQuery}”检索。`
+        : "";
       if (status) status.textContent = result.candidates.length
         ? autoCandidate
-          ? `已从可信说明书原文自动填充“${autoCandidate.drugName}”${timing}。请核对药盒规格、厂家和批准文号。`
-          : `从 ${result.searchResultCount || "多个"} 个来源中筛出 ${result.candidates.length} 份完整说明书${timing}。存在多个厂家或规格，请选择对应候选后自动填充。`
-        : `没有找到可安全自动填充的说明书${timing}。${result.warnings.join("；")}`;
+          ? `${correction}已从可信说明书原文自动填充“${autoCandidate.drugName}”${timing}。请核对药盒规格、厂家和批准文号。`
+          : `${correction}从 ${result.searchResultCount || "多个"} 个来源中筛出 ${result.candidates.length} 份完整说明书${timing}。存在多个厂家或规格，请选择对应候选后自动填充。`
+        : `${correction}没有找到可安全自动填充的说明书${timing}。${result.warnings.join("；")}`;
     } catch (error) {
       if (id !== requestId) return;
       renderCandidates([]);

@@ -1291,15 +1291,6 @@ const FREE_SOURCE_INDEX = Object.freeze([
     ]
   },
   {
-    "drugName": "芪苈强心胶囊",
-    "aliases": [
-      "芪苈强心胶囊"
-    ],
-    "urls": [
-      "https://ypk.39.net/632379/manual/"
-    ]
-  },
-  {
     "drugName": "羟苯磺酸钙胶囊",
     "aliases": [
       "羟苯磺酸钙胶囊"
@@ -2058,15 +2049,6 @@ const FREE_SOURCE_INDEX = Object.freeze([
     ]
   },
   {
-    "drugName": "盐酸二甲双胍缓释片",
-    "aliases": [
-      "盐酸二甲双胍缓释片"
-    ],
-    "urls": [
-      "https://www.yaopinnet.com/huayao/hy5312l.htm"
-    ]
-  },
-  {
     "drugName": "盐酸甲氯芬酯胶囊",
     "aliases": [
       "盐酸甲氯芬酯胶囊"
@@ -2391,22 +2373,57 @@ function normalizeSourceKey(value) {
     .replace(/[\s()（）【】\[\]〖〗·•:：,，/\\_\-"'“”‘’]/g, "");
 }
 
+function editDistance(left, right) {
+  const a = [...normalizeSourceKey(left)];
+  const b = [...normalizeSourceKey(right)];
+  if (!a.length) return b.length;
+  if (!b.length) return a.length;
+  let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+  for (let i = 0; i < a.length; i += 1) {
+    const current = [i + 1];
+    for (let j = 0; j < b.length; j += 1) {
+      current[j + 1] = Math.min(
+        current[j] + 1,
+        previous[j + 1] + 1,
+        previous[j] + (a[i] === b[j] ? 0 : 1)
+      );
+    }
+    previous = current;
+  }
+  return previous[b.length];
+}
+
 function findIndexedSources(query, limit = 6) {
   const q = normalizeSourceKey(query);
   if (!q) return [];
+  const matches = [];
+  for (const entry of FREE_SOURCE_INDEX) {
+    const keys = [entry.drugName, ...entry.aliases].map(value => ({ raw: value, normalized: normalizeSourceKey(value) })).filter(item => item.normalized);
+    const exact = keys.find(item => item.normalized.includes(q) || q.includes(item.normalized));
+    const fuzzy = !exact && q.length >= 4
+      ? keys.map(item => ({ ...item, distance: editDistance(q, item.normalized) })).filter(item => item.distance <= 1).sort((a, b) => a.distance - b.distance)[0]
+      : null;
+    if (!exact && !fuzzy) continue;
+    matches.push({
+      entry,
+      matchedKey: (exact || fuzzy).raw,
+      matchType: exact ? "exact" : "fuzzy-one-edit",
+      score: exact ? (normalizeSourceKey(exact.raw) === q ? 1000 : 800) : 600
+    });
+  }
+  matches.sort((a, b) => b.score - a.score || a.entry.drugName.localeCompare(b.entry.drugName, "zh-CN"));
   const results = [];
   const seen = new Set();
-  for (const entry of FREE_SOURCE_INDEX) {
-    const keys = [entry.drugName, ...entry.aliases].map(normalizeSourceKey).filter(Boolean);
-    if (!keys.some(key => key.includes(q) || q.includes(key))) continue;
+  for (const match of matches) {
+    const { entry } = match;
     for (const url of entry.urls) {
       if (!url || seen.has(url)) continue;
       seen.add(url);
-      results.push({ drugName: entry.drugName, url });
+      results.push({ drugName: entry.drugName, url, matchedKey: match.matchedKey, matchType: match.matchType, score: match.score });
       if (results.length >= limit) return results;
     }
   }
   return results;
 }
 
-export { FREE_SOURCE_INDEX, findIndexedSources, normalizeSourceKey };
+export { FREE_SOURCE_INDEX, editDistance, findIndexedSources, normalizeSourceKey };
