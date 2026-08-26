@@ -2,7 +2,7 @@
 (() => {
   "use strict";
 
-  const CHECKED_AT = "2026-08-25";
+  const CHECKED_AT = "2026-08-26";
   const source = (label, url) => Object.freeze({ status: "verified-label", label, url, checkedAt: CHECKED_AT });
   const FDA_ENTRESTO = source("FDA：Entresto 现行说明书（2024）", "https://www.accessdata.fda.gov/drugsatfda_docs/label/2024/207620s025%2C218591s000lbl.pdf");
   const FDA_RITONAVIR = source("FDA：Norvir（利托那韦）现行说明书（2026）", "https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/209512s010lbl.pdf");
@@ -11,6 +11,9 @@
   const FDA_MORPHINE = source("FDA：Duramorph（吗啡）现行说明书（2026）", "https://www.accessdata.fda.gov/drugsatfda_docs/label/2026/018565s035lbl.pdf");
   const FDA_LEVOTHYROXINE = source("FDA：Levo-T（左甲状腺素）说明书", "https://www.accessdata.fda.gov/drugsatfda_docs/label/2017/021342s023lbl.pdf");
   const FDA_SILDENAFIL = source("FDA：Revatio（西地那非）说明书", "https://www.accessdata.fda.gov/drugsatfda_docs/label/2018/021845s018lbl.pdf");
+  const DAILYMED_SPIRONOLACTONE = source("DailyMed：螺内酯现行说明书", "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=753bbc6f-2e50-49c1-b5bf-18f8411a1e8e&version=109");
+  const DAILYMED_CLOPIDOGREL = source("DailyMed：氯吡格雷说明书（相互作用 7.2）", "https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid=5cdca9bd-7042-142a-e053-2991aa0a9ca6");
+  const DAILYMED_LEVOFLOXACIN = source("DailyMed：左氧氟沙星说明书（相互作用 7.1 / QT 警示）", "https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=5045f807-4f08-7436-e054-00144ff88e88");
 
   const GROUPS = Object.freeze({
     acei: { any: ["贝那普利", "培哚普利", "依那普利", "卡托普利", "雷米普利", "赖诺普利", "福辛普利"] },
@@ -18,6 +21,8 @@
     arni: { any: ["沙库巴曲"] },
     raas: { any: ["贝那普利", "培哚普利", "依那普利", "卡托普利", "雷米普利", "赖诺普利", "福辛普利", "缬沙坦", "氯沙坦", "阿利沙坦", "奥美沙坦", "厄贝沙坦", "替米沙坦", "坎地沙坦", "沙库巴曲"] },
     potassium: { any: ["螺内酯", "氯化钾", "阿米洛利", "氨苯蝶啶"] },
+    spironolactone: { any: ["螺内酯"] },
+    potassiumSupplement: { any: ["氯化钾", "枸橼酸钾", "补钾"] },
     ritonavir: { any: ["利托那韦"] },
     simvastatin: { any: ["辛伐他汀", "洛伐他汀"] },
     antiarrhythmicRitonavirContra: { any: ["胺碘酮", "决奈达隆", "氟卡尼", "普罗帕酮", "奎尼丁"] },
@@ -35,7 +40,11 @@
     levothyroxine: { any: ["左甲状腺素"] },
     calciumIron: { any: ["碳酸钙", "葡萄糖酸钙", "乳酸钙", "硫酸亚铁", "富马酸亚铁", "琥珀酸亚铁"] },
     nitrate: { any: ["硝酸甘油", "单硝酸异山梨酯", "硝酸异山梨酯"] },
-    pde5: { any: ["西地那非", "他达拉非", "伐地那非", "阿伐那非"] }
+    pde5: { any: ["西地那非", "他达拉非", "伐地那非", "阿伐那非"] },
+    oralLevofloxacin: { any: ["左氧氟沙星"], exclude: ["滴眼", "眼用", "滴耳", "注射", "氯化钠", "乳膏", "凝胶"] },
+    systemicLevofloxacin: { any: ["左氧氟沙星"], exclude: ["滴眼", "眼用", "滴耳", "乳膏", "凝胶"] },
+    multivalentCation: { any: ["碳酸钙", "葡萄糖酸钙", "乳酸钙", "硫酸亚铁", "富马酸亚铁", "琥珀酸亚铁", "铝碳酸镁", "氢氧化铝", "氧化镁"] },
+    otherQtProlonging: { any: ["阿奇霉素", "胺碘酮", "索他洛尔", "莫西沙星"] }
   });
 
   const rules = Object.freeze([
@@ -134,6 +143,38 @@
       consequence: "可出现危及生命的低血压、晕厥或心肌缺血。",
       recommendation: "禁止联用；急诊需要硝酸酯时必须主动告知最近 PDE5 抑制剂用药时间。",
       source: FDA_SILDENAFIL
+    },
+    {
+      id: "spironolactone-potassium", severity: "严重", title: "螺内酯与补钾药",
+      a: GROUPS.spironolactone, aLabel: "螺内酯", b: GROUPS.potassiumSupplement, bLabel: "钾补充剂",
+      mechanism: "螺内酯减少钾排泄，补钾会进一步增加钾负荷。",
+      consequence: "可能发生严重高钾血症、传导异常和致命性心律失常。",
+      recommendation: "通常避免常规联用；如有明确指征，须核对肾功能并密切复查血钾。",
+      source: DAILYMED_SPIRONOLACTONE
+    },
+    {
+      id: "clopidogrel-nsaid", severity: "严重", title: "氯吡格雷与全身用 NSAID",
+      a: GROUPS.clopidogrel, aLabel: "氯吡格雷", b: GROUPS.systemicNsaid, bLabel: "全身用 NSAID",
+      mechanism: "抗血小板作用与 NSAID 对血小板及胃肠黏膜的不良影响叠加。",
+      consequence: "胃肠道出血及其他部位出血风险增加。",
+      recommendation: "尽量避免；确需联用时采用最低有效剂量和最短疗程，并评估胃保护及出血监测。",
+      source: DAILYMED_CLOPIDOGREL
+    },
+    {
+      id: "levofloxacin-multivalent-cation", severity: "需监测", title: "口服左氧氟沙星与多价阳离子制剂",
+      a: GROUPS.oralLevofloxacin, aLabel: "口服左氧氟沙星", b: GROUPS.multivalentCation, bLabel: "钙/铁/镁/铝制剂",
+      mechanism: "多价阳离子可与口服左氧氟沙星螯合并减少吸收。",
+      consequence: "左氧氟沙星暴露下降，可能造成抗感染疗效不足。",
+      recommendation: "口服左氧氟沙星应与相关制剂至少间隔 2 小时；注射剂不按吸收相互作用处理。",
+      source: DAILYMED_LEVOFLOXACIN
+    },
+    {
+      id: "levofloxacin-qt", severity: "严重", title: "全身用左氧氟沙星与其他 QT 延长药",
+      a: GROUPS.systemicLevofloxacin, aLabel: "全身用左氧氟沙星", b: GROUPS.otherQtProlonging, bLabel: "其他 QT 延长药",
+      mechanism: "两药对心室复极的影响可能叠加。",
+      consequence: "QT 间期延长和尖端扭转型室性心动过速风险增加。",
+      recommendation: "优先避免联用；必须联用时评估既往 QT、低钾低镁、心动过缓等风险并按医嘱监测心电图和电解质。",
+      source: DAILYMED_LEVOFLOXACIN
     }
   ]);
 

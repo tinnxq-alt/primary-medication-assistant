@@ -19,6 +19,13 @@ assert.ok(matchIds("硫酸氢氯吡格雷片", "艾司奥美拉唑镁肠溶片")
 assert.ok(matchIds("利伐沙班片", "新癀片").includes("rivaroxaban-nsaid"), "含吲哚美辛的新癀片应触发抗凝出血警示");
 assert.ok(!matchIds("利伐沙班片", "布洛芬乳膏").includes("rivaroxaban-nsaid"), "外用布洛芬不得按全身 NSAID 规则误报");
 assert.ok(matchIds("左甲状腺素钠片", "碳酸钙D3片").includes("levothyroxine-calcium-iron"));
+assert.ok(matchIds("螺内酯片", "氯化钾缓释片").includes("spironolactone-potassium"));
+assert.ok(matchIds("硫酸氢氯吡格雷片", "布洛芬缓释胶囊").includes("clopidogrel-nsaid"));
+assert.ok(!matchIds("硫酸氢氯吡格雷片", "布洛芬乳膏").includes("clopidogrel-nsaid"), "外用 NSAID 不得按全身用药误报");
+assert.ok(matchIds("左氧氟沙星片", "铝碳酸镁咀嚼片").includes("levofloxacin-multivalent-cation"));
+assert.ok(!matchIds("左氧氟沙星滴眼液", "铝碳酸镁咀嚼片").includes("levofloxacin-multivalent-cation"), "滴眼剂不得套用口服吸收相互作用");
+assert.ok(!matchIds("左氧氟沙星氯化钠注射液", "铝碳酸镁咀嚼片").includes("levofloxacin-multivalent-cation"), "注射剂不得套用口服吸收相互作用");
+assert.ok(matchIds("左氧氟沙星片", "阿奇霉素片").includes("levofloxacin-qt"));
 
 const acei = byName("盐酸贝那普利片");
 const relevant = window.DRUG_INTERACTIONS.findRelevant(acei, catalog);
@@ -26,7 +33,7 @@ assert.ok(relevant.some(item => item.rule.id === "acei-arni-36h" && item.partner
 for (const rule of window.DRUG_INTERACTIONS.rules) {
   assert.ok(["禁忌", "严重", "需监测"].includes(rule.severity));
   assert.match(rule.source?.url || "", /^https:\/\//);
-  assert.equal(rule.source?.checkedAt, "2026-08-25");
+  assert.equal(rule.source?.checkedAt, "2026-08-26");
   for (const field of ["mechanism", "consequence", "recommendation"]) assert.ok(rule[field]);
 }
 

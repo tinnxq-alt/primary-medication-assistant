@@ -1,8 +1,8 @@
 import { htmlToText, parseInstructionPage } from "./index-v3.js";
 import { bingRssLinks } from "./index-v5.js";
 
-const CANDIDATE_LIMIT = 3;
-const SOURCE_LINK_LIMIT = 8;
+const CANDIDATE_LIMIT = 5;
+const SOURCE_LINK_LIMIT = 12;
 const TRUSTED_HOSTS = ["ypk.39.net", "yaopinnet.com", "www.yaopinnet.com"];
 
 function allowedOrigins(env) {
@@ -192,20 +192,16 @@ async function siteRestrictedRss(query, host) {
 }
 
 async function trustedDiscovery(query, browser) {
-  const direct = await search39Links(query, browser);
+  const [direct, rss39, rssDrugNet] = await Promise.all([
+    search39Links(query, browser),
+    siteRestrictedRss(query, "ypk.39.net"),
+    siteRestrictedRss(query, "yaopinnet.com")
+  ]);
   let links = direct.links;
   const methods = direct.links.length ? [direct.method] : [];
-
-  if (links.length < CANDIDATE_LIMIT) {
-    const rss39 = await siteRestrictedRss(query, "ypk.39.net");
-    if (rss39.length) methods.push("bing-rss-site-39");
-    links = uniqueUrls([...links, ...rss39]);
-  }
-  if (links.length < CANDIDATE_LIMIT) {
-    const rssDrugNet = await siteRestrictedRss(query, "yaopinnet.com");
-    if (rssDrugNet.length) methods.push("bing-rss-site-yaopinnet");
-    links = uniqueUrls([...links, ...rssDrugNet]);
-  }
+  if (rss39.length) methods.push("bing-rss-site-39");
+  if (rssDrugNet.length) methods.push("bing-rss-site-yaopinnet");
+  links = uniqueUrls([...links, ...rss39, ...rssDrugNet]);
 
   return { links: links.slice(0, SOURCE_LINK_LIMIT), methods, searchUrl: direct.searchUrl };
 }

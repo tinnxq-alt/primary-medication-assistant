@@ -3,6 +3,48 @@
 
   const normalize = value => String(value ?? "").normalize("NFKC").toLowerCase().replace(/[\s()（）【】\[\]·•:：,，/\-_]/g, "");
 
+  const editDistance = (left, right) => {
+    const a = [...normalize(left)];
+    const b = [...normalize(right)];
+    let previous = Array.from({ length: b.length + 1 }, (_, index) => index);
+    for (let i = 0; i < a.length; i += 1) {
+      const current = [i + 1];
+      for (let j = 0; j < b.length; j += 1) {
+        current[j + 1] = Math.min(current[j] + 1, previous[j + 1] + 1, previous[j] + (a[i] === b[j] ? 0 : 1));
+      }
+      previous = current;
+    }
+    return previous[b.length] ?? a.length;
+  };
+
+  const fuzzyDistance = (query, value) => {
+    const q = normalize(query);
+    const name = normalize(value);
+    if (!q || !name) return Infinity;
+    const comparable = name.length > q.length ? name.slice(0, q.length) : name;
+    if (Math.abs(comparable.length - q.length) > 1) return Infinity;
+    return editDistance(q, comparable);
+  };
+
+  const resolveQuery = (query, drugs = []) => {
+    const q = normalize(query);
+    if (q.length < 4) return { query, corrected: false, correctedQuery: "", matchedDrug: null };
+    const matches = [];
+    for (const drug of Array.isArray(drugs) ? drugs : []) {
+      for (const value of [drug?.drugName, drug?.genericName, drug?.tradeName, drug?.rawName]) {
+        const name = normalize(value);
+        if (!name) continue;
+        const distance = fuzzyDistance(q, name);
+        if (distance <= 1) matches.push({ drug, value, distance });
+      }
+    }
+    matches.sort((a, b) => a.distance - b.distance);
+    const best = matches[0];
+    const uniqueDrugIds = new Set(matches.filter(item => item.distance === best?.distance).map(item => item.drug?.id || item.drug?.drugName));
+    if (!best || best.distance !== 1 || uniqueDrugIds.size !== 1) return { query, corrected: false, correctedQuery: "", matchedDrug: null };
+    return { query, corrected: true, correctedQuery: best.value, matchedDrug: best.drug };
+  };
+
   const normalizeTradeNameAliases = aliases => Array.isArray(aliases)
     ? aliases.filter(alias => alias && alias.tradeName && alias.drugName && alias.genericName)
     : [];
@@ -42,6 +84,7 @@
     if (primary.some(name => name === q)) return 1000;
     if (primary.some(name => name.startsWith(q))) return 800;
     if (primary.some(name => name.includes(q))) return 600;
+    if (q.length >= 4 && primary.some(name => fuzzyDistance(q, name) === 1)) return 500;
 
     const aliasMatch = aliasesMatchingQuery(query, aliases).find(alias => aliasTargetsDrug(alias, drug));
     if (aliasMatch) {
@@ -67,10 +110,12 @@
   window.DRUG_LOOKUP = Object.freeze({
     aliasesMatchingQuery,
     directlyMatchesDrug,
+    editDistance,
     matchScore,
     normalize,
     normalizeTradeNameAliases,
     rankDrugs,
+    resolveQuery,
     tradeNameAliasForDrug
   });
 })();
