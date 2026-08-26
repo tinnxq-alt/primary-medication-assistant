@@ -69,7 +69,9 @@
   const tradeNameAliasForDrug = (query, drug, aliases = tradeNameAliases) => findTradeNameAliasForDrug(query, drug, aliases);
 
   const routes = {
-    home: "基层用药助手 Pro",
+    home: "基层临床助手",
+    medication: "基层临床助手 · 用药",
+    emergency: "基层临床助手 · 急救",
     categories: "药品分类",
     search: "搜索药品",
     favorites: "我的收藏",
@@ -397,7 +399,51 @@
     if (!loading) updatePharmacyChrome();
   }
 
-  function renderHome() {
+  function renderClinicalHome() {
+    const views = pharmacyViews();
+    const outpatientLoaded = Array.isArray(window.OUTPATIENT_DRUG_CATALOG);
+    const outpatientCount = outpatientLoaded ? views.counts.outpatient : 392;
+    const totalDrugs = views.counts.ward + outpatientCount;
+    app.innerHTML = `
+      <section class="clinical-hero section">
+        <p class="clinical-kicker">基层医生工作台</p>
+        <h2>今天值班，需要什么帮助？</h2>
+        <p>一个平台，保留用药与急救两套专业模块；药品资料由统一药库维护。</p>
+        <label class="search-box clinical-global-search">
+          <span>⌕</span>
+          <input id="clinicalSearch" placeholder="搜索药品；急症入口将在下一阶段接入" autocomplete="off">
+        </label>
+      </section>
+
+      <section class="section">
+        <div class="section-title"><h2>核心模块</h2><small>分阶段融合</small></div>
+        <div class="clinical-module-grid">
+          <button class="clinical-module medication" type="button" data-route-link="medication">
+            <span class="clinical-module-icon">💊</span>
+            <span><strong>用药助手</strong><small>${totalDrugs} 个统一药品 ID · 病房 ${views.counts.ward} · 门诊 ${outpatientCount}</small></span>
+            <b>进入 →</b>
+          </button>
+          <button class="clinical-module emergency" type="button" data-route-link="emergency">
+            <span class="clinical-module-icon">🚑</span>
+            <span><strong>急救诊疗</strong><small>急症识别、处理流程与抢救用药</small></span>
+            <b>进入 →</b>
+          </button>
+        </div>
+      </section>
+
+      <section class="section clinical-next-grid">
+        <article class="card"><h3>🧮 临床计算</h3><p class="drug-sub">规划中：eGFR、CrCl 与常用风险评分。</p></article>
+        <article class="card"><h3>📋 常用医嘱</h3><p class="drug-sub">规划中：个人模板与公共审核模板分离。</p></article>
+        <article class="card"><h3>✅ 我的待办</h3><p class="drug-sub">账号接入前继续保存在当前浏览器，不上传患者信息。</p></article>
+      </section>
+      <section class="notice section"><strong>融合边界：</strong>当前稳定用药站与急救站保持不变；本分支只建立统一入口和数据契约。</section>`;
+    document.getElementById("clinicalSearch").addEventListener("change", event => {
+      sessionStorage.setItem("drug-search-query", event.target.value.trim());
+      navigate("search");
+    });
+  }
+
+  function renderMedicationHome() {
     const drugs = allDrugs();
     const pharmacy = PHARMACIES[state.activePharmacy];
     const verified = drugs.filter(d => isVerifiedSource(d.source?.status)).length;
@@ -433,6 +479,28 @@
       sessionStorage.setItem("drug-search-query", event.target.value.trim());
       navigate("search");
     });
+  }
+
+  function renderEmergencyHome() {
+    const emergencyUrl = "https://tinnxq-alt.github.io/emergency-care-assistant/";
+    app.innerHTML = `
+      <section class="clinical-hero emergency-hero section">
+        <p class="clinical-kicker">基层临床助手 · 急救</p>
+        <h2>急症识别与处理流程</h2>
+        <p>第一阶段继续使用已发布的急救诊疗助手 v0.20；后续逐条把流程药物改为统一 <code>drug_id</code> 引用。</p>
+        <div class="toolbar clinical-actions">
+          <a class="btn primary link-btn" href="${emergencyUrl}" target="_blank" rel="noopener">打开稳定急救模块</a>
+          <button class="btn ghost" type="button" data-route-link="medication">转到统一药品库</button>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-title"><h2>迁移状态</h2><small>v0.20 稳定基线</small></div>
+        <div class="clinical-status-list">
+          <article class="card"><strong>已保留</strong><p class="drug-sub">首页、急症、流程、用药、待办与离线能力。</p></article>
+          <article class="card"><strong>正在统一</strong><p class="drug-sub">页面导航、药品 ID、资料来源和版本字段。</p></article>
+          <article class="card"><strong>尚未迁移</strong><p class="drug-sub">账号、收藏、笔记、待办云同步与数据库级隔离。</p></article>
+        </div>
+      </section>`;
   }
 
   function renderCategories() {
@@ -1753,9 +1821,12 @@
     const { route, param } = currentRoute();
     updateChrome(route);
     updatePharmacyChrome();
+    if (pharmacySwitcher) pharmacySwitcher.hidden = ["home", "emergency"].includes(route);
     if (route !== "notebook") delete app.dataset.notebookPharmacy;
     const handlers = {
-      home: renderHome,
+      home: renderClinicalHome,
+      medication: renderMedicationHome,
+      emergency: renderEmergencyHome,
       categories: renderCategories,
       search: renderSearch,
       detail: () => renderDetail(param),
@@ -1769,7 +1840,7 @@
       contraindications: renderContraindications,
       notebook: renderNotebook
     };
-    (handlers[route] || renderHome)();
+    (handlers[route] || renderClinicalHome)();
     window.scrollTo({ top: 0, behavior: "instant" });
     window.dispatchEvent(new CustomEvent("primary-medication-rendered", { detail: { route, param } }));
   }
@@ -1839,8 +1910,8 @@
     toast(pharmacyId === "outpatient"
       ? `已切换到门诊药库（${outpatientCount} 个品规）`
       : `已切换到${pharmacyLabel(pharmacyId)}`);
-    if (currentRoute().route === "home") render();
-    else navigate("home");
+    if (currentRoute().route === "medication") render();
+    else navigate("medication");
   });
 
   let swipeStart = null;
@@ -1872,7 +1943,7 @@
     invalidateCatalogCaches();
     if (state.activePharmacy !== "outpatient") return;
     const route = currentRoute().route;
-    if (["home", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();
+    if (["medication", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();
   });
   updateNetwork();
   if ("serviceWorker" in navigator) {
@@ -1903,7 +1974,7 @@
     .then(() => {
       const route = currentRoute().route;
       const outpatientStillLoading = state.activePharmacy === "outpatient" && !Array.isArray(window.OUTPATIENT_DRUG_CATALOG);
-      if (!outpatientStillLoading && ["home", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();
+      if (!outpatientStillLoading && ["medication", "detail"].includes(route) && !document.activeElement?.matches("input, textarea, select")) render();
     })
     .catch(error => console.error("中文核验库加载失败", error));
 })();
