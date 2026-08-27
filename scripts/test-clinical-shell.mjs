@@ -18,7 +18,9 @@ for (const marker of ['emergencyFlow: () => renderEmergencyFlow(param)', 'emerge
 }
 if (!serviceWorker.includes('clinical-data-contract.js')) throw new Error('离线外壳未缓存数据契约');
 if (!serviceWorker.includes('clinical-workspace-data.js')) throw new Error('离线外壳未缓存融合工作台数据');
-if (!serviceWorker.includes('primary-medication-v60')) throw new Error('融合界面发布后未更新离线缓存版本');
+if (!serviceWorker.includes('user-data-store.js')) throw new Error('离线外壳未缓存个人数据隔离层');
+if (!serviceWorker.includes('primary-medication-v61')) throw new Error('个人数据隔离发布后未更新离线缓存版本');
+if (!index.includes('user-data-store.js') || index.indexOf('user-data-store.js') > index.indexOf('app.js')) throw new Error('个人数据隔离层必须先于主应用加载');
 
 const context = { window: {} };
 vm.createContext(context);
