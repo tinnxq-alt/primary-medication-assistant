@@ -1,3 +1,4 @@
+
 (() => {
   "use strict";
 
@@ -49,6 +50,7 @@
     hidden: read("hidden", []),
     categoryOverrides: read("categoryOverrides", {}),
     drugOverrides: read("drugOverrides", {}),
+    tasks: read("tasks", []),
     smartSearchEndpoint: read("smartSearchEndpoint", DEFAULT_SMART_SEARCH_ENDPOINT),
     activePharmacy: normalizePharmacyId(read("activePharmacy", "ward")),
     history: []
@@ -59,7 +61,7 @@
     normalizeCategory: normalizeDrugCategory,
     normalizeTherapeuticClass
   } = window.DRUG_CLASSIFICATION;
-  const BACKUP_ARRAY_KEYS = ["favorites", "groups", "notes", "customDrugs", "customCategories", "contraindications", "marks", "remembered", "cached", "hidden"];
+  const BACKUP_ARRAY_KEYS = ["favorites", "groups", "notes", "customDrugs", "customCategories", "contraindications", "marks", "remembered", "cached", "hidden", "tasks"];
   const BACKUP_OBJECT_KEYS = ["favoriteMap", "categoryOverrides", "drugOverrides"];
   const BACKUP_KEYS = [...BACKUP_ARRAY_KEYS, ...BACKUP_OBJECT_KEYS];
   let deferredInstallPrompt = null;
@@ -72,6 +74,13 @@
     home: "基层临床助手",
     medication: "基层临床助手 · 用药",
     emergency: "基层临床助手 · 急救",
+    emergencyFlow: "急救流程",
+    emergencyDrugs: "流程关联用药",
+    common: "常用工具",
+    calculators: "临床计算",
+    orders: "常用医嘱",
+    tasks: "笔记与待办",
+    profile: "我的",
     categories: "药品分类",
     search: "搜索药品",
     favorites: "我的收藏",
@@ -85,6 +94,14 @@
     notebook: "笔记本",
     detail: "药品详情"
   };
+
+  const MEDICATION_ROUTES = new Set(["medication", "categories", "search", "detail", "add", "interactions", "symptoms", "flashcards", "all", "contraindications"]);
+  const NAV_ROUTE_GROUPS = Object.freeze({
+    medication: new Set(MEDICATION_ROUTES),
+    emergency: new Set(["emergency", "emergencyFlow", "emergencyDrugs"]),
+    common: new Set(["common", "calculators", "orders", "favorites"]),
+    profile: new Set(["profile", "notebook", "tasks", "cache"])
+  });
 
   const shortcuts = [
     ["categories", "▦", "药品分类"],
@@ -354,7 +371,8 @@
     pageTitle.textContent = routes[route] || routes.home;
     backBtn.hidden = route === "home";
     document.querySelectorAll(".bottom-nav button").forEach(btn => {
-      btn.classList.toggle("active", btn.dataset.route === route);
+      const group = NAV_ROUTE_GROUPS[btn.dataset.route];
+      btn.classList.toggle("active", btn.dataset.route === route || Boolean(group?.has(route)));
     });
   }
 
@@ -404,41 +422,53 @@
     const outpatientLoaded = Array.isArray(window.OUTPATIENT_DRUG_CATALOG);
     const outpatientCount = outpatientLoaded ? views.counts.outpatient : 392;
     const totalDrugs = views.counts.ward + outpatientCount;
+    const flows = window.CLINICAL_WORKSPACE_DATA?.flows || [];
     app.innerHTML = `
-      <section class="clinical-hero section">
-        <p class="clinical-kicker">基层医生工作台</p>
-        <h2>今天值班，需要什么帮助？</h2>
-        <p>一个平台，保留用药与急救两套专业模块；药品资料由统一药库维护。</p>
+      <section class="workspace-brand section">
+        <div class="workspace-brand-mark">✚</div>
+        <div><p class="clinical-kicker">PRIMARY CARE CLINICAL</p><h2>基层临床助手</h2><p>基层医生的一站式临床工作台</p></div>
+      </section>
+      <section class="section">
         <label class="search-box clinical-global-search">
           <span>⌕</span>
-          <input id="clinicalSearch" placeholder="搜索药品；急症入口将在下一阶段接入" autocomplete="off">
+          <input id="clinicalSearch" placeholder="搜索药品、急症、流程或计算工具" autocomplete="off">
         </label>
       </section>
 
       <section class="section">
-        <div class="section-title"><h2>核心模块</h2><small>分阶段融合</small></div>
         <div class="clinical-module-grid">
           <button class="clinical-module medication" type="button" data-route-link="medication">
             <span class="clinical-module-icon">💊</span>
-            <span><strong>用药助手</strong><small>${totalDrugs} 个统一药品 ID · 病房 ${views.counts.ward} · 门诊 ${outpatientCount}</small></span>
-            <b>进入 →</b>
+            <span><strong>用药助手</strong><small>查药 · 剂量 · 禁忌 · 肾功能调整<br>${totalDrugs} 个院内品规</small></span>
           </button>
           <button class="clinical-module emergency" type="button" data-route-link="emergency">
             <span class="clinical-module-icon">🚑</span>
-            <span><strong>急救诊疗</strong><small>急症识别、处理流程与抢救用药</small></span>
-            <b>进入 →</b>
+            <span><strong>急救诊疗</strong><small>快速识别 · 处置流程 · 抢救用药<br>${flows.length} 个流程入口</small></span>
           </button>
         </div>
       </section>
 
-      <section class="section clinical-next-grid">
-        <article class="card"><h3>🧮 临床计算</h3><p class="drug-sub">规划中：eGFR、CrCl 与常用风险评分。</p></article>
-        <article class="card"><h3>📋 常用医嘱</h3><p class="drug-sub">规划中：个人模板与公共审核模板分离。</p></article>
-        <article class="card"><h3>✅ 我的待办</h3><p class="drug-sub">账号接入前继续保存在当前浏览器，不上传患者信息。</p></article>
+      <section class="section quick-workspace-grid" aria-label="常用工作台">
+        <button class="workspace-tile" data-route-link="calculators"><span>▣</span><strong>临床计算</strong></button>
+        <button class="workspace-tile" data-route-link="orders"><span>☷</span><strong>常用医嘱</strong></button>
+        <button class="workspace-tile" data-route-link="favorites"><span>☆</span><strong>我的收藏</strong></button>
+        <button class="workspace-tile" data-route-link="tasks"><span>✎</span><strong>笔记与待办</strong></button>
       </section>
-      <section class="notice section"><strong>融合边界：</strong>当前稳定用药站与急救站保持不变；本分支只建立统一入口和数据契约。</section>`;
+      <section class="section">
+        <div class="section-title"><h2>最近使用</h2><small>快捷返回</small></div>
+        <div class="recent-list">
+          <button data-emergency-flow="shock"><span class="recent-icon danger">!</span><span><strong>休克/循环不稳</strong><small>急救流程</small></span><b>›</b></button>
+          <button data-route-link="favorites"><span class="recent-icon">★</span><span><strong>我的收藏</strong><small>${state.favorites.length} 个药品</small></span><b>›</b></button>
+          <button data-route-link="calculators"><span class="recent-icon">▣</span><span><strong>eGFR 计算</strong><small>临床计算工具</small></span><b>›</b></button>
+        </div>
+      </section>
+      <p class="safety-footer">仅供医务人员参考，不替代临床判断</p>`;
     document.getElementById("clinicalSearch").addEventListener("change", event => {
-      sessionStorage.setItem("drug-search-query", event.target.value.trim());
+      const query = event.target.value.trim();
+      const flow = flows.find(item => item.title.includes(query) || query.includes(item.title));
+      if (query && flow) return navigate("emergencyFlow", flow.id);
+      if (/eGFR|CrCl|HAS-BLED|CHA/i.test(query)) return navigate("calculators");
+      sessionStorage.setItem("drug-search-query", query);
       navigate("search");
     });
   }
@@ -483,24 +513,165 @@
 
   function renderEmergencyHome() {
     const emergencyUrl = "https://tinnxq-alt.github.io/emergency-care-assistant/";
+    const flows = window.CLINICAL_WORKSPACE_DATA?.flows || [];
+    const flowCard = flow => `<button class="emergency-flow-card ${esc(flow.tone)}" type="button" data-emergency-flow="${esc(flow.id)}"><span>${esc(flow.icon)}</span><span><strong>${esc(flow.title)}</strong><small>${esc(flow.summary)}</small></span><b>›</b></button>`;
     app.innerHTML = `
-      <section class="clinical-hero emergency-hero section">
-        <p class="clinical-kicker">基层临床助手 · 急救</p>
-        <h2>急症识别与处理流程</h2>
-        <p>第一阶段继续使用已发布的急救诊疗助手 v0.20；后续逐条把流程药物改为统一 <code>drug_id</code> 引用。</p>
-        <div class="toolbar clinical-actions">
-          <a class="btn primary link-btn" href="${emergencyUrl}" target="_blank" rel="noopener">打开稳定急救模块</a>
-          <button class="btn ghost" type="button" data-route-link="medication">转到统一药品库</button>
-        </div>
+      <section class="section emergency-search-panel">
+        <label class="search-box"><span>⌕</span><input id="emergencySearch" placeholder="搜索急症或处置流程" autocomplete="off"></label>
+        <div class="life-threat-banner">⚠ 危及生命：立即评估 ABCDE</div>
       </section>
       <section class="section">
-        <div class="section-title"><h2>迁移状态</h2><small>v0.20 稳定基线</small></div>
-        <div class="clinical-status-list">
-          <article class="card"><strong>已保留</strong><p class="drug-sub">首页、急症、流程、用药、待办与离线能力。</p></article>
-          <article class="card"><strong>正在统一</strong><p class="drug-sub">页面导航、药品 ID、资料来源和版本字段。</p></article>
-          <article class="card"><strong>尚未迁移</strong><p class="drug-sub">账号、收藏、笔记、待办云同步与数据库级隔离。</p></article>
-        </div>
+        <div class="section-title"><h2>急救流程</h2><small>v0.20 · ${flows.length} 项</small></div>
+        <div id="emergencyFlowList" class="emergency-flow-list">${flows.map(flowCard).join("")}</div>
+      </section>
+      <section class="notice section"><strong>审核边界：</strong>融合页只提供流程导航和通用药物身份链接；剂量、浓度、配液与院内处置规范仍以稳定急救模块及审核资料为准。<div class="toolbar clinical-actions"><a class="btn ghost link-btn" href="${emergencyUrl}" target="_blank" rel="noopener">打开稳定急救模块</a></div>
       </section>`;
+    document.getElementById("emergencySearch").addEventListener("input", event => {
+      const query = normalize(event.target.value);
+      const filtered = flows.filter(flow => !query || normalize(`${flow.title}${flow.summary}`).includes(query));
+      document.getElementById("emergencyFlowList").innerHTML = filtered.length ? filtered.map(flowCard).join("") : empty("未找到匹配流程，请打开稳定急救模块继续查找。");
+    });
+  }
+
+  function workspaceFlowById(id) {
+    return (window.CLINICAL_WORKSPACE_DATA?.flows || []).find(flow => flow.id === id);
+  }
+
+  function renderEmergencyFlow(id) {
+    const flow = workspaceFlowById(id);
+    if (!flow) {
+      app.innerHTML = empty("未找到该急救流程。", '<button class="btn primary" data-route-link="emergency">返回急救首页</button>');
+      return;
+    }
+    const concepts = flow.drugIds.map(drugId => window.DRUG_CONCEPT_INDEX?.byId?.[drugId]).filter(Boolean);
+    app.innerHTML = `
+      <section class="flow-header section">
+        <div><span class="badge blocked">急救流程 · 待临床复核</span><h2>${esc(flow.title)}</h2><p>${esc(flow.summary)}</p></div>
+        <button class="btn danger" type="button" id="startEmergencyFlow">启动流程</button>
+      </section>
+      <section class="section">
+        <div class="flow-timeline">${flow.steps.map((step, index) => `<article><span>${index + 1}</span><div><strong>${esc(step.split("：")[0])}</strong><p>${esc(step.split("：").slice(1).join("："))}</p></div></article>`).join("")}</div>
+      </section>
+      ${concepts.length ? `<section class="section"><div class="section-title"><h2>流程关联用药</h2><button class="btn ghost small" data-emergency-drugs="${esc(flow.id)}">查看分层信息</button></div><div class="concept-chip-list">${concepts.map(concept => `<span>💊 ${esc(concept.drugName)}</span>`).join("")}</div></section>` : ""}
+      <section class="notice danger section"><strong>安全提示：</strong>本页是融合导航层，不包含剂量、浓度、配液或泵速。执行前必须核对稳定急救模块、院内制度及可靠来源。</section>`;
+    document.getElementById("startEmergencyFlow").onclick = () => toast("已进入流程导航；请同步启动本院急救处置");
+  }
+
+  function renderEmergencyDrugs(id) {
+    const flow = workspaceFlowById(id);
+    if (!flow) {
+      app.innerHTML = empty("未找到流程关联用药。", '<button class="btn primary" data-route-link="emergency">返回急救首页</button>');
+      return;
+    }
+    const concepts = flow.drugIds.map(drugId => window.DRUG_CONCEPT_INDEX?.byId?.[drugId]).filter(Boolean);
+    app.innerHTML = `
+      <section class="section"><div class="section-title"><div><p class="clinical-kicker">${esc(flow.title)}</p><h2>流程关联用药</h2></div><button class="btn ghost small" data-emergency-flow="${esc(flow.id)}">返回流程</button></div></section>
+      <section class="section concept-detail-list">${concepts.length ? concepts.map(concept => {
+        const products = concept.productIds.map(productId => drugById(productId)).filter(Boolean);
+        const inventory = concept.inventoryEvidence || [];
+        return `<article class="concept-detail-card">
+          <div class="concept-identity"><span>💊</span><div><h3>${esc(concept.drugName)}</h3><small>${esc(concept.id)}</small></div><span class="badge ok">drug_id 已关联</span></div>
+          <div class="concept-layer-grid">
+            <div><strong>通用药物身份</strong><p>身份已审计；急救流程只引用这一层。</p></div>
+            <div><strong>院内品规</strong><p>${concept.productIds.length ? `已关联 ${concept.productIds.length} 个品规${products.length ? `，当前已加载 ${products.length} 个` : ""}。` : "尚未建立院内品规关联。"}</p></div>
+            <div><strong>库存证据</strong><p>${inventory.length ? esc(inventory.join("；")) : "暂无已审核库存证据。"}</p></div>
+            <div class="warning-layer"><strong>禁忌与注意</strong><p>必须进入药品详情并结合患者情况、来源与院内规范复核。</p></div>
+          </div>
+          ${products.length ? `<div class="toolbar">${products.map(product => `<button class="btn ghost small" data-open-drug="${esc(product.id)}">查看 ${esc(product.drugName)} 品规</button>`).join("")}</div>` : ""}
+        </article>`;
+      }).join("") : empty("该流程没有关联药物。")}</section>`;
+  }
+
+  function renderCommonHub() {
+    app.innerHTML = `
+      <section class="section workspace-page-head"><p class="clinical-kicker">常用工作台</p><h2>把高频工具放在一起</h2><p>公共模板与个人收藏分开保存，避免把个人内容写入临床主数据。</p></section>
+      <section class="section common-hub-grid">
+        <button data-route-link="calculators"><span>▣</span><div><strong>临床计算</strong><small>eGFR、CrCl 与风险评分</small></div><b>›</b></button>
+        <button data-route-link="orders"><span>☷</span><div><strong>常用医嘱</strong><small>审核模板与使用边界</small></div><b>›</b></button>
+        <button data-route-link="favorites"><span>☆</span><div><strong>我的收藏</strong><small>${state.favorites.length} 个药品收藏</small></div><b>›</b></button>
+        <button data-route-link="tasks"><span>✓</span><div><strong>笔记与待办</strong><small>${state.tasks.filter(task => !task.done).length} 项未完成</small></div><b>›</b></button>
+      </section>`;
+  }
+
+  function renderCalculators() {
+    const calculators = window.CLINICAL_WORKSPACE_DATA?.calculators || [];
+    app.innerHTML = `
+      <section class="section"><label class="search-box"><span>⌕</span><input id="calculatorSearch" placeholder="搜索计算工具"></label></section>
+      <section class="section calculator-grid" id="calculatorGrid">${calculators.map(item => `<button type="button" data-calculator-id="${esc(item.id)}"><span>▣</span><strong>${esc(item.title)}</strong><small>${esc(item.subtitle)}</small></button>`).join("")}</section>
+      <section class="panel section calculator-preview"><span class="badge warn">尚未启用计算</span><h2 id="calculatorTitle">请选择计算工具</h2><p id="calculatorStatus">公式版本、适用人群、单位与边界条件完成临床审核后才会开放计算。</p><div class="form-grid"><div class="field"><label>年龄</label><input disabled placeholder="待功能审核"></div><div class="field"><label>相关检验值</label><input disabled placeholder="待单位审核"></div></div><button class="btn primary" type="button" disabled>输入完整信息后计算</button></section>
+      <section class="notice section"><strong>当前阶段：</strong>只完成统一入口和界面骨架，不输出未经验证的医学计算结果。</section>`;
+    document.getElementById("calculatorSearch").oninput = event => {
+      const query = normalize(event.target.value);
+      document.querySelectorAll("[data-calculator-id]").forEach(button => { button.hidden = query && !normalize(button.textContent).includes(query); });
+    };
+    document.getElementById("calculatorGrid").onclick = event => {
+      const button = event.target.closest("[data-calculator-id]");
+      if (!button) return;
+      const item = calculators.find(entry => entry.id === button.dataset.calculatorId);
+      document.getElementById("calculatorTitle").textContent = item.title;
+      document.getElementById("calculatorStatus").textContent = item.status;
+      document.querySelectorAll("[data-calculator-id]").forEach(node => node.classList.toggle("active", node === button));
+    };
+  }
+
+  function renderOrders() {
+    const templates = window.CLINICAL_WORKSPACE_DATA?.orderTemplates || [];
+    app.innerHTML = `
+      <section class="section"><div class="section-title"><h2>常用医嘱</h2><span class="badge info">公共审核模板</span></div><label class="search-box"><span>⌕</span><input id="orderSearch" placeholder="搜索医嘱模板"></label></section>
+      <section class="section"><div class="order-filter-row"><button class="active">全部</button>${[...new Set(templates.map(item => item.category))].map(category => `<button>${esc(category)}</button>`).join("")}</div></section>
+      <section class="section card-list" id="orderList">${templates.map(item => `<article class="card order-template-card"><div><span class="badge info">模板</span><h3>${esc(item.title)}</h3><p class="drug-sub">${esc(item.description)}</p></div><button class="btn ghost small" type="button" data-preview-order="${esc(item.id)}">查看边界</button></article>`).join("")}</section>
+      <section class="notice section"><strong>使用前核对：</strong>模板不包含可直接执行的患者医嘱；具体药物、剂量、频次、疗程与监测必须个体化确认。</section>`;
+    document.getElementById("orderSearch").oninput = event => {
+      const query = normalize(event.target.value);
+      document.querySelectorAll(".order-template-card").forEach(card => { card.hidden = query && !normalize(card.textContent).includes(query); });
+    };
+    document.getElementById("orderList").onclick = event => {
+      if (event.target.closest("[data-preview-order]")) toast("该模板目前只展示审核边界，尚未开放执行内容");
+    };
+  }
+
+  function renderTasks() {
+    const sorted = [...state.tasks].sort((a, b) => Number(a.done) - Number(b.done) || b.createdAt.localeCompare(a.createdAt));
+    app.innerHTML = `
+      <section class="section personal-tabs"><button data-route-link="notebook">笔记</button><button class="active">待办</button></section>
+      <section class="panel section"><form id="taskForm" class="task-form"><input name="title" maxlength="80" placeholder="添加不含患者身份信息的待办" required><button class="btn primary">＋ 新建</button></form><p class="drug-sub">仅保存在当前浏览器；请勿记录姓名、住院号、电话等患者身份信息。</p></section>
+      <section class="section task-list" id="taskList">${sorted.length ? sorted.map(task => `<article class="card ${task.done ? "done" : ""}"><label><input type="checkbox" data-task-toggle="${esc(task.id)}" ${task.done ? "checked" : ""}><span>${esc(task.title)}</span></label><button class="btn ghost small" data-task-delete="${esc(task.id)}">删除</button></article>`).join("") : empty("还没有待办事项。")}</section>
+      <section class="privacy-card section">🔒 <strong>个人数据边界</strong><p>账号系统接入前只保存在本机；未来迁移时每条记录必须绑定 user_id 并执行逐行隔离。</p></section>`;
+    document.getElementById("taskForm").onsubmit = event => {
+      event.preventDefault();
+      const title = new FormData(event.target).get("title").trim();
+      if (!title) return;
+      state.tasks.push({ id: `task-${Date.now()}`, title, done: false, createdAt: new Date().toISOString() });
+      saveState("tasks"); renderTasks(); toast("待办已添加");
+    };
+    document.getElementById("taskList").onchange = event => {
+      const id = event.target.dataset.taskToggle;
+      if (!id) return;
+      state.tasks = state.tasks.map(task => task.id === id ? { ...task, done: event.target.checked } : task);
+      saveState("tasks"); renderTasks();
+    };
+    document.getElementById("taskList").onclick = event => {
+      const button = event.target.closest("[data-task-delete]");
+      if (!button) return;
+      state.tasks = state.tasks.filter(task => task.id !== button.dataset.taskDelete);
+      saveState("tasks"); renderTasks(); toast("待办已删除");
+    };
+  }
+
+  function renderProfile() {
+    app.innerHTML = `
+      <section class="profile-head section"><div class="profile-avatar">●</div><div><h2>基层医生</h2><p>本机个人工作台</p></div></section>
+      <section class="section settings-list">
+        <button data-profile-action="account"><span>↻</span><div><strong>账号与同步</strong><small>统一账号方案待接入</small></div><b>›</b></button>
+        <button id="exportWorkspace"><span>⇩</span><div><strong>数据导出</strong><small>导出当前浏览器个人数据</small></div><b>›</b></button>
+        <button data-profile-action="privacy"><span>◇</span><div><strong>隐私与安全</strong><small>患者身份信息不进入默认模型</small></div><b>›</b></button>
+        <button data-route-link="medication"><span>▣</span><div><strong>药库设置</strong><small>病房与门诊药库独立显示</small></div><b>›</b></button>
+        <button data-route-link="cache"><span>⇩</span><div><strong>离线缓存</strong><small>管理已缓存临床资料</small></div><b>›</b></button>
+      </section>
+      <section class="section data-boundary-grid"><article><span>▤</span><strong>公共临床数据</strong><small>平台提供 · 只读优先</small></article><article><span>●</span><strong>个人数据</strong><small>当前仅本人浏览器可见</small></article></section>
+      <section class="privacy-card section">🔒 个人收藏、笔记与待办相互隔离；真实账号上线前不会自动上传。</section>`;
+    document.getElementById("exportWorkspace").onclick = () => downloadJson("clinical-assistant-local-backup.json", createFullBackup());
+    app.querySelectorAll("[data-profile-action]").forEach(button => button.onclick = () => toast("该能力将在统一账号阶段接入"));
   }
 
   function renderCategories() {
@@ -1513,6 +1684,7 @@
       return `<article class="card"><div class="detail-head"><div><h3>${esc(drug?.drugName || "已删除药品")}</h3><span class="badge info">${esc(fieldLabels[mark.field] || mark.field)} · ${esc(typeLabels[mark.type] || mark.type)}</span></div><button class="btn ghost small" data-delete-mark="${esc(mark.id)}">删除</button></div><p class="mark-quote">${esc(mark.text)}</p></article>`;
     });
     app.innerHTML = `
+      <section class="section personal-tabs"><button class="active">笔记</button><button data-route-link="tasks">待办</button></section>
       <section class="section" data-notebook-section="notes"><div class="section-title"><h2>${esc(pharmacyLabel(pharmacyId))}笔记</h2><button class="btn ghost small" id="exportNotes">导出当前药库</button></div><div class="card-list">${notes.length ? [...notes].sort((a,b) => b.updatedAt.localeCompare(a.updatedAt)).map(noteCard).join("") : empty(`还没有${pharmacyLabel(pharmacyId)}笔记。请从药品详情页添加。`)}</div></section>
       <section class="section" data-notebook-section="marks"><div class="section-title"><h2>${esc(pharmacyLabel(pharmacyId))}文本标记</h2><small>${marks.length} 条</small></div><div class="marks-list" data-local-marks-signature="${esc(marks.map(mark => `${mark.id}:${mark.type}`).join("|"))}">${markCards.length ? markCards.join("") : empty("还没有划线、加粗或荧光笔标记。")}</div></section>`;
     document.getElementById("exportNotes").onclick = () => downloadJson(`${pharmacyId}-drug-notebook.json`, {
@@ -1821,12 +1993,19 @@
     const { route, param } = currentRoute();
     updateChrome(route);
     updatePharmacyChrome();
-    if (pharmacySwitcher) pharmacySwitcher.hidden = ["home", "emergency"].includes(route);
+    if (pharmacySwitcher) pharmacySwitcher.hidden = !MEDICATION_ROUTES.has(route) && route !== "notebook";
     if (route !== "notebook") delete app.dataset.notebookPharmacy;
     const handlers = {
       home: renderClinicalHome,
       medication: renderMedicationHome,
       emergency: renderEmergencyHome,
+      emergencyFlow: () => renderEmergencyFlow(param),
+      emergencyDrugs: () => renderEmergencyDrugs(param),
+      common: renderCommonHub,
+      calculators: renderCalculators,
+      orders: renderOrders,
+      tasks: renderTasks,
+      profile: renderProfile,
       categories: renderCategories,
       search: renderSearch,
       detail: () => renderDetail(param),
@@ -1846,6 +2025,10 @@
   }
 
   document.addEventListener("click", event => {
+    const emergencyFlow = event.target.closest("[data-emergency-flow]");
+    if (emergencyFlow) return navigate("emergencyFlow", emergencyFlow.dataset.emergencyFlow);
+    const emergencyDrugs = event.target.closest("[data-emergency-drugs]");
+    if (emergencyDrugs) return navigate("emergencyDrugs", emergencyDrugs.dataset.emergencyDrugs);
     const routeLink = event.target.closest("[data-route-link], .bottom-nav [data-route]");
     if (routeLink) return navigate(routeLink.dataset.routeLink || routeLink.dataset.route);
     const favorite = event.target.closest("[data-favorite]");
@@ -1978,3 +2161,4 @@
     })
     .catch(error => console.error("中文核验库加载失败", error));
 })();
+
