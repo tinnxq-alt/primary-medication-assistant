@@ -2,7 +2,8 @@
 (() => {
   "use strict";
 
-  const STORAGE_PREFIX = "primary-medication-pro:v1:";
+  const userDataStore = window.USER_DATA_STORE;
+  const currentUserId = userDataStore.currentUserId;
   const DEFAULT_SMART_SEARCH_ENDPOINT = "https://primary-medication-smart-search.tinnxq.workers.dev";
   const VERIFIED_SOURCE_STATUSES = new Set(["verified-template", "verified-label", "verified-monograph", "verified-regulator"]);
   const INITIAL_SEARCH_RENDER_LIMIT = 40;
@@ -17,14 +18,9 @@
   const pharmacySwitcher = document.getElementById("pharmacySwitcher");
 
   const read = (key, fallback) => {
-    try {
-      const value = JSON.parse(localStorage.getItem(STORAGE_PREFIX + key));
-      return value ?? fallback;
-    } catch {
-      return fallback;
-    }
+    return userDataStore.read(key, fallback);
   };
-  const write = (key, value) => localStorage.setItem(STORAGE_PREFIX + key, JSON.stringify(value));
+  const write = (key, value) => userDataStore.write(key, value);
   const PHARMACIES = Object.freeze({
     ward: { label: "病房药库", shortLabel: "病房", emptyText: "病房药库暂无药品。" },
     outpatient: { label: "门诊药库", shortLabel: "门诊", emptyText: "门诊药库暂无药品。" }
@@ -55,6 +51,13 @@
     activePharmacy: normalizePharmacyId(read("activePharmacy", "ward")),
     history: []
   };
+  for (const key of ["notes", "marks", "tasks"]) {
+    const records = state[key];
+    if (!records.every(record => record.userId)) {
+      state[key] = records.map(record => record.userId ? record : { ...record, userId: currentUserId });
+      write(key, state[key]);
+    }
+  }
   const {
     categories: DRUG_CATEGORY_IDS,
     classifyCandidate: classifyDrugCandidate,
@@ -323,7 +326,7 @@
   function renderMarkedText(drugId, field, value) {
     let html = esc(value);
     const marks = state.marks
-      .filter(mark => mark.drugId === drugId && mark.field === field && mark.text)
+      .filter(mark => userDataStore.userOwns(mark) && mark.drugId === drugId && mark.field === field && mark.text)
       .sort((a, b) => b.text.length - a.text.length);
     marks.forEach(mark => {
       const target = esc(mark.text);
@@ -589,7 +592,7 @@
         <button data-route-link="calculators"><span>▣</span><div><strong>临床计算</strong><small>eGFR、CrCl 与风险评分</small></div><b>›</b></button>
         <button data-route-link="orders"><span>☷</span><div><strong>常用医嘱</strong><small>审核模板与使用边界</small></div><b>›</b></button>
         <button data-route-link="favorites"><span>☆</span><div><strong>我的收藏</strong><small>${state.favorites.length} 个药品收藏</small></div><b>›</b></button>
-        <button data-route-link="tasks"><span>✓</span><div><strong>笔记与待办</strong><small>${state.tasks.filter(task => !task.done).length} 项未完成</small></div><b>›</b></button>
+        <button data-route-link="tasks"><span>✓</span><div><strong>笔记与待办</strong><small>${state.tasks.filter(task => userDataStore.userOwns(task) && !task.done).length} 项未完成</small></div><b>›</b></button>
       </section>`;
   }
 
@@ -631,7 +634,7 @@
   }
 
   function renderTasks() {
-    const sorted = [...state.tasks].sort((a, b) => Number(a.done) - Number(b.done) || b.createdAt.localeCompare(a.createdAt));
+    const sorted = state.tasks.filter(userDataStore.userOwns).sort((a, b) => Number(a.done) - Number(b.done) || b.createdAt.localeCompare(a.createdAt));
     app.innerHTML = `
       <section class="section personal-tabs"><button data-route-link="notebook">笔记</button><button class="active">待办</button></section>
       <section class="panel section"><form id="taskForm" class="task-form"><input name="title" maxlength="80" placeholder="添加不含患者身份信息的待办" required><button class="btn primary">＋ 新建</button></form><p class="drug-sub">仅保存在当前浏览器；请勿记录姓名、住院号、电话等患者身份信息。</p></section>
@@ -641,35 +644,37 @@
       event.preventDefault();
       const title = new FormData(event.target).get("title").trim();
       if (!title) return;
-      state.tasks.push({ id: `task-${Date.now()}`, title, done: false, createdAt: new Date().toISOString() });
+      state.tasks.push({ id: `task-${Date.now()}`, userId: currentUserId, title, done: false, createdAt: new Date().toISOString() });
       saveState("tasks"); renderTasks(); toast("待办已添加");
     };
     document.getElementById("taskList").onchange = event => {
       const id = event.target.dataset.taskToggle;
       if (!id) return;
-      state.tasks = state.tasks.map(task => task.id === id ? { ...task, done: event.target.checked } : task);
+      state.tasks = state.tasks.map(task => task.id === id && userDataStore.userOwns(task) ? { ...task, done: event.target.checked } : task);
       saveState("tasks"); renderTasks();
     };
     document.getElementById("taskList").onclick = event => {
       const button = event.target.closest("[data-task-delete]");
       if (!button) return;
-      state.tasks = state.tasks.filter(task => task.id !== button.dataset.taskDelete);
+      state.tasks = state.tasks.filter(task => task.id !== button.dataset.taskDelete || !userDataStore.userOwns(task));
       saveState("tasks"); renderTasks(); toast("待办已删除");
     };
   }
 
   function renderProfile() {
+    const migration = userDataStore.migrationStatus();
+    const userLabel = migration.userId.length > 22 ? `${migration.userId.slice(0, 18)}…` : migration.userId;
     app.innerHTML = `
       <section class="profile-head section"><div class="profile-avatar">●</div><div><h2>基层医生</h2><p>本机个人工作台</p></div></section>
       <section class="section settings-list">
-        <button data-profile-action="account"><span>↻</span><div><strong>账号与同步</strong><small>统一账号方案待接入</small></div><b>›</b></button>
+        <button data-profile-action="account"><span>↻</span><div><strong>账号与同步</strong><small>当前身份：${esc(userLabel)}</small></div><b>›</b></button>
         <button id="exportWorkspace"><span>⇩</span><div><strong>数据导出</strong><small>导出当前浏览器个人数据</small></div><b>›</b></button>
         <button data-profile-action="privacy"><span>◇</span><div><strong>隐私与安全</strong><small>患者身份信息不进入默认模型</small></div><b>›</b></button>
         <button data-route-link="medication"><span>▣</span><div><strong>药库设置</strong><small>病房与门诊药库独立显示</small></div><b>›</b></button>
         <button data-route-link="cache"><span>⇩</span><div><strong>离线缓存</strong><small>管理已缓存临床资料</small></div><b>›</b></button>
       </section>
       <section class="section data-boundary-grid"><article><span>▤</span><strong>公共临床数据</strong><small>平台提供 · 只读优先</small></article><article><span>●</span><strong>个人数据</strong><small>当前仅本人浏览器可见</small></article></section>
-      <section class="privacy-card section">🔒 个人收藏、笔记与待办相互隔离；真实账号上线前不会自动上传。</section>`;
+      <section class="privacy-card section">🔒 个人收藏、笔记与待办已进入独立用户命名空间；迁移旧数据 ${migration.migratedKeys.length} 类。草稿阶段保留旧键镜像，真实账号上线前不会自动上传。</section>`;
     document.getElementById("exportWorkspace").onclick = () => downloadJson("clinical-assistant-local-backup.json", createFullBackup());
     app.querySelectorAll("[data-profile-action]").forEach(button => button.onclick = () => toast("该能力将在统一账号阶段接入"));
   }
@@ -784,7 +789,7 @@
     const detailPharmacy = normalizePharmacyScopes(drug).includes(state.activePharmacy)
       ? state.activePharmacy
       : normalizePharmacyScopes(drug)[0];
-    const notes = state.notes.filter(note => note.drugId === id && recordBelongsToPharmacy(note, detailPharmacy));
+    const notes = state.notes.filter(note => userDataStore.userOwns(note) && note.drugId === id && recordBelongsToPharmacy(note, detailPharmacy));
     const interactionFindings = interactionEngine?.findRelevant?.(drug, visibleDrugs()) || [];
     const clinicalFields = {
       indication: clinical?.indication || "待逐条核验具体厂家现行说明书",
@@ -872,7 +877,7 @@
       if (!selectionData) return;
       const duplicate = state.marks.some(mark => mark.drugId === drugId && mark.field === selectionData.field && mark.text === selectionData.text && mark.type === button.dataset.markType);
       if (!duplicate) {
-        state.marks.push({ id: `mark-${Date.now()}`, drugId, pharmacyId: recordPharmacyId({ drugId }), ...selectionData, type: button.dataset.markType, createdAt: new Date().toISOString() });
+        state.marks.push({ id: `mark-${Date.now()}`, userId: currentUserId, drugId, pharmacyId: recordPharmacyId({ drugId }), ...selectionData, type: button.dataset.markType, createdAt: new Date().toISOString() });
         saveState("marks");
         toast("文本标记已保存");
       }
@@ -1084,7 +1089,7 @@
       }
       const notes = data.notes.trim();
       if (notes) {
-        state.notes.push({ id: `note-${Date.now()}`, drugId, pharmacyId: pharmacyScope, content: notes, updatedAt: now });
+        state.notes.push({ id: `note-${Date.now()}`, userId: currentUserId, drugId, pharmacyId: pharmacyScope, content: notes, updatedAt: now });
         saveState("notes");
       }
       state.activePharmacy = pharmacyScope;
@@ -1675,8 +1680,8 @@
   function renderNotebook() {
     const fieldLabels = { indication: "适应症", dosage: "用法用量", adverseReactions: "不良反应", precautions: "注意事项" };
     const pharmacyId = state.activePharmacy;
-    const notes = state.notes.filter(note => recordBelongsToPharmacy(note, pharmacyId));
-    const marks = state.marks.filter(mark => recordBelongsToPharmacy(mark, pharmacyId));
+    const notes = state.notes.filter(note => userDataStore.userOwns(note) && recordBelongsToPharmacy(note, pharmacyId));
+    const marks = state.marks.filter(mark => userDataStore.userOwns(mark) && recordBelongsToPharmacy(mark, pharmacyId));
     app.dataset.notebookPharmacy = pharmacyId;
     const markCards = marks.map(mark => {
       const drug = drugById(mark.drugId);
@@ -1717,13 +1722,13 @@
 
   function openNoteModal(drugId, noteId = "") {
     const drug = drugById(drugId);
-    const existing = state.notes.find(note => note.id === noteId);
+    const existing = state.notes.find(note => note.id === noteId && userDataStore.userOwns(note));
     const pharmacyId = existing ? recordPharmacyId(existing) : recordPharmacyId({ drugId });
     modalRoot.innerHTML = `<div class="modal-backdrop"><form class="modal" id="noteForm"><h2>${existing ? "编辑笔记" : "添加笔记"}</h2><p class="muted">${esc(drug?.drugName)} · ${esc(pharmacyLabel(pharmacyId))}</p><div class="field"><label>笔记内容</label><textarea name="content" rows="6" required>${esc(existing?.content)}</textarea></div><div class="modal-actions"><button type="button" class="btn ghost" data-close-modal>取消</button><button class="btn primary">保存</button></div></form></div>`;
     document.getElementById("noteForm").onsubmit = event => {
       event.preventDefault(); const content = new FormData(event.target).get("content").trim();
-      if (existing) state.notes = state.notes.map(note => note.id === noteId ? { ...note, pharmacyId, content, updatedAt: new Date().toISOString() } : note);
-      else state.notes.push({ id: `note-${Date.now()}`, drugId, pharmacyId, content, updatedAt: new Date().toISOString() });
+      if (existing) state.notes = state.notes.map(note => note.id === noteId && userDataStore.userOwns(note) ? { ...note, pharmacyId, content, updatedAt: new Date().toISOString() } : note);
+      else state.notes.push({ id: `note-${Date.now()}`, userId: currentUserId, drugId, pharmacyId, content, updatedAt: new Date().toISOString() });
       saveState("notes"); closeModal(); toast(existing ? "笔记已更新" : "笔记已保存"); render();
     };
   }
@@ -1953,17 +1958,20 @@
 
   function createFullBackup() {
     return {
-      appId: "primary-medication-assistant", schemaVersion: 1, exportedAt: new Date().toISOString(),
+      appId: "primary-medication-assistant", schemaVersion: 2, exportedAt: new Date().toISOString(),
+      userId: currentUserId, storageScope: "user-namespaced-local",
       data: Object.fromEntries(BACKUP_KEYS.map(key => [key, state[key]]))
     };
   }
 
   function validateFullBackup(payload) {
-    if (!payload || payload.appId !== "primary-medication-assistant" || payload.schemaVersion !== 1 || !payload.data) throw new Error("不是本应用的完整备份文件");
+    if (!payload || payload.appId !== "primary-medication-assistant" || ![1, 2].includes(payload.schemaVersion) || !payload.data) throw new Error("不是本应用的完整备份文件");
     const restored = {};
     BACKUP_ARRAY_KEYS.forEach(key => {
       if (!Array.isArray(payload.data[key])) throw new Error(`字段 ${key} 格式错误`);
-      restored[key] = payload.data[key];
+      restored[key] = ["notes", "marks", "tasks"].includes(key)
+        ? payload.data[key].map(record => ({ ...record, userId: currentUserId }))
+        : payload.data[key];
     });
     BACKUP_OBJECT_KEYS.forEach(key => {
       const value = payload.data[key];
@@ -2046,13 +2054,13 @@
     const form = event.target.closest("[data-form]");
     if (form) return openCategoryDrugList("", form.dataset.form, "");
     const note = event.target.closest("[data-delete-note]");
-    if (note) confirmModal("确认删除这条笔记？", () => { state.notes = state.notes.filter(n => n.id !== note.dataset.deleteNote); saveState("notes"); render(); toast("笔记已删除"); });
+    if (note) confirmModal("确认删除这条笔记？", () => { state.notes = state.notes.filter(n => n.id !== note.dataset.deleteNote || !userDataStore.userOwns(n)); saveState("notes"); render(); toast("笔记已删除"); });
     const editNote = event.target.closest("[data-edit-note]");
     if (editNote) { event.stopPropagation(); openNoteModal(editNote.dataset.noteDrug, editNote.dataset.editNote); }
     const contra = event.target.closest("[data-delete-contra]");
     if (contra) confirmModal("确认删除这条自定义禁忌记录？", () => { state.contraindications = state.contraindications.filter(c => c.id !== contra.dataset.deleteContra); saveState("contraindications"); render(); toast("记录已删除"); });
     const mark = event.target.closest("[data-delete-mark]");
-    if (mark) confirmModal("确认删除这条文本标记？", () => { state.marks = state.marks.filter(m => m.id !== mark.dataset.deleteMark); saveState("marks"); render(); toast("标记已删除"); });
+    if (mark) confirmModal("确认删除这条文本标记？", () => { state.marks = state.marks.filter(m => m.id !== mark.dataset.deleteMark || !userDataStore.userOwns(m)); saveState("marks"); render(); toast("标记已删除"); });
     const custom = event.target.closest("[data-delete-custom]");
     if (custom) confirmModal("确认删除这个自定义药品及其关联笔记、标记？", () => {
       const id = custom.dataset.deleteCustom;
