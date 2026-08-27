@@ -30,3 +30,11 @@
 - 新增跨用户隔离、来源限制、未认证拒绝和过期版本冲突测试。
 - 本阶段未创建远程 D1、未部署 Worker、未改变两个稳定站点。
 
+## 2026-08-28：阶段 7 — 独立测试数据库
+
+- 创建独立 D1 测试库 `clinical-assistant-user-data-staging`（`ec476fa1-d463-4697-a5b8-5b3044657d4c`）。
+- 应用 `user_entities` 迁移，并通过只读查询确认表和索引已建立。
+- 新增专用 `wrangler.staging.jsonc`；它不绑定现有 D1，也不改动现有两个 Workers。
+- 更新至 Wrangler 4.126.0 和当前 Workers 类型，并保留锁文件以固定可复现依赖。
+- 测试库不含真实用户数据；测试 Worker 尚未部署，Access 白名单尚未配置。
+
