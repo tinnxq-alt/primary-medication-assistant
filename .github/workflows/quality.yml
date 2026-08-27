@@ -52,6 +52,7 @@ jobs:
           node --check drug-classification.js
           node --check clinical-data-contract.js
           node --check drug-concepts.js
+          node --check clinical-workspace-data.js
           node --check drugs.js
           node --check outpatient-drugs.js
           node --check service-worker.js
