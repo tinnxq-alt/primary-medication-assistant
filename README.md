@@ -2,6 +2,8 @@
 
 面向基层医疗场景的静态药品资料管理网站，可直接部署到 GitHub Pages。
 
+融合版草稿已升级为“基层临床助手”，并在不影响现有站点的分支中加入用药、急救、常用和我的统一入口。账号同步的最低成本核算见 [`docs/MINIMUM_COST_ACCOUNT_SYNC.md`](docs/MINIMUM_COST_ACCOUNT_SYNC.md)，非生产同步服务骨架见 [`sync-worker/`](sync-worker/README.md)。
+
 ## 当前版本
 
 - 已接通 13 个页面入口：首页、分类、搜索、详情、收藏、添加药物、相互作用、症状搜索、记忆卡片、缓存管理、全部药物、用药禁忌、笔记本。
@@ -105,3 +107,4 @@ python3 -m http.server 8000
 ```
 
 然后访问 `http://localhost:8000`。不要直接双击 `index.html`，否则 Service Worker 与部分浏览器存储功能可能受限。
+

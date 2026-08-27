@@ -1,0 +1,14 @@
+{
+  "name": "clinical-assistant-user-sync-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js && node --check test.mjs",
+    "test": "node test.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4.36.0"
+  }
+}
+

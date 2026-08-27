@@ -1,4 +1,3 @@
-
 name: Quality gate
 
 on:
@@ -72,6 +71,8 @@ jobs:
           node --check worker/src/free-source-index.js
           node --check worker/test-v11.mjs
           node --check worker/test-v12.mjs
+          node --check sync-worker/src/index.js
+          node --check sync-worker/test.mjs
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
       - name: Catalog permanent deletion tests
@@ -116,5 +117,8 @@ jobs:
         run: node scripts/test-user-data-store.mjs
       - name: Worker tests
         working-directory: worker
+        run: npm test
+      - name: User sync Worker tests
+        working-directory: sync-worker
         run: npm test
 
