@@ -53,6 +53,7 @@ jobs:
           node --check clinical-data-contract.js
           node --check drug-concepts.js
           node --check clinical-workspace-data.js
+          node --check user-data-store.js
           node --check drugs.js
           node --check outpatient-drugs.js
           node --check service-worker.js
@@ -111,6 +112,8 @@ jobs:
         run: node scripts/test-clinical-shell.mjs
       - name: Canonical drug concept registry tests
         run: node scripts/test-drug-concepts.mjs
+      - name: User data isolation tests
+        run: node scripts/test-user-data-store.mjs
       - name: Worker tests
         working-directory: worker
         run: npm test
