@@ -38,3 +38,10 @@
 - 更新至 Wrangler 4.126.0 和当前 Workers 类型，并保留锁文件以固定可复现依赖。
 - 测试库不含真实用户数据；测试 Worker 尚未部署，Access 白名单尚未配置。
 
+## 2026-08-28：阶段 8 — 独立测试 Worker
+
+- 通过 Cloudflare OAuth 部署全新 Worker `clinical-assistant-user-sync-staging`，版本 `cd69209d-ddc8-4617-a8a9-e9f672e8f74b`。
+- Worker 只绑定独立测试 D1；现有 `personal-os-api`、`primary-medication-smart-search` 和原有 D1 均未修改。
+- 远程访问 `/health` 在缺少 Access 身份时返回 `403 ACCESS_REQUIRED`，确认默认拒绝生效。
+- Cloudflare One 尚未初始化；Access 白名单需在明确确认选择 0 美元免费计划后继续配置。
+
