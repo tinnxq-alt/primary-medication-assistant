@@ -14,11 +14,10 @@
     }
   ],
   "vars": {
-    "ALLOWED_ORIGINS": "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000"
+    "ALLOWED_ORIGINS": "https://tinnxq-alt.github.io,http://localhost:8000,http://127.0.0.1:8000",
+    "ALLOWED_GITHUB_USER_IDS": "316177058",
+    "GITHUB_CALLBACK_URL": "https://clinical-assistant-user-sync-staging.tinnxq.workers.dev/auth/github/callback"
   },
-  "observability": {
-    "enabled": true,
-    "head_sampling_rate": 1
-  }
+  "observability": { "enabled": true, "head_sampling_rate": 1 }
 }
 
