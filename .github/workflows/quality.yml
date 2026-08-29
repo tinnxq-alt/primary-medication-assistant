@@ -49,6 +49,10 @@ jobs:
           node --check drug-lookup.js
           node --check pharmacy-scope.js
           node --check drug-classification.js
+          node --check clinical-data-contract.js
+          node --check drug-concepts.js
+          node --check clinical-workspace-data.js
+          node --check user-data-store.js
           node --check drugs.js
           node --check outpatient-drugs.js
           node --check service-worker.js
@@ -67,6 +71,8 @@ jobs:
           node --check worker/src/free-source-index.js
           node --check worker/test-v11.mjs
           node --check worker/test-v12.mjs
+          node --check sync-worker/src/index.js
+          node --check sync-worker/test.mjs
       - name: Catalog audit
         run: node scripts/audit-catalog.mjs
       - name: Catalog permanent deletion tests
@@ -103,6 +109,16 @@ jobs:
         run: node scripts/test-notebook-scroll.mjs
       - name: Header layout tests
         run: node scripts/test-header-layout.mjs
+      - name: Clinical shell and data contract tests
+        run: node scripts/test-clinical-shell.mjs
+      - name: Canonical drug concept registry tests
+        run: node scripts/test-drug-concepts.mjs
+      - name: User data isolation tests
+        run: node scripts/test-user-data-store.mjs
       - name: Worker tests
         working-directory: worker
         run: npm test
+      - name: User sync Worker tests
+        working-directory: sync-worker
+        run: npm test
+

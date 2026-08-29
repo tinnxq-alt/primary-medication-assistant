@@ -1,0 +1,47 @@
+# 融合改动记录
+
+## 2026-08-26：阶段 1 — 统一外壳
+
+- 确认用药助手稳定基线：`523cc38`。
+- 确认急救助手稳定基线：`8568056`（v0.20）。
+- 创建远程备份分支：
+  - `codex/backup-primary-stable-20260826`
+  - `codex/backup-emergency-v020-20260826`
+- 创建隔离整合分支：`codex/clinical-assistant-shell-20260826`。
+- 新增“基层临床助手”统一首页与五项底部导航。
+- 原用药首页移动到 `#/medication`，其余既有用药路由保持不变。
+- 急救入口暂时指向已发布 v0.20，避免复制或破坏急救内容。
+- 新增统一数据契约，规定急救流程只能通过 `drug_id` 引用药品。
+- 新增盘点、架构和回退记录，以及融合外壳回归检查。
+
+## 回退方式
+
+- 未合并前：关闭或删除 Draft PR 即可；两个 `main` 和线上站不受影响。
+- 合并后如需回退：把用药助手恢复到备份分支对应提交 `523cc38`。
+- 急救助手本阶段没有代码变更；其备份基线为 `8568056`。
+
+## 2026-08-27：阶段 6 — 最低成本账号同步骨架
+
+- 核算 Cloudflare Access、Workers、D1 和 `workers.dev` 免费额度；50 人以内的低使用量方案预计新增固定费用为 $0/月。
+- 新增独立 `sync-worker/`，不修改现有药品智能检索 Worker。
+- 同步服务从 Cloudflare Access `ctx.access` 取得 `user_uuid`；没有认证身份时默认拒绝。
+- 新增 D1 `user_entities` 表，只保存收藏、笔记、待办和设置，不保存邮箱。
+- 所有读写按服务端取得的 `user_id` 限定，并用版本号检测覆盖冲突。
+- 新增跨用户隔离、来源限制、未认证拒绝和过期版本冲突测试。
+- 本阶段未创建远程 D1、未部署 Worker、未改变两个稳定站点。
+
+## 2026-08-28：阶段 7 — 独立测试数据库
+
+- 创建独立 D1 测试库 `clinical-assistant-user-data-staging`（`ec476fa1-d463-4697-a5b8-5b3044657d4c`）。
+- 应用 `user_entities` 迁移，并通过只读查询确认表和索引已建立。
+- 新增专用 `wrangler.staging.jsonc`；它不绑定现有 D1，也不改动现有两个 Workers。
+- 更新至 Wrangler 4.126.0 和当前 Workers 类型，并保留锁文件以固定可复现依赖。
+- 测试库不含真实用户数据；测试 Worker 尚未部署，Access 白名单尚未配置。
+
+## 2026-08-28：阶段 8 — 独立测试 Worker
+
+- 通过 Cloudflare OAuth 部署全新 Worker `clinical-assistant-user-sync-staging`，版本 `cd69209d-ddc8-4617-a8a9-e9f672e8f74b`。
+- Worker 只绑定独立测试 D1；现有 `personal-os-api`、`primary-medication-smart-search` 和原有 D1 均未修改。
+- 远程访问 `/health` 在缺少 Access 身份时返回 `403 ACCESS_REQUIRED`，确认默认拒绝生效。
+- Cloudflare One 尚未初始化；Access 白名单需在明确确认选择 0 美元免费计划后继续配置。
+

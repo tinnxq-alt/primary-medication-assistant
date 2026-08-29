@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0f766e">
-  <meta name="description" content="基层用药助手：药品目录、收藏、笔记与离线缓存。仅供医务人员核对资料，不替代诊疗决策。">
-  <title>基层用药助手</title>
+  <meta name="description" content="基层临床助手：统一进入用药助手与急救诊疗模块。仅供医务人员核对资料和流程导航，不替代诊疗决策。">
+  <title>基层临床助手</title>
   <script>try{if(sessionStorage.getItem("primary-medication:view-restore"))document.documentElement.classList.add("restoring-view")}catch{}</script>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icon-192.png" sizes="192x192">
@@ -18,7 +18,7 @@
   <div id="offlineBanner" class="offline-banner" hidden>当前离线：仅可查看本机已缓存资料</div>
   <header class="app-header">
     <button id="backBtn" class="icon-btn" type="button" aria-label="返回" hidden>←</button>
-    <div><p class="eyebrow">PRIMARY CARE</p><h1 id="pageTitle">基层用药助手</h1></div>
+    <div><p class="eyebrow">PRIMARY CARE CLINICAL</p><h1 id="pageTitle">基层临床助手</h1></div>
     <button id="homeBtn" class="icon-btn" type="button" aria-label="首页">⌂</button>
   </header>
   <main class="app-shell">
@@ -29,7 +29,7 @@
     <div id="app" aria-live="polite"></div>
   </main>
   <nav class="bottom-nav" aria-label="主要导航">
-    <button type="button" data-route="home"><span>⌂</span>首页</button><button type="button" data-route="categories"><span>▦</span>分类</button><button type="button" data-route="search"><span>⌕</span>搜索</button><button type="button" data-route="favorites"><span>★</span>收藏</button><button type="button" data-route="notebook"><span>✎</span>笔记</button>
+    <button type="button" data-route="home"><span>⌂</span>首页</button><button type="button" data-route="medication"><span>💊</span>用药</button><button type="button" data-route="emergency"><span>🚑</span>急救</button><button type="button" data-route="common"><span>▦</span>常用</button><button type="button" data-route="profile"><span>◎</span>我的</button>
   </nav>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
   <div id="modalRoot"></div>
@@ -43,6 +43,10 @@
   <script src="catalog-data-loader.js" defer></script>
   <script src="outpatient-clinical-hydration.js" defer></script>
   <script src="drug-classification.js" defer></script>
+  <script src="clinical-data-contract.js" defer></script>
+  <script src="drug-concepts.js" defer></script>
+  <script src="clinical-workspace-data.js" defer></script>
+  <script src="user-data-store.js" defer></script>
   <script src="app.js" defer></script>
   <script src="outpatient-metadata-ui.js" defer></script>
   <script src="fast-search-ui.js" defer></script>
@@ -54,3 +58,4 @@
   <script src="header-brand.js" defer></script>
 </body>
 </html>
+

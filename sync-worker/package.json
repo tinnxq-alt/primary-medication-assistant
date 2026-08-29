@@ -1,0 +1,15 @@
+{
+  "name": "clinical-assistant-user-sync-worker",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/index.js && node --check test.mjs",
+    "test": "node test.mjs"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260826.1",
+    "wrangler": "^4.126.0"
+  }
+}
+
