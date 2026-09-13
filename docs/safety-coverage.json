@@ -1,0 +1,5455 @@
+{
+  "checkedAt": "2026-09-13",
+  "note": "匹配重点规则不等于完整审核；空列表代表尚未覆盖，不能判断安全。",
+  "total": 556,
+  "interactionRules": 26,
+  "singleRules": 12,
+  "drugs": [
+    {
+      "id": "drug-001",
+      "name": "阿卡波糖片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-003",
+      "name": "阿普唑仑片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-004",
+      "name": "阿奇霉素片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-qt"
+      ]
+    },
+    {
+      "id": "drug-005",
+      "name": "阿托伐他汀钙片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-006",
+      "name": "阿昔洛韦乳膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-007",
+      "name": "艾地骨化醇软胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-008",
+      "name": "艾司奥美拉唑镁肠溶干混悬剂",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "clopidogrel-omeprazole"
+      ]
+    },
+    {
+      "id": "drug-009",
+      "name": "艾司唑仑片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-010",
+      "name": "舒乐安定",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-011",
+      "name": "爱维心口服液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-012",
+      "name": "桉柠蒎肠溶胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-013",
+      "name": "氨氯地平贝那普利片(II)",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "drug-014",
+      "name": "奥美沙坦酯片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "drug-015",
+      "name": "莫匹罗星软膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-016",
+      "name": "克罗米通乳膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-017",
+      "name": "胞磷胆碱钠片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-018",
+      "name": "苯磺酸氨氯地平片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-019",
+      "name": "苯磺酸左氨氯地平片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-020",
+      "name": "苯甲酸福格列汀片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-021",
+      "name": "苯溴马隆胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-022",
+      "name": "冰黄肤乐软膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-023",
+      "name": "丙戊酸钠片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-024",
+      "name": "布洛芬缓释胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "drug-025",
+      "name": "阿司匹林肠溶片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "drug-027",
+      "name": "丹参酮IIA磺酸钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-028",
+      "name": "丹龙口服液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-030",
+      "name": "丹栀逍遥丸",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-031",
+      "name": "单硝酸异山梨酯缓释胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "nitrate-pde5"
+      ]
+    },
+    {
+      "id": "drug-032",
+      "name": "当飞利肝宁胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-033",
+      "name": "地塞米松磷酸钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-034",
+      "name": "地衣芽孢杆菌活菌颗粒",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-035",
+      "name": "丁酸氢化可的松乳膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-036",
+      "name": "甲磺酸多沙唑嗪缓释片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-037",
+      "name": "甲磺酸多沙唑嗪片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-038",
+      "name": "二甲双胍格列吡嗪片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-039",
+      "name": "非布司他片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-040",
+      "name": "非那雄胺片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-041",
+      "name": "双氯芬酸二乙胺乳胶剂",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-042",
+      "name": "氟伐他汀钠胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-043",
+      "name": "氟哌噻吨美利曲辛片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-044",
+      "name": "复方氨酚伪麻胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-045",
+      "name": "复方甲氧那明胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-046",
+      "name": "复合维生素B片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-047",
+      "name": "富马酸比索洛尔片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "digoxin-beta"
+      ]
+    },
+    {
+      "id": "drug-048",
+      "name": "富马酸依美斯汀缓释胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-049",
+      "name": "格列美脲片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-050",
+      "name": "枸橼酸莫沙必利片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-051",
+      "name": "谷维素片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-052",
+      "name": "猴头健胃灵片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-053",
+      "name": "黄葵胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-054",
+      "name": "甲磺酸二氢麦角碱分散片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-055",
+      "name": "降脂通脉胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-056",
+      "name": "金银花口服液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-057",
+      "name": "精蛋白人胰岛素混合注射液30R",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-058",
+      "name": "酒石酸美托洛尔片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "digoxin-beta"
+      ]
+    },
+    {
+      "id": "drug-059",
+      "name": "酒石酸唑吡坦片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-060",
+      "name": "开塞露",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-061",
+      "name": "拉西地平分散片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-062",
+      "name": "兰索拉唑胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-063",
+      "name": "利伐沙班片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "rivaroxaban-bleeding"
+      ],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding"
+      ]
+    },
+    {
+      "id": "drug-064",
+      "name": "利伐沙班片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "rivaroxaban-bleeding"
+      ],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding"
+      ]
+    },
+    {
+      "id": "drug-065",
+      "name": "利肺片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-066",
+      "name": "利可君片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-067",
+      "name": "联苯苄唑乳膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-068",
+      "name": "林可霉素滴眼液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-069",
+      "name": "磷霉素氨丁三醇散",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-070",
+      "name": "磷酸奥司他韦胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-071",
+      "name": "灵泽片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-072",
+      "name": "硫酸吗啡缓释片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "morphine-contra"
+      ],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-073",
+      "name": "硫酸吗啡控释片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "morphine-contra"
+      ],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-074",
+      "name": "硫酸氢氯吡格雷片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "clopidogrel-omeprazole",
+        "rivaroxaban-antiplatelet",
+        "clopidogrel-nsaid",
+        "repaglinide-clopidogrel",
+        "sertraline-bleeding"
+      ]
+    },
+    {
+      "id": "drug-075",
+      "name": "潞党参口服液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-076",
+      "name": "螺内酯片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "spironolactone-contra"
+      ],
+      "interactionRules": [
+        "raas-potassium",
+        "spironolactone-potassium",
+        "digoxin-spironolactone-assay",
+        "spironolactone-nsaid",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "drug-077",
+      "name": "洛索洛芬钠凝胶贴膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-078",
+      "name": "铝镁匹林片(II)",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "drug-079",
+      "name": "铝碳酸镁咀嚼片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-multivalent-cation",
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "drug-080",
+      "name": "氯化钾缓释片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "raas-potassium",
+        "spironolactone-potassium"
+      ]
+    },
+    {
+      "id": "drug-081",
+      "name": "氯化钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-082",
+      "name": "氯化钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-083",
+      "name": "氯化钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-084",
+      "name": "氯化钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-085",
+      "name": "氯雷他定片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-086",
+      "name": "氯硝西泮片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-087",
+      "name": "麻仁丸",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-088",
+      "name": "玛巴洛沙韦片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-089",
+      "name": "美阿沙坦钾片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-090",
+      "name": "美愈伪麻口服溶液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-091",
+      "name": "萘普生钠片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "drug-092",
+      "name": "脑心通胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-093",
+      "name": "尿素乳膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-094",
+      "name": "枇杷止咳软胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-095",
+      "name": "脯氨酸恒格列净片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-096",
+      "name": "葡萄糖注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-097",
+      "name": "普瑞巴林胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-098",
+      "name": "芪黄通秘软胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-099",
+      "name": "氢溴酸替格列汀片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-100",
+      "name": "盐酸曲美他嗪片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-101",
+      "name": "去乙酰毛花苷注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-102",
+      "name": "乳果糖口服溶液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-103",
+      "name": "瑞舒伐他汀依折麦布片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-104",
+      "name": "三七通舒胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-105",
+      "name": "沙格列汀二甲双胍缓释片(II)",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-106",
+      "name": "沙库巴曲阿利沙坦钙片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "drug-107",
+      "name": "沙库巴曲缬沙坦钠片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "drug-108",
+      "name": "麝香追风止痛膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-109",
+      "name": "肾衰宁胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-110",
+      "name": "生血宝合剂",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-111",
+      "name": "石杉碱甲片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-112",
+      "name": "双氯芬酸钠双释放肠溶胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "drug-113",
+      "name": "双石通淋胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-114",
+      "name": "四季抗病毒合剂",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-115",
+      "name": "呋塞米片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-116",
+      "name": "呋塞米注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-117",
+      "name": "速效救心丸",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-118",
+      "name": "羧甲司坦口服溶液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-119",
+      "name": "酚麻美敏片(泰诺)",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-120",
+      "name": "碳酸钙D3片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levothyroxine-calcium-iron",
+        "levofloxacin-multivalent-cation",
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "drug-121",
+      "name": "替米沙坦片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "drug-122",
+      "name": "天麻素注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-123",
+      "name": "通天口服液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-124",
+      "name": "头孢克洛缓释胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-125",
+      "name": "外用应急软膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-126",
+      "name": "万应胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-127",
+      "name": "维生素B6片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-128",
+      "name": "维生素B6注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-129",
+      "name": "维生素C注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-130",
+      "name": "维生素D2软胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-131",
+      "name": "乌灵胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-132",
+      "name": "西帕依固龈液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-133",
+      "name": "吲哚美辛栓",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "drug-134",
+      "name": "硝苯地平控释片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-135",
+      "name": "硝苯地平片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-136",
+      "name": "缬沙坦胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "drug-137",
+      "name": "心速宁胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-138",
+      "name": "宣肺止嗽合剂",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-139",
+      "name": "玄七健骨片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-140",
+      "name": "血塞通胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-141",
+      "name": "盐酸二甲双胍片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-142",
+      "name": "盐酸氟桂利嗪胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-143",
+      "name": "盐酸凯普拉生片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-144",
+      "name": "盐酸乐卡地平片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-145",
+      "name": "盐酸吗啡注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "drug-146",
+      "name": "盐酸坦索罗辛缓释胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-147",
+      "name": "盐酸特比萘芬乳膏",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-148",
+      "name": "盐酸西替利嗪片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-149",
+      "name": "盐酸小檗碱片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-150",
+      "name": "盐酸溴己新口服溶液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-151",
+      "name": "左氧氟沙星片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-multivalent-cation",
+        "levofloxacin-qt",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-152",
+      "name": "左氧氟沙星氯化钠注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-qt",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-153",
+      "name": "养心氏片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-154",
+      "name": "叶酸片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-155",
+      "name": "依折麦布片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-156",
+      "name": "乙酰半胱氨酸胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-157",
+      "name": "盐酸洛哌丁胺胶囊",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-158",
+      "name": "银杏叶片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-159",
+      "name": "枣仁安神液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-160",
+      "name": "珍菊降压片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-161",
+      "name": "珍菊降压片(薄膜衣片)",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-162",
+      "name": "人胰岛素注射液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "drug-163",
+      "name": "注射用奥美拉唑钠",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "clopidogrel-omeprazole"
+      ]
+    },
+    {
+      "id": "drug-164",
+      "name": "注射用头孢曲松钠",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-165",
+      "name": "左甲状腺素钠片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [
+        "thyroxine-adrenal"
+      ],
+      "interactionRules": [
+        "levothyroxine-calcium-iron"
+      ]
+    },
+    {
+      "id": "drug-166",
+      "name": "左氧氟沙星滴眼液",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "drug-167",
+      "name": "佐匹克隆片",
+      "pharmacy": [
+        "ward"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "outpatient-fx9991",
+      "name": "阿戈美拉汀片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1382",
+      "name": "佐匹克隆片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "outpatient-gz0032",
+      "name": "正柴胡饮颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3674",
+      "name": "葡萄糖注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1052",
+      "name": "二羟丙茶碱注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx9400",
+      "name": "玛舒拉沙韦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0114",
+      "name": "林可霉素滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6082",
+      "name": "萘普生钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "outpatient-fx0752",
+      "name": "阿利沙坦酯吲达帕胺缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-fx0753",
+      "name": "阿利沙坦酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-fx6181",
+      "name": "丙酸倍氯米松乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0473",
+      "name": "盐酸甲氯芬酯胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx3831",
+      "name": "瑞格列奈二甲双胍片(Ⅰ)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "repaglinide-clopidogrel",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-fx9500",
+      "name": "先诺特韦片/利托那韦片组合包装",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-simvastatin",
+        "ritonavir-antiarrhythmic",
+        "ritonavir-inhaled-steroid",
+        "digoxin-inhibitors"
+      ]
+    },
+    {
+      "id": "outpatient-fx0251",
+      "name": "富马酸依美斯汀缓释胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0261",
+      "name": "铝镁匹林片(II)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "outpatient-gz1281",
+      "name": "金砂五淋丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5851",
+      "name": "艾司奥美拉唑镁肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "clopidogrel-omeprazole"
+      ]
+    },
+    {
+      "id": "outpatient-fx6011",
+      "name": "沙格列汀二甲双胍缓释片(Ⅲ)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-fz1571",
+      "name": "金银花口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx9300",
+      "name": "玛巴洛沙韦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0636",
+      "name": "盐酸利多卡因注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1131",
+      "name": "地奥心血康胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1963",
+      "name": "盐酸特比萘芬乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4181",
+      "name": "王氏保赤丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2541",
+      "name": "麝香追风止痛膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4191",
+      "name": "爱维心口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6041",
+      "name": "坎地氢噻片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6061",
+      "name": "盐酸班布特罗口服溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2206",
+      "name": "开塞露",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0783",
+      "name": "阿司匹林肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "outpatient-dl2891",
+      "name": "磷酸西格列汀片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5862",
+      "name": "依帕司他片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1583",
+      "name": "地高辛片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "digoxin-vf",
+        "digoxin-risk"
+      ],
+      "interactionRules": [
+        "digoxin-inhibitors",
+        "digoxin-beta",
+        "digoxin-spironolactone-assay"
+      ]
+    },
+    {
+      "id": "outpatient-gx1104",
+      "name": "盐酸氯丙嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5841",
+      "name": "替米沙坦氨氯地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl5932",
+      "name": "艾地骨化醇软胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2343",
+      "name": "呋塞米注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx7160",
+      "name": "琥珀酸美托洛尔缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "digoxin-beta"
+      ]
+    },
+    {
+      "id": "outpatient-fz4201",
+      "name": "芪蛭益肾胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2472",
+      "name": "叶酸片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6071",
+      "name": "盐酸尼卡地平缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2331",
+      "name": "口腔溃疡散",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0064",
+      "name": "头孢克洛缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4211",
+      "name": "心速宁胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0252",
+      "name": "利肺片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6091",
+      "name": "布洛芬乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2511",
+      "name": "骨痛灵酊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6101",
+      "name": "美阿沙坦钾片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6111",
+      "name": "依折麦布阿托伐他汀钙片(Ⅱ)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1973",
+      "name": "联苯苄唑乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1594",
+      "name": "去乙酰毛花苷注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6121",
+      "name": "沙库巴曲缬沙坦钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-fz4221",
+      "name": "复方熊胆滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6131",
+      "name": "替戈拉生片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0421",
+      "name": "甲磺酸二氢麦角碱分散片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1072",
+      "name": "色甘酸钠滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx2001",
+      "name": "天麻素片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4231",
+      "name": "丹参舒心胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6141",
+      "name": "瑞舒伐他汀依折麦布片(Ⅰ)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1211",
+      "name": "速效救心丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6151",
+      "name": "盐酸溴己新口服溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4241",
+      "name": "胃康宁片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0791",
+      "name": "济生肾气丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6161",
+      "name": "苯甲酸福格列汀片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1021",
+      "name": "诺迪康胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6171",
+      "name": "艾普拉唑肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4251",
+      "name": "至灵胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0802",
+      "name": "双氯芬酸钠双释放肠溶胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "outpatient-gz2521",
+      "name": "通络祛痛膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0901",
+      "name": "多巴丝肼片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0454",
+      "name": "吡拉西坦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2853",
+      "name": "达格列净片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0483",
+      "name": "磷酸奥司他韦颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl4912",
+      "name": "洛索洛芬钠凝胶贴膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl3041",
+      "name": "阿仑膦酸钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "alendronate-contra"
+      ],
+      "interactionRules": [
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "outpatient-dl2482",
+      "name": "腺苷钴胺胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0412",
+      "name": "盐酸贝尼地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1463",
+      "name": "尼可地尔片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0862",
+      "name": "普伐他汀钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5992",
+      "name": "瑞巴派特片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5902",
+      "name": "二甲双胍恩格列净片(I)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-gx1880",
+      "name": "非诺贝特胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0613",
+      "name": "盐酸曲美他嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1559",
+      "name": "匹伐他汀钙片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1644",
+      "name": "缬沙坦胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl0194",
+      "name": "盐酸氨基葡萄糖胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1873",
+      "name": "瑞舒伐他汀钙片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0762",
+      "name": "厄贝沙坦氢氯噻嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl1155",
+      "name": "泮托拉唑钠肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1674",
+      "name": "骨化三醇软胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3617",
+      "name": "氯化钠注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1694",
+      "name": "非洛地平缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0452",
+      "name": "盐酸小檗碱片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2785",
+      "name": "盐酸二甲双胍缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-sz0673",
+      "name": "养心氏片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0952",
+      "name": "血塞通胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1854",
+      "name": "辛伐他汀片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-simvastatin"
+      ]
+    },
+    {
+      "id": "outpatient-gz0743",
+      "name": "生血宝合剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4141",
+      "name": "猴头健胃灵片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1271",
+      "name": "逍遥丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0902",
+      "name": "德谷门冬双胰岛素注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-gz1834",
+      "name": "小金片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4022",
+      "name": "小儿豉翘清热颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4151",
+      "name": "潞党参口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4161",
+      "name": "四季抗病毒合剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6020",
+      "name": "达格列净二甲双胍缓释片(I)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl1562",
+      "name": "伏格列波糖分散片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1145",
+      "name": "雷贝拉唑钠肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2815",
+      "name": "格列美脲片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl1",
+      "name": "阿奇霉素干混悬剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-qt"
+      ]
+    },
+    {
+      "id": "outpatient-dl4922",
+      "name": "奥美沙坦酯氨氯地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-fx5971",
+      "name": "盐酸凯普拉生片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx5981",
+      "name": "硫糖铝分散片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "outpatient-fz4171",
+      "name": "苁蓉益肾颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2422",
+      "name": "七厘胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0262",
+      "name": "藿香正气水",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0173",
+      "name": "牛黄上清片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4052",
+      "name": "诺迪康颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0852",
+      "name": "天麻钩藤颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0903",
+      "name": "门冬胰岛素30注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-sx0602",
+      "name": "丹参酮IIA磺酸钠注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz2191",
+      "name": "复方血栓通软胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1163",
+      "name": "脑安颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1223",
+      "name": "心可舒胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0302",
+      "name": "藤黄健骨丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0952",
+      "name": "脂必泰胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0751",
+      "name": "阿利沙坦酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-gx2521",
+      "name": "吲哚布芬片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0481",
+      "name": "磷酸奥司他韦胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3031",
+      "name": "维生素D2软胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0208",
+      "name": "阿奇霉素片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-qt"
+      ]
+    },
+    {
+      "id": "outpatient-dl0032",
+      "name": "奥美沙坦酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl0304",
+      "name": "甲硝唑片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0773",
+      "name": "坎地沙坦酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-gz1440",
+      "name": "丹珍头痛胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz2501",
+      "name": "丹参口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2115",
+      "name": "铝碳酸镁咀嚼片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-multivalent-cation",
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "outpatient-fz0312",
+      "name": "绞股蓝总甙胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2212",
+      "name": "乳果糖口服溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1591",
+      "name": "三金片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1571",
+      "name": "尿毒清颗粒（无糖型）",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0292",
+      "name": "双黄连合剂（无糖型）",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz3601",
+      "name": "芪黄通秘软胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1711",
+      "name": "金蝉止痒胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2083",
+      "name": "奥美拉唑肠溶胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "clopidogrel-omeprazole"
+      ]
+    },
+    {
+      "id": "outpatient-dl0795",
+      "name": "布洛芬缓释胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "outpatient-dl2781",
+      "name": "盐酸二甲双胍片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl2412",
+      "name": "非那雄胺片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2392",
+      "name": "盐酸坦索罗辛缓释胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl3512",
+      "name": "维生素B6片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0572",
+      "name": "盐酸舍曲林片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "sertraline-maoi"
+      ],
+      "interactionRules": [
+        "sertraline-bleeding"
+      ]
+    },
+    {
+      "id": "outpatient-dl1702",
+      "name": "盐酸西替利嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0713",
+      "name": "六味地黄丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0822",
+      "name": "甲磺酸多沙唑嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz8702",
+      "name": "丹龙口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2821",
+      "name": "格列喹酮分散片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-gz1363",
+      "name": "五灵胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0732",
+      "name": "羟苯磺酸钙胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0761",
+      "name": "普瑞巴林胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "outpatient-dl0281",
+      "name": "左氧氟沙星片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-multivalent-cation",
+        "levofloxacin-qt",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl0273",
+      "name": "玻璃酸钠滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2182",
+      "name": "枸橼酸莫沙必利片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0723",
+      "name": "培哚普利叔丁胺片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl0803",
+      "name": "替米沙坦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-fz4011",
+      "name": "蛭蛇通络胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2341",
+      "name": "西帕依固龈液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-10183",
+      "name": "盐酸西替利嗪滴剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2562",
+      "name": "小儿柴桂退热口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0793",
+      "name": "布洛芬混悬液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "outpatient-gx1345",
+      "name": "阿普唑仑片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "outpatient-dl1863",
+      "name": "阿托伐他汀钙片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0752",
+      "name": "活血通脉胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0711",
+      "name": "尼群洛尔片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0753",
+      "name": "百令胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0125",
+      "name": "头孢呋辛酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0463",
+      "name": "阿昔洛韦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0702",
+      "name": "盐酸贝那普利片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl0584",
+      "name": "单硝酸异山梨酯缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "nitrate-pde5"
+      ]
+    },
+    {
+      "id": "outpatient-dl0126",
+      "name": "注射用头孢美唑钠",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0091",
+      "name": "注射用头孢唑林钠",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0382",
+      "name": "盐酸乐卡地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1513",
+      "name": "酒石酸美托洛尔片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "digoxin-beta"
+      ]
+    },
+    {
+      "id": "outpatient-dl2031",
+      "name": "吸入用布地奈德混悬液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-inhaled-steroid"
+      ]
+    },
+    {
+      "id": "outpatient-sx1632",
+      "name": "胰激肽原酶肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1632",
+      "name": "普乐安片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx5891",
+      "name": "美愈伪麻口服溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1731",
+      "name": "肛泰软膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2442",
+      "name": "独一味片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4031",
+      "name": "胃复春胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gxd276",
+      "name": "精蛋白人胰岛素混合注射液(30R)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl0786",
+      "name": "氯沙坦钾片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl0280",
+      "name": "左氧氟沙星滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0932",
+      "name": "氯氮平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1224",
+      "name": "盐酸帕罗西汀片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2462",
+      "name": "维生素B12注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1626",
+      "name": "马来酸依那普利片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-sx0820",
+      "name": "甲磺酸多沙唑嗪缓释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1092",
+      "name": "福辛普利钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-gx3881",
+      "name": "醋酸曲安奈德益康唑乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-inhaled-steroid"
+      ]
+    },
+    {
+      "id": "outpatient-gz1502",
+      "name": "小活络丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0741",
+      "name": "阿齐沙坦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1857",
+      "name": "碳酸钙D3片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levothyroxine-calcium-iron",
+        "levofloxacin-multivalent-cation",
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "outpatient-gz0977",
+      "name": "银杏叶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx2019",
+      "name": "天麻素注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0302",
+      "name": "银黄口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6000",
+      "name": "艾托格列净片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0551",
+      "name": "蛤蚧定喘丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1871",
+      "name": "灵泽片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0562",
+      "name": "氟哌噻吨美利曲辛片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0092",
+      "name": "罗红霉素片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1444",
+      "name": "硝苯地平控释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2883",
+      "name": "盐酸吡格列酮片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "pioglitazone-hf"
+      ],
+      "interactionRules": [
+        "pioglitazone-insulin"
+      ]
+    },
+    {
+      "id": "outpatient-dl1042",
+      "name": "盐酸氟桂利嗪胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5872",
+      "name": "依折麦布片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1044",
+      "name": "硫酸特布他林雾化吸入用溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0142",
+      "name": "蓝芩口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1802",
+      "name": "双石通淋胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0052",
+      "name": "银杏酮酯分散片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3601",
+      "name": "口服补液盐散(III)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4071",
+      "name": "养阴清肺口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0852",
+      "name": "氟伐他汀钠胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx5895",
+      "name": "复方酚咖伪麻胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2292",
+      "name": "清咽滴丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0761",
+      "name": "金水宝片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz1431",
+      "name": "冰黄肤乐软膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3871",
+      "name": "硝酸咪康唑乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2403",
+      "name": "云南白药气雾剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0913",
+      "name": "乌灵胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0122",
+      "name": "丹七片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0421",
+      "name": "西尼地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1654",
+      "name": "缬沙坦氨氯地平片(I)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-gx2252",
+      "name": "联苯双酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0632",
+      "name": "参苓白术丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4091",
+      "name": "金喉健喷雾剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4101",
+      "name": "七十味珍珠丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0796",
+      "name": "氯沙坦钾氢氯噻嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl1717",
+      "name": "苯磺酸左氨氯地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl0305",
+      "name": "甲硝唑氯化钠注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4111",
+      "name": "枣仁安神液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx6010",
+      "name": "脯氨酸恒格列净片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4121",
+      "name": "醒脾胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz4131",
+      "name": "玄七健骨片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx2033",
+      "name": "丁酸氢化可的松乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-50202",
+      "name": "维生素D滴剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1331",
+      "name": "艾司唑仑片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "outpatient-gx2510",
+      "name": "硫酸氢氯吡格雷片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "clopidogrel-omeprazole",
+        "rivaroxaban-antiplatelet",
+        "clopidogrel-nsaid",
+        "repaglinide-clopidogrel",
+        "sertraline-bleeding"
+      ]
+    },
+    {
+      "id": "outpatient-gx1910",
+      "name": "芪苈强心胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx2175",
+      "name": "盐酸金霉素眼膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2191",
+      "name": "复方血栓通胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1851",
+      "name": "脉管复康胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl2871",
+      "name": "瑞格列奈片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "repaglinide-clopidogrel",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl2142",
+      "name": "格列吡嗪控释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-fx2031",
+      "name": "卡泊三醇软膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1650",
+      "name": "血脂康胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0711",
+      "name": "六味地黄丸（仲景）",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2171",
+      "name": "石斛夜光丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1041",
+      "name": "厄贝沙坦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-dl1701",
+      "name": "苯磺酸氨氯地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2291",
+      "name": "地衣芽孢杆菌活菌颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz2041",
+      "name": "外用应急软膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0242",
+      "name": "吸入用乙酰半胱氨酸溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0291",
+      "name": "双黄连口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx2295",
+      "name": "替硝唑栓",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0985",
+      "name": "银丹心脑通软胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0872",
+      "name": "苯溴马隆胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0411",
+      "name": "生脉饮（人参方）",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0691",
+      "name": "归脾丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0643",
+      "name": "肾衰宁胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1625",
+      "name": "马来酸依那普利叶酸片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-sx0692",
+      "name": "拉西地平分散片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0101",
+      "name": "复方银花解毒颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3891",
+      "name": "莫匹罗星软膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0221",
+      "name": "双氯芬酸二乙胺乳胶剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz1181",
+      "name": "麝珠明目滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx2271",
+      "name": "呋麻滴鼻液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0462",
+      "name": "阿昔洛韦乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1662",
+      "name": "维生素C片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1811",
+      "name": "复合维生素B片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2830",
+      "name": "格列齐特片(II)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-dl2840",
+      "name": "阿卡波糖片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2221",
+      "name": "盐酸洛哌丁胺胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2091",
+      "name": "枸橼酸铋钾胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2110",
+      "name": "铝碳酸镁咀嚼片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levofloxacin-multivalent-cation",
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "outpatient-gx2410",
+      "name": "非那雄胺片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1700",
+      "name": "苯磺酸氨氯地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1442",
+      "name": "硝苯地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0971",
+      "name": "丙戊酸钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1140",
+      "name": "通心络胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2361",
+      "name": "六神丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0811",
+      "name": "珍菊降压片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0431",
+      "name": "急支糖浆",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2390",
+      "name": "伤科接骨片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3901",
+      "name": "尿素乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2767",
+      "name": "精蛋白人胰岛素混合注射液(30R)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-fx4751",
+      "name": "硒酵母胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx5941",
+      "name": "维生素B1片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2920",
+      "name": "左甲状腺素钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "thyroxine-adrenal"
+      ],
+      "interactionRules": [
+        "levothyroxine-calcium-iron"
+      ]
+    },
+    {
+      "id": "outpatient-gx2300",
+      "name": "双歧杆菌三联活菌胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1122",
+      "name": "复方甲氧那明胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1481",
+      "name": "盐酸普罗帕酮片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-antiarrhythmic",
+        "digoxin-inhibitors"
+      ]
+    },
+    {
+      "id": "outpatient-sx1124",
+      "name": "硝苯地平控释片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2404",
+      "name": "云南白药胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1000",
+      "name": "麝香保心丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz1041",
+      "name": "胆宁片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0465",
+      "name": "阿昔洛韦滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz1362",
+      "name": "骨松宝颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0991",
+      "name": "苯巴比妥片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "opioid-cns-depressant"
+      ]
+    },
+    {
+      "id": "outpatient-gx2763",
+      "name": "精蛋白重组人胰岛素混合注射液30R",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-gx0780",
+      "name": "阿司匹林肠溶片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-antiplatelet",
+        "sertraline-bleeding",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "outpatient-gz0181",
+      "name": "一清胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2362",
+      "name": "螺内酯片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "spironolactone-contra"
+      ],
+      "interactionRules": [
+        "raas-potassium",
+        "spironolactone-potassium",
+        "digoxin-spironolactone-assay",
+        "spironolactone-nsaid",
+        "spironolactone-aspirin"
+      ]
+    },
+    {
+      "id": "outpatient-gx2351",
+      "name": "氢氯噻嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1481",
+      "name": "利可君片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1860",
+      "name": "阿托伐他汀钙片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0821",
+      "name": "全天麻胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3371",
+      "name": "维A酸乳膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0171",
+      "name": "万应胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1040",
+      "name": "参松养心胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1162",
+      "name": "脑安胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1081",
+      "name": "石杉碱甲片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0372",
+      "name": "香砂养胃片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1420",
+      "name": "通天口服液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0241",
+      "name": "金荞麦片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl3093",
+      "name": "氯雷他定片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0900",
+      "name": "门冬胰岛素30注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-sx1533",
+      "name": "曲安奈德注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-inhaled-steroid"
+      ]
+    },
+    {
+      "id": "outpatient-gx1691",
+      "name": "非洛地平片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1201",
+      "name": "复方丹参滴丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1465",
+      "name": "养血清脑颗粒（无糖型）",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1662",
+      "name": "缩泉胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1430",
+      "name": "松龄血脉康胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx3941",
+      "name": "炉甘石洗剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1052",
+      "name": "益心舒片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz1451",
+      "name": "皮肤康洗液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0081",
+      "name": "麻仁丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1312",
+      "name": "胃苏颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0841",
+      "name": "培元通脑胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0132",
+      "name": "新癀片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "rivaroxaban-nsaid",
+        "clopidogrel-nsaid",
+        "sertraline-bleeding",
+        "spironolactone-nsaid"
+      ]
+    },
+    {
+      "id": "outpatient-dl1783",
+      "name": "甲钴胺片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1171",
+      "name": "脉血康胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0931",
+      "name": "萆薢分清丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0091",
+      "name": "祖卡木颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0832",
+      "name": "参芪降糖片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx1942",
+      "name": "复方甘草口服溶液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0784",
+      "name": "氯沙坦钾片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "arni-arb-duplicate",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-gx3619",
+      "name": "氯化钠注射液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx0232",
+      "name": "磷霉素氨丁三醇散",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1581",
+      "name": "癃清胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl1722",
+      "name": "富马酸比索洛尔片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "digoxin-beta"
+      ]
+    },
+    {
+      "id": "outpatient-gx0892",
+      "name": "盐酸苯海索片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz2251",
+      "name": "香菊胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0503",
+      "name": "双氯芬酸钠滴眼液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0191",
+      "name": "当飞利肝宁胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0752",
+      "name": "贞芪扶正颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1010",
+      "name": "脑心通胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1561",
+      "name": "肾炎康复片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1192",
+      "name": "血府逐瘀胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz1093",
+      "name": "康复新液",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0331",
+      "name": "连花清瘟颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0751",
+      "name": "三拗片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz1621",
+      "name": "平眩胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0351",
+      "name": "降脂通脉胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0221",
+      "name": "天丹通络片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0441",
+      "name": "裸花紫珠胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0101",
+      "name": "氨氯地平贝那普利片(II)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "acei-arni-36h",
+        "raas-potassium"
+      ]
+    },
+    {
+      "id": "outpatient-gz0543",
+      "name": "苏黄止咳胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1350",
+      "name": "荜铃胃痛颗粒",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1113",
+      "name": "三七通舒胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz1072",
+      "name": "灯盏生脉胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz0061",
+      "name": "宣肺止嗽合剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx0302",
+      "name": "酚麻美敏片（泰诺）",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gz0773",
+      "name": "金匮肾气片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0241",
+      "name": "乙酰半胱氨酸胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1794",
+      "name": "维生素AD滴剂(胶囊型)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1854",
+      "name": "碳酸钙D3片(Ⅰ)",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "levothyroxine-calcium-iron",
+        "levofloxacin-multivalent-cation",
+        "alendronate-cations"
+      ]
+    },
+    {
+      "id": "outpatient-fx2021",
+      "name": "替勃龙片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx4131",
+      "name": "克霉唑阴道片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz3501",
+      "name": "黄葵胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx0611",
+      "name": "胞磷胆碱钠片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2040",
+      "name": "布地奈德福莫特罗吸入粉雾剂",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": [
+        "ritonavir-inhaled-steroid"
+      ]
+    },
+    {
+      "id": "outpatient-fx4831",
+      "name": "地奥司明片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-dl5911",
+      "name": "非布司他片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx2351",
+      "name": "复方消化酶胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz242",
+      "name": "如意珍宝丸",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-gx2280",
+      "name": "水飞蓟素胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sx1162",
+      "name": "兰索拉唑胶囊",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx3821",
+      "name": "吡格列酮二甲双胍片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "pioglitazone-hf",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "pioglitazone-insulin",
+        "levofloxacin-glucose"
+      ]
+    },
+    {
+      "id": "outpatient-sx0482",
+      "name": "谷维素片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-sz0493",
+      "name": "丹参片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fz1172",
+      "name": "麝香海马追风膏",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [],
+      "interactionRules": []
+    },
+    {
+      "id": "outpatient-fx5882",
+      "name": "二甲双胍格列吡嗪片",
+      "pharmacy": [
+        "outpatient"
+      ],
+      "contraindications": [
+        "metformin-renal",
+        "metformin-acidosis",
+        "metformin-initiation"
+      ],
+      "interactionRules": [
+        "levofloxacin-glucose"
+      ]
+    }
+  ]
+}

@@ -7,6 +7,7 @@ globalThis.window = {};
 await import(pathToFileURL(path.join(root, "drugs.js")).href);
 await import(pathToFileURL(path.join(root, "outpatient-drugs.js")).href);
 await import(pathToFileURL(path.join(root, "outpatient-web-verification.js")).href);
+await import(pathToFileURL(path.join(root, "medication-safety.js")).href);
 await import(pathToFileURL(path.join(root, "drug-interactions.js")).href);
 
 const catalog = [...window.DRUG_CATALOG, ...window.OUTPATIENT_DRUG_CATALOG];
@@ -33,7 +34,7 @@ assert.ok(relevant.some(item => item.rule.id === "acei-arni-36h" && item.partner
 for (const rule of window.DRUG_INTERACTIONS.rules) {
   assert.ok(["禁忌", "严重", "需监测"].includes(rule.severity));
   assert.match(rule.source?.url || "", /^https:\/\//);
-  assert.equal(rule.source?.checkedAt, "2026-08-26");
+  assert.match(rule.source?.checkedAt || "", /^2026-(08-26|09-13)$/);
   for (const field of ["mechanism", "consequence", "recommendation"]) assert.ok(rule[field]);
 }
 

@@ -20,7 +20,7 @@
     arb: { any: ["缬沙坦", "氯沙坦", "阿利沙坦", "奥美沙坦", "厄贝沙坦", "替米沙坦", "坎地沙坦"] },
     arni: { any: ["沙库巴曲"] },
     raas: { any: ["贝那普利", "培哚普利", "依那普利", "卡托普利", "雷米普利", "赖诺普利", "福辛普利", "缬沙坦", "氯沙坦", "阿利沙坦", "奥美沙坦", "厄贝沙坦", "替米沙坦", "坎地沙坦", "沙库巴曲"] },
-    potassium: { any: ["螺内酯", "氯化钾", "阿米洛利", "氨苯蝶啶"] },
+    potassium: { any: ["螺内酯", "氯化钾", "枸橼酸钾", "阿米洛利", "氨苯蝶啶"] },
     spironolactone: { any: ["螺内酯"] },
     potassiumSupplement: { any: ["氯化钾", "枸橼酸钾", "补钾"] },
     ritonavir: { any: ["利托那韦"] },
@@ -30,13 +30,13 @@
     clopidogrel: { any: ["氯吡格雷"] },
     omeprazole: { any: ["奥美拉唑", "艾司奥美拉唑"] },
     rivaroxaban: { any: ["利伐沙班"] },
-    antiplatelet: { any: ["阿司匹林", "氯吡格雷", "替格瑞洛", "普拉格雷"] },
+    antiplatelet: { any: ["阿司匹林", "铝镁匹林", "氯吡格雷", "替格瑞洛", "普拉格雷"] },
     systemicNsaid: {
       any: ["布洛芬", "双氯芬酸", "吲哚美辛", "塞来昔布", "依托考昔", "洛索洛芬", "萘普生", "新癀片"],
       exclude: ["乳膏", "乳胶剂", "凝胶", "滴眼"]
     },
     opioid: { any: ["吗啡", "可待因", "羟考酮", "芬太尼", "曲马多", "哌替啶"] },
-    cnsDepressant: { any: ["苯巴比妥", "地西泮", "咪达唑仑", "阿普唑仑", "氯硝西泮", "劳拉西泮", "唑吡坦", "佐匹克隆", "右佐匹克隆", "普瑞巴林", "加巴喷丁"] },
+    cnsDepressant: { any: ["苯巴比妥", "地西泮", "咪达唑仑", "阿普唑仑", "艾司唑仑", "氯硝西泮", "劳拉西泮", "唑吡坦", "佐匹克隆", "右佐匹克隆", "普瑞巴林", "加巴喷丁"] },
     levothyroxine: { any: ["左甲状腺素"] },
     calciumIron: { any: ["碳酸钙", "葡萄糖酸钙", "乳酸钙", "硫酸亚铁", "富马酸亚铁", "琥珀酸亚铁"] },
     nitrate: { any: ["硝酸甘油", "单硝酸异山梨酯", "硝酸异山梨酯"] },
@@ -175,43 +175,62 @@
       consequence: "QT 间期延长和尖端扭转型室性心动过速风险增加。",
       recommendation: "优先避免联用；必须联用时评估既往 QT、低钾低镁、心动过缓等风险并按医嘱监测心电图和电解质。",
       source: DAILYMED_LEVOFLOXACIN
-    }
+    },
+    ...(window.MEDICATION_SAFETY?.interactions || [])
   ]);
 
   const normalize = value => String(value || "").normalize("NFKC").toLowerCase().replace(/[\s·•_\-（）()\[\]【】]/g, "");
   const drugText = drug => normalize([
-    drug?.drugName, drug?.rawName, drug?.genericName, drug?.tradeName,
-    ...(Array.isArray(drug?.components) ? drug.components : [])
+    drug?.drugName || drug?.rawName, drug?.genericName,
+    ...(Array.isArray(drug?.components) ? drug.components.map(item => typeof item === "string" ? item : item?.name || item?.ingredient || item?.genericName) : [])
   ].filter(Boolean).join("|"));
+
+  function routeOf(drug) {
+    const text = normalize([drug?.drugName, drug?.dosageForm, drug?.route, drug?.administrationRoute].filter(Boolean).join("|"));
+    if (/滴眼|眼用|眼膏|滴耳|滴鼻|鼻用|乳膏|软膏|凝胶|乳胶|贴膏|外用|洗剂|搽剂|阴道/.test(text)) return "local";
+    if (/注射|静脉|肌内|皮下/.test(text)) return "injection";
+    if (/吸入|雾化/.test(text)) return "inhaled";
+    if (/栓|直肠/.test(text)) return "rectal";
+    if (/口服|片|胶囊|颗粒|散|丸|合剂|糖浆/.test(text)) return "oral";
+    return "unknown";
+  }
 
   function matchesGroup(drug, group) {
     const text = drugText(drug);
     if (!text) return false;
+    const route = routeOf(drug);
+    const oralGroups = [GROUPS.levothyroxine, GROUPS.calciumIron, GROUPS.oralLevofloxacin, GROUPS.multivalentCation];
+    if ((group.route === "oral" || oralGroups.includes(group)) && route !== "oral") return false;
+    // 吸入/鼻用激素与利托那韦的规则保留；其他全身规则不套用于局部制剂。
+    if (route === "local" && group !== GROUPS.inhaledSteroid && group.route !== "local") return false;
     if (group.exclude?.some(term => text.includes(normalize(term)))) return false;
     return group.any?.some(term => text.includes(normalize(term))) || false;
   }
 
   function matchRule(rule, drugA, drugB) {
-    if (!drugA || !drugB || drugA.id === drugB.id) return false;
+    if (!drugA || !drugB || drugA === drugB || (drugA.id != null && drugB.id != null && String(drugA.id) === String(drugB.id))) return false;
     return (matchesGroup(drugA, rule.a) && matchesGroup(drugB, rule.b))
       || (matchesGroup(drugA, rule.b) && matchesGroup(drugB, rule.a));
   }
 
   function findMatches(drugA, drugB) {
-    return rules.filter(rule => matchRule(rule, drugA, drugB));
+    return rules.filter(rule => matchRule(rule, drugA, drugB)).sort(bySeverity);
   }
+
+  const bySeverity = (a, b) => ({ "禁忌": 0, "严重": 1, "慎用": 2, "需监测": 3 }[a.severity] ?? 4) - ({ "禁忌": 0, "严重": 1, "慎用": 2, "需监测": 3 }[b.severity] ?? 4);
+  const findContraindications = drug => (window.MEDICATION_SAFETY?.contraindications || []).filter(rule => matchesGroup(drug, rule.group)).sort(bySeverity);
 
   function findRelevant(drug, catalog) {
     const byRule = new Map();
     for (const other of Array.isArray(catalog) ? catalog : []) {
-      if (!other || other.id === drug?.id) continue;
+      if (!other || other === drug || (other.id != null && drug?.id != null && String(other.id) === String(drug.id))) continue;
       for (const rule of findMatches(drug, other)) {
         if (!byRule.has(rule.id)) byRule.set(rule.id, { rule, partners: [] });
         byRule.get(rule.id).partners.push(other);
       }
     }
-    return [...byRule.values()];
+    return [...byRule.values()].sort((a, b) => bySeverity(a.rule, b.rule));
   }
 
-  window.DRUG_INTERACTIONS = Object.freeze({ rules, findMatches, findRelevant, matchesGroup });
+  window.DRUG_INTERACTIONS = Object.freeze({ rules, findMatches, findRelevant, matchesGroup, findContraindications, routeOf });
 })();

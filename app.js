@@ -107,15 +107,15 @@
     catch { return ""; }
   };
   const interactionEngine = window.DRUG_INTERACTIONS;
-  const interactionSeverityClass = severity => severity === "禁忌" ? "blocked" : severity === "严重" ? "warn" : "info";
+  const interactionSeverityClass = severity => severity === "禁忌" ? "blocked" : ["严重", "慎用"].includes(severity) ? "warn" : "info";
   const interactionRuleCard = (rule, partners = []) => {
     const sourceUrl = safeExternalUrl(rule.source?.url);
     const uniquePartners = [...new Map(partners.map(partner => [partner.id, partner])).values()];
     const shownPartners = uniquePartners.slice(0, 8).map(partner => partner.drugName).join("、");
     const partnerText = shownPartners
-      ? `<p class="drug-sub"><strong>本药库相关药品：</strong>${esc(shownPartners)}${uniquePartners.length > 8 ? ` 等 ${uniquePartners.length} 种` : ""}</p>`
+      ? `<p class="drug-sub"><strong>药库相关药品：</strong>${esc(shownPartners)}${uniquePartners.length > 8 ? ` 等 ${uniquePartners.length} 种` : ""}</p>`
       : "";
-    return `<article class="card interaction-rule-card"><div class="detail-head"><div><h3>${esc(rule.title)}</h3><span class="badge ${interactionSeverityClass(rule.severity)}">${esc(rule.severity)}</span></div></div>${partnerText}<p class="drug-sub"><strong>机制：</strong>${esc(rule.mechanism)}</p><p class="drug-sub"><strong>可能后果：</strong>${esc(rule.consequence)}</p><p class="drug-sub"><strong>处理建议：</strong>${esc(rule.recommendation)}</p><p class="drug-sub"><strong>依据：</strong>${sourceUrl ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener">${esc(rule.source?.label)}</a>` : esc(rule.source?.label || "未记录")}${rule.source?.checkedAt ? ` · 核验 ${esc(rule.source.checkedAt)}` : ""}</p></article>`;
+    return `<article class="card interaction-rule-card"><div class="detail-head"><div><h3>${esc(rule.title)}</h3><span class="badge ${interactionSeverityClass(rule.severity)}">${esc(rule.severity)}</span></div></div>${partnerText}<p class="drug-sub"><strong>${rule.group ? "适用条件" : "机制"}：</strong>${esc(rule.mechanism)}</p><p class="drug-sub"><strong>可能后果：</strong>${esc(rule.consequence)}</p><p class="drug-sub"><strong>处理建议：</strong>${esc(rule.recommendation)}</p><p class="drug-sub"><strong>依据：</strong>${sourceUrl ? `<a href="${esc(sourceUrl)}" target="_blank" rel="noopener">${esc(rule.source?.label)}</a>` : esc(rule.source?.label || "未记录")}${rule.source?.checkedAt ? ` · 核验 ${esc(rule.source.checkedAt)}` : ""}</p></article>`;
   };
   const normalizeServiceEndpoint = value => {
     const raw = String(value || "").trim().replace(/\/+$/, "");
@@ -582,6 +582,8 @@
         </dl>
         <div class="clinical-editor" style="margin-top:16px">
           <h3>相互作用与禁忌</h3>
+          <div class="card-list">${(interactionEngine?.findContraindications?.(drug) || []).map(rule => interactionRuleCard(rule)).join("")}</div>
+          <p class="muted">单药禁忌仅整理部分重点条件，未显示不代表无禁忌；成分级境外说明书参考不能代替本品中国说明书。</p>
           ${drug.contraindications ? `<div class="notice danger" style="margin-top:10px"><strong>本药禁忌补充：</strong>${esc(drug.contraindications)}</div>` : ""}
           ${drug.interactionNotes ? `<div class="notice" style="margin-top:10px"><strong>本药相互作用补充：</strong>${esc(drug.interactionNotes)}</div>` : ""}
           <div class="card-list" style="margin-top:10px">${interactionFindings.length
@@ -989,17 +991,45 @@
     return { candidates, networkError, smartError, warnings, verificationLinks, smartConfigured };
   }
 
+  let safetyCatalogReady = false;
+  function prepareSafetyCatalog(retry) {
+    if (safetyCatalogReady) return true;
+    app.innerHTML = '<section class="panel section" id="safetyLoading"><h2>正在加载完整药库</h2><p>载入病房和门诊药品，以便查询跨药库组合。</p></section>';
+    const screen = document.getElementById("safetyLoading");
+    ensureOutpatientCatalogLoaded().then(() => {
+      safetyCatalogReady = true;
+      if (screen.isConnected) retry();
+    }).catch(error => {
+      if (!screen.isConnected) return;
+      screen.innerHTML = '<p class="notice danger">完整药库加载失败：' + esc(error.message) + '</p><button class="btn primary" id="retrySafety">重新加载</button>';
+      document.getElementById("retrySafety").onclick = retry;
+    });
+    return false;
+  }
+
   function renderInteractions() {
+    if (!prepareSafetyCatalog(renderInteractions)) return;
     const options = visibleDrugs().map(drug => `<option value="${esc(drug.id)}">${esc(drug.drugName)}｜${esc(drug.specification)}｜${esc(normalizePharmacyScopes(drug).map(id => PHARMACIES[id].shortLabel).join("/"))}</option>`).join("");
     app.innerHTML = `
       <section class="panel section">
-        <h2>两药联用查询</h2>
+        <h2>两药联用查询</h2><p class="muted">病房 + 门诊共 ${visibleDrugs().length} 个可见品规 · ${interactionEngine?.rules?.length || 0} 条重点联用规则</p>
         <p class="notice danger"><strong>安全边界：</strong>当前匹配公开现行说明书整理的高风险规则及本机自定义记录，重点覆盖禁忌和严重组合；不是完整处方审核，未匹配不代表可以联用。</p>
-        <div class="field" style="margin-top:16px"><label>药品 A</label><select id="drugA"><option value="">请选择</option>${options}</select></div>
-        <div class="field"><label>药品 B</label><select id="drugB"><option value="">请选择</option>${options}</select></div>
+        <div class="field" style="margin-top:16px"><label for="drugA">药品 A</label><input id="filterDrugA" aria-label="筛选药品 A" placeholder="输入药名筛选"><select id="drugA"><option value="">请选择</option>${options}</select></div>
+        <div class="field"><label for="drugB">药品 B</label><input id="filterDrugB" aria-label="筛选药品 B" placeholder="输入药名筛选"><select id="drugB"><option value="">请选择</option>${options}</select></div>
         <button class="btn primary" id="checkInteraction">查询相互作用</button>
         <div id="interactionResult" style="margin-top:14px"></div>
       </section>`;
+    for (const suffix of ["A", "B"]) {
+      const select = document.getElementById("drug" + suffix);
+      const input = document.getElementById("filterDrug" + suffix);
+      input.oninput = () => {
+        const selected = select.value;
+        const q = normalize(input.value);
+        select.innerHTML = '<option value="">请选择</option>' + visibleDrugs().filter(drug => !q || normalize(drug.drugName + (drug.genericName || "") + (drug.tradeName || "")).includes(q) || drug.id === selected).map(drug => '<option value="' + esc(drug.id) + '">' + esc(drug.drugName + '｜' + drug.specification + '｜' + normalizePharmacyScopes(drug).map(id => PHARMACIES[id].shortLabel).join('/')) + '</option>').join('');
+        select.value = selected;
+      };
+      select.onchange = () => { document.getElementById("interactionResult").innerHTML = ""; };
+    }
     document.getElementById("checkInteraction").addEventListener("click", () => {
       const a = document.getElementById("drugA").value;
       const b = document.getElementById("drugB").value;
@@ -1010,7 +1040,11 @@
       }
       const drugA = drugById(a);
       const drugB = drugById(b);
-      const verifiedMatches = interactionEngine?.findMatches?.(drugA, drugB) || [];
+      if (!drugA || !drugB || !interactionEngine?.findMatches || !window.MEDICATION_SAFETY) {
+        result.innerHTML = '<div class="notice danger">药品或规则数据未完整加载，无法完成查询。请刷新重试。</div>';
+        return;
+      }
+      const verifiedMatches = interactionEngine.findMatches(drugA, drugB);
       const customMatches = state.contraindications.filter(item =>
         (item.drugA === a && item.drugB === b) || (item.drugA === b && item.drugB === a));
       const verifiedHtml = verifiedMatches.map(rule => interactionRuleCard(rule)).join("");
@@ -1378,13 +1412,27 @@
   }
 
   function renderContraindications() {
+    if (!prepareSafetyCatalog(renderContraindications)) return;
     let editingId = "";
-    const verifiedRules = interactionEngine?.rules || [];
+    const safetyCatalog = visibleDrugs();
+    const verifiedRules = (interactionEngine?.rules || []).map(rule => {
+      const left = safetyCatalog.filter(drug => interactionEngine.matchesGroup(drug, rule.a));
+      const right = safetyCatalog.filter(drug => interactionEngine.matchesGroup(drug, rule.b));
+      return { rule, partners: [...left, ...right], available: left.some(a => right.some(b => a.id !== b.id)) };
+    }).filter(item => item.available);
     app.innerHTML = `
+      <section class="panel section">
+        <h2>单药禁忌与慎用</h2>
+        <p class="notice">按成分整理的重点提示；境外说明书仅作参考，请核对本品中国现行说明书。未录入不代表没有禁忌，复方仍需逐一核对所有成分。</p>
+        <p class="muted">${safetyCatalog.length} 个可见品规中，${safetyCatalog.filter(drug => interactionEngine?.findContraindications?.(drug).length).length} 个有结构化重点提示；其余须查阅说明书。过敏史需逐药核对。</p>
+        <div class="field"><label for="singleDrugQuery">筛选药品</label><input id="singleDrugQuery" placeholder="输入通用名或商品名"></div>
+        <div class="field"><label for="singleDrug">选择药品（病房 + 门诊）</label><select id="singleDrug"><option value="">请选择</option>${drugOptions()}</select></div>
+        <div id="singleDrugSafety" class="card-list" aria-live="polite"></div>
+      </section>
       <section class="section">
-        <div class="section-title"><h2>已核验高风险规则</h2><small>${verifiedRules.length} 条</small></div>
-        <p class="notice danger">优先展示“禁忌”和“严重”组合，规则均附公开说明书来源。规则是重点筛查集，并非完整相互作用数据库。</p>
-        <div class="card-list" style="margin-top:12px">${verifiedRules.length ? verifiedRules.map(rule => interactionRuleCard(rule)).join("") : empty("高风险规则尚未加载。")}</div>
+        <div class="section-title"><h2>联用重点规则</h2><small>${verifiedRules.length} 条</small></div>
+        <p class="notice">以下仅列两侧药物均在可见药库中的重点规则，均附来源；共收录 ${interactionEngine?.rules?.length || 0} 条联用规则，不能据此判断所有未匹配组合安全。</p><div class="toolbar"><input id="safetyRuleQuery" aria-label="筛选联用规则" placeholder="搜索药名、风险或处理建议"><select id="safetyRuleSeverity" aria-label="筛选联用严重程度"><option value="">全部程度</option><option>禁忌</option><option>严重</option><option>需监测</option></select></div>
+        <div id="safetyRuleList" class="card-list" style="margin-top:12px"></div>
       </section>
       <section class="panel section">
         <h2>自定义禁忌组合</h2>
@@ -1403,6 +1451,34 @@
         </form>
       </section>
       <section class="section"><p id="contraCount" class="muted"></p><div id="contraList" class="card-list"></div></section>`;
+    const drawSafetyRules = () => {
+      const q = normalize(document.getElementById("safetyRuleQuery").value);
+      const severity = document.getElementById("safetyRuleSeverity").value;
+      const items = verifiedRules.filter(({rule, partners}) => (!severity || severity === rule.severity) && (!q || normalize([rule.title, rule.mechanism, rule.consequence, rule.recommendation, ...partners.map(drug => drug.drugName)].join(" ")).includes(q)));
+      document.getElementById("safetyRuleList").innerHTML = items.length ? items.map(({rule, partners}) => interactionRuleCard(rule, partners)).join("") : empty("未找到药库内匹配规则；不代表无相互作用。");
+    };
+    document.getElementById("safetyRuleQuery").oninput = drawSafetyRules;
+    document.getElementById("safetyRuleSeverity").onchange = drawSafetyRules;
+    drawSafetyRules();
+    const singleDrug = document.getElementById("singleDrug");
+    document.getElementById("singleDrugQuery").oninput = event => {
+      const q = normalize(event.target.value);
+      const selected = singleDrug.value;
+      singleDrug.innerHTML = '<option value="">请选择</option>' + safetyCatalog.filter(drug => !q || normalize(drug.drugName + (drug.genericName || "") + (drug.tradeName || "")).includes(q) || drug.id === selected).map(drug => '<option value="' + esc(drug.id) + '">' + esc(drug.drugName + '｜' + drug.specification) + '</option>').join('');
+      singleDrug.value = selected;
+    };
+    singleDrug.onchange = () => {
+      const drug = drugById(singleDrug.value);
+      const result = document.getElementById("singleDrugSafety");
+      if (!drug) { result.innerHTML = ""; return; }
+      if (!window.MEDICATION_SAFETY || !interactionEngine?.findContraindications) {
+        result.innerHTML = '<p class="notice danger">规则模块加载失败，请刷新重试。</p>'; return;
+      }
+      const findings = interactionEngine.findContraindications(drug);
+      result.innerHTML = '<h3>' + esc(drug.drugName) + '</h3>' + (findings.length ? findings.map(rule => interactionRuleCard(rule)).join('') : '<p class="notice">本药尚无结构化单药禁忌规则，不代表无禁忌。</p>')
+        + (drug.contraindications ? '<p class="notice"><strong>本机禁忌补充（未核验）：</strong>' + esc(drug.contraindications) + '</p>' : '')
+        + '<button class="btn ghost" data-open-drug="' + esc(drug.id) + '">查看完整药品资料与来源</button>';
+    };
     const form = document.getElementById("contraForm");
     const resetForm = () => {
       editingId = ""; form.reset(); document.getElementById("saveContra").textContent = "新增记录"; document.getElementById("cancelContraEdit").hidden = true;
@@ -1414,11 +1490,13 @@
         return (!q || normalize(text).includes(q)) && (!severity || item.severity === severity);
       });
       document.getElementById("contraCount").textContent = `${filtered.length} 条记录`;
-      document.getElementById("contraList").innerHTML = filtered.length ? filtered.map(item => `<article class="card"><div class="detail-head"><div><h3>${esc(drugById(item.drugA)?.drugName || "已删除药品")} + ${esc(drugById(item.drugB)?.drugName || "已删除药品")}</h3><span class="badge blocked">${esc(item.severity)}</span></div><div class="card-actions"><button class="btn ghost small" data-edit-contra="${esc(item.id)}">编辑</button><button class="btn ghost small" data-delete-contra="${esc(item.id)}">删除</button></div></div>${item.mechanism ? `<p class="drug-sub"><strong>机制：</strong>${esc(item.mechanism)}</p>` : ""}${item.consequence ? `<p class="drug-sub"><strong>后果：</strong>${esc(item.consequence)}</p>` : ""}<p class="drug-sub"><strong>建议：</strong>${esc(item.recommendation)}</p></article>`).join("") : empty("没有匹配的禁忌记录。");
+      document.getElementById("contraList").innerHTML = filtered.length ? filtered.map(item => `<article class="card"><div class="detail-head"><div><h3>${esc(drugById(item.drugA)?.drugName || "已删除药品")} + ${esc(drugById(item.drugB)?.drugName || "已删除药品")}</h3><span class="badge ${interactionSeverityClass(item.severity)}">${esc(item.severity)}</span></div><div class="card-actions"><button class="btn ghost small" data-edit-contra="${esc(item.id)}">编辑</button><button class="btn ghost small" data-delete-contra="${esc(item.id)}">删除</button></div></div>${item.mechanism ? `<p class="drug-sub"><strong>机制：</strong>${esc(item.mechanism)}</p>` : ""}${item.consequence ? `<p class="drug-sub"><strong>后果：</strong>${esc(item.consequence)}</p>` : ""}<p class="drug-sub"><strong>建议：</strong>${esc(item.recommendation)}</p></article>`).join("") : empty("没有匹配的禁忌记录。");
     };
     form.addEventListener("submit", event => {
       event.preventDefault(); const data = Object.fromEntries(new FormData(event.target));
       if (data.drugA === data.drugB) return toast("请选择两种不同药品");
+      if (!drugById(data.drugA) || !drugById(data.drugB)) return toast("药品已不存在，请重新选择");
+      if (state.contraindications.some(item => item.id !== editingId && ((item.drugA === data.drugA && item.drugB === data.drugB) || (item.drugA === data.drugB && item.drugB === data.drugA)))) return toast("该组合已有记录，请编辑现有记录");
       if (editingId) state.contraindications = state.contraindications.map(item => item.id === editingId ? { ...item, ...data, updatedAt: new Date().toISOString() } : item);
       else state.contraindications.push({ id: `contra-${Date.now()}`, ...data, updatedAt: new Date().toISOString() });
       saveState("contraindications"); toast(editingId ? "禁忌记录已更新" : "禁忌记录已添加"); resetForm(); draw();

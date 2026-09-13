@@ -45,6 +45,7 @@ jobs:
           node --check outpatient-clinical-hydration.js
           node --check outpatient-metadata-ui.js
           node --check drug-interactions.js
+          node --check medication-safety.js
           node --check symptom-assistant.js
           node --check drug-lookup.js
           node --check pharmacy-scope.js
@@ -87,6 +88,10 @@ jobs:
         run: node scripts/test-outpatient-clinical-hydration.mjs
       - name: Drug interaction tests
         run: node scripts/test-drug-interactions.mjs
+      - name: Medication safety regression and coverage
+        run: node scripts/test-medication-safety.mjs
+      - name: Safety offline cache isolation
+        run: node scripts/test-safety-cache.mjs
       - name: Symptom catalog assistant tests
         run: node scripts/test-symptom-assistant.mjs
       - name: Pharmacy notes and editing tests
