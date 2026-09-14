@@ -180,8 +180,11 @@
   ]);
 
   const normalize = value => String(value || "").normalize("NFKC").toLowerCase().replace(/[\s·•_\-（）()\[\]【】]/g, "");
+  const canonicalName = drug => normalize(String(drug?.drugName || drug?.rawName || "").normalize("NFKC").replace(/\([^)]*\)/g, ""));
+  const mappedIngredients = drug => routeOf(drug) === "oral" ? (window.MEDICATION_SAFETY?.ingredientAliases || []).filter(entry => entry.names.some(name => normalize(name) === canonicalName(drug))).flatMap(entry => entry.ingredients) : [];
   const drugText = drug => normalize([
     drug?.drugName || drug?.rawName, drug?.genericName,
+    ...mappedIngredients(drug),
     ...(Array.isArray(drug?.components) ? drug.components.map(item => typeof item === "string" ? item : item?.name || item?.ingredient || item?.genericName) : [])
   ].filter(Boolean).join("|"));
 
@@ -205,7 +208,9 @@
     if ((group.route === "oral" || oralGroups.includes(group)) && route !== "oral") return false;
     // 吸入/鼻用激素与利托那韦的规则保留；其他全身规则不套用于局部制剂。
     if (route === "local" && group !== GROUPS.inhaledSteroid && group.route !== "local") return false;
+    if (group.exactNames && !group.exactNames.some(name => normalize(name) === canonicalName(drug))) return false;
     if (group.exclude?.some(term => text.includes(normalize(term)))) return false;
+    if (group.exactNames && !group.any) return true;
     return group.any?.some(term => text.includes(normalize(term))) || false;
   }
 

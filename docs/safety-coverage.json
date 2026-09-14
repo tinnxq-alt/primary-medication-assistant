@@ -2,8 +2,8 @@
   "checkedAt": "2026-09-14",
   "note": "匹配重点规则不等于完整审核；空列表代表尚未覆盖，不能判断安全。",
   "total": 556,
-  "interactionRules": 39,
-  "singleRules": 43,
+  "interactionRules": 45,
+  "singleRules": 53,
   "drugs": [
     {
       "id": "drug-001",
@@ -28,7 +28,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -93,7 +94,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -104,7 +106,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -223,7 +226,10 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "benzbromarone-allergy",
+        "benzbromarone-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -261,7 +267,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -474,7 +481,8 @@
       ],
       "interactionRules": [
         "digoxin-beta",
-        "sulfonylurea-beta"
+        "sulfonylurea-beta",
+        "zhenju-beta-withdrawal"
       ]
     },
     {
@@ -593,7 +601,8 @@
       ],
       "interactionRules": [
         "digoxin-beta",
-        "sulfonylurea-beta"
+        "sulfonylurea-beta",
+        "zhenju-beta-withdrawal"
       ]
     },
     {
@@ -604,7 +613,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -737,7 +747,8 @@
         "morphine-contra"
       ],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -750,7 +761,8 @@
         "morphine-contra"
       ],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -895,7 +907,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -954,7 +967,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -1047,7 +1061,9 @@
         "ward"
       ],
       "contraindications": [],
-      "interactionRules": []
+      "interactionRules": [
+        "tyc-digitalis"
+      ]
     },
     {
       "id": "drug-102",
@@ -1178,7 +1194,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -1253,8 +1270,19 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "tyc-organ",
+        "tyc-maoi",
+        "tyc-allergy",
+        "tyc-antihypertensive",
+        "tyc-special"
+      ],
+      "interactionRules": [
+        "duplicate-acetaminophen",
+        "tyc-nsaid",
+        "tyc-sedatives",
+        "tyc-digitalis"
+      ]
     },
     {
       "id": "drug-120",
@@ -1399,7 +1427,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -1522,7 +1551,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -1670,8 +1700,17 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "hctz-anuria",
+        "zhenju-pregnancy",
+        "zhenju-allergy",
+        "zhenju-withdrawal"
+      ],
+      "interactionRules": [
+        "hctz-digoxin",
+        "duplicate-hctz",
+        "zhenju-beta-withdrawal"
+      ]
     },
     {
       "id": "drug-161",
@@ -1679,8 +1718,17 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "hctz-anuria",
+        "zhenju-pregnancy",
+        "zhenju-allergy",
+        "zhenju-withdrawal"
+      ],
+      "interactionRules": [
+        "hctz-digoxin",
+        "duplicate-hctz",
+        "zhenju-beta-withdrawal"
+      ]
     },
     {
       "id": "drug-162",
@@ -1751,7 +1799,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -1771,7 +1820,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -1834,7 +1884,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -2121,7 +2172,8 @@
         "digoxin-spironolactone-assay",
         "furosemide-digoxin",
         "hctz-digoxin",
-        "acarbose-digoxin"
+        "acarbose-digoxin",
+        "tyc-digitalis"
       ]
     },
     {
@@ -2186,7 +2238,8 @@
       ],
       "interactionRules": [
         "digoxin-beta",
-        "sulfonylurea-beta"
+        "sulfonylurea-beta",
+        "zhenju-beta-withdrawal"
       ]
     },
     {
@@ -2311,7 +2364,9 @@
         "outpatient"
       ],
       "contraindications": [],
-      "interactionRules": []
+      "interactionRules": [
+        "tyc-digitalis"
+      ]
     },
     {
       "id": "outpatient-fx6121",
@@ -2482,7 +2537,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -2698,7 +2754,8 @@
         "raas-potassium",
         "arb-nsaid-renal",
         "acei-arb-dual",
-        "hctz-digoxin"
+        "hctz-digoxin",
+        "duplicate-hctz"
       ]
     },
     {
@@ -3320,7 +3377,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -3576,7 +3634,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -3587,7 +3646,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -3711,7 +3771,8 @@
       ],
       "interactionRules": [
         "digoxin-beta",
-        "sulfonylurea-beta"
+        "sulfonylurea-beta",
+        "zhenju-beta-withdrawal"
       ]
     },
     {
@@ -4118,7 +4179,9 @@
         "outpatient"
       ],
       "contraindications": [],
-      "interactionRules": []
+      "interactionRules": [
+        "duplicate-acetaminophen"
+      ]
     },
     {
       "id": "outpatient-gz2292",
@@ -4261,7 +4324,8 @@
         "raas-potassium",
         "arb-nsaid-renal",
         "acei-arb-dual",
-        "hctz-digoxin"
+        "hctz-digoxin",
+        "duplicate-hctz"
       ]
     },
     {
@@ -4344,7 +4408,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -4554,7 +4619,10 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "benzbromarone-allergy",
+        "benzbromarone-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -4807,8 +4875,17 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "hctz-anuria",
+        "zhenju-pregnancy",
+        "zhenju-allergy",
+        "zhenju-withdrawal"
+      ],
+      "interactionRules": [
+        "hctz-digoxin",
+        "duplicate-hctz",
+        "zhenju-beta-withdrawal"
+      ]
     },
     {
       "id": "outpatient-gz0431",
@@ -4976,7 +5053,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "opioid-cns-depressant"
+        "opioid-cns-depressant",
+        "tyc-sedatives"
       ]
     },
     {
@@ -5044,7 +5122,8 @@
         "hctz-anuria"
       ],
       "interactionRules": [
-        "hctz-digoxin"
+        "hctz-digoxin",
+        "duplicate-hctz"
       ]
     },
     {
@@ -5297,7 +5376,8 @@
         "sertraline-bleeding",
         "spironolactone-nsaid",
         "acei-nsaid-renal",
-        "arb-nsaid-renal"
+        "arb-nsaid-renal",
+        "tyc-nsaid"
       ]
     },
     {
@@ -5409,7 +5489,8 @@
       ],
       "interactionRules": [
         "digoxin-beta",
-        "sulfonylurea-beta"
+        "sulfonylurea-beta",
+        "zhenju-beta-withdrawal"
       ]
     },
     {
@@ -5616,8 +5697,19 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "tyc-organ",
+        "tyc-maoi",
+        "tyc-allergy",
+        "tyc-antihypertensive",
+        "tyc-special"
+      ],
+      "interactionRules": [
+        "duplicate-acetaminophen",
+        "tyc-nsaid",
+        "tyc-sedatives",
+        "tyc-digitalis"
+      ]
     },
     {
       "id": "outpatient-gz0773",

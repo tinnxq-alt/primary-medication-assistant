@@ -1,4 +1,4 @@
-/* 成分级补充规则；来源是境外说明书参考，不等同于本品中国批准文号说明书。 */
+/* 重点安全规则；国内产品、监管转载与境外参考分别标注，不代表全药库完整审核。 */
 (() => {
   "use strict";
   const source = (label, setid) => Object.freeze({ status: "verified-label", label: `DailyMed：${label}（境外说明书参考）`, url: `https://dailymed.nlm.nih.gov/dailymed/drugInfo.cfm?setid=${setid}`, checkedAt: "2026-09-13" });
@@ -146,5 +146,44 @@
     single("simvastatin-myopathy", "simvastatin", "慎用", "辛伐他汀：肌病高风险因素", "高龄、未控制甲减、肾功能不全、高剂量或合并相关相互作用药物。", "核对剂量与联用药；出现无法解释的肌痛、无力或深色尿及时就医。", "simvastatin")
   );
 
-  window.MEDICATION_SAFETY = Object.freeze({ interactions: Object.freeze(interactions), contraindications: Object.freeze(contraindications) });
+  const domestic = (label, url, status = "verified-cn-label") => Object.freeze({ label, url, status, checkedAt: "2026-09-14" });
+  Object.assign(S, {
+    tyc: domestic("上海强生：酚麻美敏片说明书（2021-03-19 修订，国内产品参考）", "https://www.xian-janssen.com.cn/sites/default/files/PDF/tyc_0.pdf"),
+    zhenju: domestic("珍菊降压片：2013 年第 20 号监管修订公告（转载，非厂家逐批核验）", "https://www.pharnexcloud.com/data/zcfg_d28d3f387758af41548507f2541c3b21.html", "regulator-reprint"),
+    benzbromarone: domestic("中国食品药品网转载：苯溴马隆 2020 年第 150 号说明书修订公告", "https://m.cnpharm.com/c/2020-12-30/770078.shtml", "regulator-reprint")
+  });
+  Object.assign(G, {
+    tyc: { exactNames: ["酚麻美敏片"], route: "oral" },
+    zhenju: { exactNames: ["珍菊降压片"], route: "oral" },
+    benzbromarone: group("苯溴马隆", "oral"),
+    acetaminophen: group("对乙酰氨基酚", "oral"),
+    sedatives: group("阿普唑仑|艾司唑仑|氯硝西泮|佐匹克隆|唑吡坦|吗啡|苯巴比妥"),
+    digitalis: group("地高辛|去乙酰毛花苷")
+  });
+  // 仅扩展已核验通用名，不根据商品名、旧名称或类似字样猜测复方成分。
+  const ingredientAliases = Object.freeze([
+    Object.freeze({ names: ["珍菊降压片"], ingredients: ["氢氯噻嗪", "可乐定", "芦丁"], source: S.zhenju }),
+    Object.freeze({ names: ["酚麻美敏片"], ingredients: ["对乙酰氨基酚", "伪麻黄碱", "右美沙芬", "氯苯那敏"], source: S.tyc })
+  ]);
+  interactions.push(
+    pair("duplicate-hctz", "需监测", "重复成分：氢氯噻嗪（含珍菊降压片）", "hctz", "hctz", "两个品规含相同利尿成分。", "总剂量可能重复，增加低血压及电解质紊乱风险。", "由医师核算总量并确认是否有意组合；不要自行停药。", "zhenju"),
+    pair("duplicate-acetaminophen", "严重", "重复成分：对乙酰氨基酚", "acetaminophen", "acetaminophen", "不同品规中的同一解热镇痛成分叠加。", "过量可能损伤肝脏。", "避免自行叠加，核对全部复方成分与总量；误服过量即使无症状也应就医。", "tyc"),
+    pair("tyc-nsaid", "严重", "酚麻美敏片与全身用 NSAID", "tyc", "nsaid", "解热镇痛作用及毒性可能叠加。", "肝肾损伤风险增加。", "避免自行合用，由医师或药师评估替代方案。", "tyc"),
+    pair("tyc-sedatives", "需监测", "酚麻美敏片与镇静药", "tyc", "sedatives", "氯苯那敏可增强中枢抑制作用。", "嗜睡及反应能力下降。", "联用前咨询医生，避免饮酒及驾驶。", "tyc"),
+    pair("tyc-digitalis", "严重", "酚麻美敏片与洋地黄苷类", "tyc", "digitalis", "国内说明书列为不宜并用。", "需重新评估组合。", "请医师或药师调整感冒用药，不要自行停用心脏治疗药。", "tyc"),
+    pair("zhenju-beta-withdrawal", "严重", "珍菊降压片与 β 受体阻滞剂：撤药风险", "zhenju", "beta", "β 阻滞剂可加重可乐定撤药反应。", "突然停药可能引起血压反跳。", "不要自行减停任一药物；由医生安排停药顺序及渐减方案。", "zhenju")
+  );
+  contraindications.push(
+    single("tyc-organ", "tyc", "禁忌", "酚麻美敏片：严重肝肾功能不全", "存在严重肝或肾功能不全。", "禁用；较轻损害也需医师评估。", "tyc"),
+    single("tyc-maoi", "tyc", "禁忌", "酚麻美敏片：MAOI 换药间隔", "正在使用 MAOI 或停用未满 14 天。", "禁用，核对药库外用药。", "tyc"),
+    single("tyc-antihypertensive", "tyc", "严重", "酚麻美敏片：正在服用降压药", "国内说明书注意事项要求服用降压药者勿服本品。", "请医生选择替代感冒药，不要停用降压药来服本品。", "tyc"),
+    single("tyc-special", "tyc", "慎用", "酚麻美敏片：孕哺期及儿童", "孕期、哺乳期或未满 12 岁。", "孕哺期须评估获益风险；儿童用量咨询医师或药师，不能套用成人剂量。", "tyc"),
+    single("tyc-allergy", "tyc", "禁忌", "酚麻美敏片：成分过敏", "对本品过敏。", "禁用；服药后出现皮疹等过敏征象须停药并就医。", "tyc"),
+    single("zhenju-pregnancy", "zhenju", "禁忌", "珍菊降压片：孕期及哺乳期", "妊娠或哺乳期。", "禁用，联系医生更换治疗。", "zhenju"),
+    single("zhenju-allergy", "zhenju", "禁忌", "珍菊降压片：成分或磺胺类过敏", "对本品、组方成分或磺胺类药物过敏。", "禁用；不能按纯中药忽略过敏史。", "zhenju"),
+    single("zhenju-withdrawal", "zhenju", "慎用", "珍菊降压片：不可突然停药", "含可乐定，骤停可能发生撤药反应。", "在医师指导下渐减，并监测血压。", "zhenju"),
+    single("benzbromarone-allergy", "benzbromarone", "禁忌", "苯溴马隆：成分或辅料过敏", "对本品或辅料过敏。", "禁用。", "benzbromarone"),
+    single("benzbromarone-liver", "benzbromarone", "慎用", "苯溴马隆：肝损伤风险", "近期肝病、持续转氨酶升高、黄疸或酗酒。", "监测肝肾功能，避免合用潜在肝毒性药；出现疑似肝损伤症状应停药并及时就医。", "benzbromarone")
+  );
+  window.MEDICATION_SAFETY = Object.freeze({ interactions: Object.freeze(interactions), contraindications: Object.freeze(contraindications), ingredientAliases });
 })();
