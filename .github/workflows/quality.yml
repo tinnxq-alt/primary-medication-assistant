@@ -92,6 +92,8 @@ jobs:
         run: node scripts/test-medication-safety.mjs
       - name: Safety offline cache isolation
         run: node scripts/test-safety-cache.mjs
+      - name: Expanded catalog safety conditions
+        run: node scripts/test-safety-expansion.mjs
       - name: Symptom catalog assistant tests
         run: node scripts/test-symptom-assistant.mjs
       - name: Pharmacy notes and editing tests

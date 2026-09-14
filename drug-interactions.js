@@ -199,6 +199,8 @@
     const text = drugText(drug);
     if (!text) return false;
     const route = routeOf(drug);
+    if (group.routes && !group.routes.includes(route)) return false;
+    if (["injection", "rectal", "inhaled", "local"].includes(group.route) && group.route !== route) return false;
     const oralGroups = [GROUPS.levothyroxine, GROUPS.calciumIron, GROUPS.oralLevofloxacin, GROUPS.multivalentCation];
     if ((group.route === "oral" || oralGroups.includes(group)) && route !== "oral") return false;
     // 吸入/鼻用激素与利托那韦的规则保留；其他全身规则不套用于局部制剂。

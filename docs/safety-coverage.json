@@ -1,9 +1,9 @@
 {
-  "checkedAt": "2026-09-13",
+  "checkedAt": "2026-09-14",
   "note": "匹配重点规则不等于完整审核；空列表代表尚未覆盖，不能判断安全。",
   "total": 556,
-  "interactionRules": 26,
-  "singleRules": 12,
+  "interactionRules": 39,
+  "singleRules": 43,
   "drugs": [
     {
       "id": "drug-001",
@@ -11,8 +11,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "acarbose-gut",
+        "acarbose-dka-liver"
+      ],
+      "interactionRules": [
+        "acarbose-digoxin",
+        "acarbose-hypoglycemia"
+      ]
     },
     {
       "id": "drug-003",
@@ -31,7 +37,10 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "azithromycin-liver",
+        "azithromycin-allergy"
+      ],
       "interactionRules": [
         "levofloxacin-qt"
       ]
@@ -42,7 +51,9 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "atorvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -120,10 +131,16 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "acei-pregnancy",
+        "amlodipine-hypotension"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual",
+        "simvastatin-amlodipine"
       ]
     },
     {
@@ -132,10 +149,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -171,8 +192,12 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "amlodipine-hypotension"
+      ],
+      "interactionRules": [
+        "simvastatin-amlodipine"
+      ]
     },
     {
       "id": "drug-019",
@@ -225,12 +250,18 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "ibuprofen-allergy",
+        "ibuprofen-cabg",
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -300,7 +331,9 @@
         "ward"
       ],
       "contraindications": [],
-      "interactionRules": []
+      "interactionRules": [
+        "levofloxacin-systemic-steroid"
+      ]
     },
     {
       "id": "drug-034",
@@ -347,10 +380,14 @@
       "contraindications": [
         "metformin-renal",
         "metformin-acidosis",
-        "metformin-initiation"
+        "metformin-initiation",
+        "sulfonylurea-low-glucose"
       ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -431,9 +468,13 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "bisoprolol-conduction",
+        "bisoprolol-hf"
+      ],
       "interactionRules": [
-        "digoxin-beta"
+        "digoxin-beta",
+        "sulfonylurea-beta"
       ]
     },
     {
@@ -451,9 +492,15 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "glimepiride-allergy",
+        "sulfonylurea-low-glucose"
+      ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -525,10 +572,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "human-insulin-low-glucose"
+      ],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -537,9 +588,12 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "metoprolol-contra"
+      ],
       "interactionRules": [
-        "digoxin-beta"
+        "digoxin-beta",
+        "sulfonylurea-beta"
       ]
     },
     {
@@ -705,7 +759,9 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "clopidogrel-active-bleeding"
+      ],
       "interactionRules": [
         "clopidogrel-omeprazole",
         "rivaroxaban-antiplatelet",
@@ -866,8 +922,13 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "arb-pregnancy"
+      ],
+      "interactionRules": [
+        "arb-nsaid-renal",
+        "acei-arb-dual"
+      ]
     },
     {
       "id": "drug-090",
@@ -884,12 +945,16 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -999,7 +1064,9 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "rosuvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -1032,11 +1099,15 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -1045,11 +1116,15 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -1094,12 +1169,16 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -1126,8 +1205,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "furosemide-anuria",
+        "furosemide-depletion"
+      ],
+      "interactionRules": [
+        "furosemide-digoxin",
+        "dapagliflozin-loop"
+      ]
     },
     {
       "id": "drug-116",
@@ -1135,8 +1220,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "furosemide-anuria",
+        "furosemide-depletion"
+      ],
+      "interactionRules": [
+        "furosemide-digoxin",
+        "dapagliflozin-loop"
+      ]
     },
     {
       "id": "drug-117",
@@ -1184,10 +1275,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -1295,12 +1390,16 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -1327,10 +1426,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -1473,11 +1576,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "levofloxacin-mg"
+      ],
       "interactionRules": [
         "levofloxacin-multivalent-cation",
         "levofloxacin-qt",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "levofloxacin-systemic-steroid"
       ]
     },
     {
@@ -1486,10 +1592,13 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "levofloxacin-mg"
+      ],
       "interactionRules": [
         "levofloxacin-qt",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "levofloxacin-systemic-steroid"
       ]
     },
     {
@@ -1579,10 +1688,14 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "human-insulin-low-glucose"
+      ],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -1602,7 +1715,10 @@
       "pharmacy": [
         "ward"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "ceftriaxone-neonatal",
+        "ceftriaxone-calcium"
+      ],
       "interactionRules": []
     },
     {
@@ -1709,12 +1825,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -1723,10 +1843,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -1735,10 +1859,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -1772,7 +1900,8 @@
       ],
       "interactionRules": [
         "repaglinide-clopidogrel",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -1989,7 +2118,10 @@
       "interactionRules": [
         "digoxin-inhibitors",
         "digoxin-beta",
-        "digoxin-spironolactone-assay"
+        "digoxin-spironolactone-assay",
+        "furosemide-digoxin",
+        "hctz-digoxin",
+        "acarbose-digoxin"
       ]
     },
     {
@@ -2007,10 +2139,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy",
+        "amlodipine-hypotension"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual",
+        "simvastatin-amlodipine"
       ]
     },
     {
@@ -2028,8 +2166,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "furosemide-anuria",
+        "furosemide-depletion"
+      ],
+      "interactionRules": [
+        "furosemide-digoxin",
+        "dapagliflozin-loop"
+      ]
     },
     {
       "id": "outpatient-fx7160",
@@ -2037,9 +2181,12 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "metoprolol-succinate-contra"
+      ],
       "interactionRules": [
-        "digoxin-beta"
+        "digoxin-beta",
+        "sulfonylurea-beta"
       ]
     },
     {
@@ -2129,8 +2276,13 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "arb-pregnancy"
+      ],
+      "interactionRules": [
+        "arb-nsaid-renal",
+        "acei-arb-dual"
+      ]
     },
     {
       "id": "outpatient-fx6111",
@@ -2138,7 +2290,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "atorvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -2165,11 +2319,15 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -2232,7 +2390,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "rosuvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -2313,12 +2473,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -2354,8 +2518,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "dapagliflozin-ketoacidosis",
+        "dapagliflozin-surgery"
+      ],
+      "interactionRules": [
+        "dapagliflozin-insulin",
+        "dapagliflozin-loop"
+      ]
     },
     {
       "id": "outpatient-dl0483",
@@ -2455,7 +2625,9 @@
         "outpatient"
       ],
       "contraindications": [],
-      "interactionRules": []
+      "interactionRules": [
+        "simvastatin-fenofibrate"
+      ]
     },
     {
       "id": "outpatient-dl0613",
@@ -2481,10 +2653,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -2502,7 +2678,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "rosuvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -2511,10 +2689,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "hctz-anuria",
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual",
+        "hctz-digoxin"
       ]
     },
     {
@@ -2601,9 +2785,13 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "simvastatin-myopathy"
+      ],
       "interactionRules": [
-        "ritonavir-simvastatin"
+        "ritonavir-simvastatin",
+        "simvastatin-amlodipine",
+        "simvastatin-fenofibrate"
       ]
     },
     {
@@ -2642,7 +2830,9 @@
       "contraindications": [],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -2690,10 +2880,14 @@
       "contraindications": [
         "metformin-renal",
         "metformin-acidosis",
-        "metformin-initiation"
+        "dapagliflozin-ketoacidosis",
+        "metformin-initiation",
+        "dapagliflozin-surgery"
       ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "dapagliflozin-insulin",
+        "dapagliflozin-loop"
       ]
     },
     {
@@ -2720,9 +2914,15 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "glimepiride-allergy",
+        "sulfonylurea-low-glucose"
+      ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -2731,7 +2931,10 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "azithromycin-liver",
+        "azithromycin-allergy"
+      ],
       "interactionRules": [
         "levofloxacin-qt"
       ]
@@ -2742,10 +2945,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy",
+        "amlodipine-hypotension"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual",
+        "simvastatin-amlodipine"
       ]
     },
     {
@@ -2831,7 +3040,9 @@
       "contraindications": [],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -2894,10 +3105,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -2933,7 +3148,10 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "azithromycin-liver",
+        "azithromycin-allergy"
+      ],
       "interactionRules": [
         "levofloxacin-qt"
       ]
@@ -2944,10 +3162,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -2956,7 +3178,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "metronidazole-alcohol"
+      ],
       "interactionRules": []
     },
     {
@@ -2965,10 +3189,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3081,12 +3309,18 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "ibuprofen-allergy",
+        "ibuprofen-cabg",
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -3186,9 +3420,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "sulfonylurea-low-glucose"
+      ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -3226,11 +3465,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "levofloxacin-mg"
+      ],
       "interactionRules": [
         "levofloxacin-multivalent-cation",
         "levofloxacin-qt",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "levofloxacin-systemic-steroid"
       ]
     },
     {
@@ -3257,10 +3499,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "acei-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3269,10 +3515,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3317,12 +3567,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -3342,7 +3596,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "atorvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -3396,10 +3652,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "acei-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3446,9 +3706,12 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "metoprolol-contra"
+      ],
       "interactionRules": [
-        "digoxin-beta"
+        "digoxin-beta",
+        "sulfonylurea-beta"
       ]
     },
     {
@@ -3522,10 +3785,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "human-insulin-low-glucose"
+      ],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -3534,10 +3801,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3582,10 +3853,15 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "enalapril-angioedema",
+        "acei-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3603,10 +3879,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "acei-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -3635,8 +3915,13 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "arb-pregnancy"
+      ],
+      "interactionRules": [
+        "arb-nsaid-renal",
+        "acei-arb-dual"
+      ]
     },
     {
       "id": "outpatient-sx1857",
@@ -3913,10 +4198,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy",
+        "amlodipine-hypotension"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual",
+        "simvastatin-amlodipine"
       ]
     },
     {
@@ -3961,10 +4252,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "hctz-anuria",
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual",
+        "hctz-digoxin"
       ]
     },
     {
@@ -4056,7 +4353,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "clopidogrel-active-bleeding"
+      ],
       "interactionRules": [
         "clopidogrel-omeprazole",
         "rivaroxaban-antiplatelet",
@@ -4110,7 +4409,8 @@
       "contraindications": [],
       "interactionRules": [
         "repaglinide-clopidogrel",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -4119,9 +4419,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "sulfonylurea-low-glucose"
+      ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -4166,10 +4471,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -4178,8 +4487,12 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "amlodipine-hypotension"
+      ],
+      "interactionRules": [
+        "simvastatin-amlodipine"
+      ]
     },
     {
       "id": "outpatient-gz2291",
@@ -4277,10 +4590,15 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "enalapril-angioedema",
+        "acei-pregnancy"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -4370,9 +4688,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "sulfonylurea-low-glucose"
+      ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -4381,8 +4704,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "acarbose-gut",
+        "acarbose-dka-liver"
+      ],
+      "interactionRules": [
+        "acarbose-digoxin",
+        "acarbose-hypoglycemia"
+      ]
     },
     {
       "id": "outpatient-gx2221",
@@ -4429,8 +4758,12 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "amlodipine-hypotension"
+      ],
+      "interactionRules": [
+        "simvastatin-amlodipine"
+      ]
     },
     {
       "id": "outpatient-gx1442",
@@ -4510,10 +4843,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "human-insulin-low-glucose"
+      ],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -4648,10 +4985,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "human-insulin-low-glucose"
+      ],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -4699,8 +5040,12 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
-      "interactionRules": []
+      "contraindications": [
+        "hctz-anuria"
+      ],
+      "interactionRules": [
+        "hctz-digoxin"
+      ]
     },
     {
       "id": "outpatient-sx1481",
@@ -4717,7 +5062,9 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "atorvastatin-liver"
+      ],
       "interactionRules": []
     },
     {
@@ -4819,7 +5166,9 @@
       "contraindications": [],
       "interactionRules": [
         "pioglitazone-insulin",
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "dapagliflozin-insulin"
       ]
     },
     {
@@ -4830,7 +5179,8 @@
       ],
       "contraindications": [],
       "interactionRules": [
-        "ritonavir-inhaled-steroid"
+        "ritonavir-inhaled-steroid",
+        "levofloxacin-systemic-steroid"
       ]
     },
     {
@@ -4938,12 +5288,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "nsaid-pregnancy"
+      ],
       "interactionRules": [
         "rivaroxaban-nsaid",
         "clopidogrel-nsaid",
         "sertraline-bleeding",
-        "spironolactone-nsaid"
+        "spironolactone-nsaid",
+        "acei-nsaid-renal",
+        "arb-nsaid-renal"
       ]
     },
     {
@@ -5006,10 +5360,14 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "arb-pregnancy"
+      ],
       "interactionRules": [
         "arni-arb-duplicate",
-        "raas-potassium"
+        "raas-potassium",
+        "arb-nsaid-renal",
+        "acei-arb-dual"
       ]
     },
     {
@@ -5045,9 +5403,13 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "bisoprolol-conduction",
+        "bisoprolol-hf"
+      ],
       "interactionRules": [
-        "digoxin-beta"
+        "digoxin-beta",
+        "sulfonylurea-beta"
       ]
     },
     {
@@ -5191,10 +5553,16 @@
       "pharmacy": [
         "outpatient"
       ],
-      "contraindications": [],
+      "contraindications": [
+        "acei-pregnancy",
+        "amlodipine-hypotension"
+      ],
       "interactionRules": [
         "acei-arni-36h",
-        "raas-potassium"
+        "raas-potassium",
+        "acei-nsaid-renal",
+        "acei-arb-dual",
+        "simvastatin-amlodipine"
       ]
     },
     {
@@ -5445,10 +5813,14 @@
       "contraindications": [
         "metformin-renal",
         "metformin-acidosis",
-        "metformin-initiation"
+        "metformin-initiation",
+        "sulfonylurea-low-glucose"
       ],
       "interactionRules": [
-        "levofloxacin-glucose"
+        "levofloxacin-glucose",
+        "acarbose-hypoglycemia",
+        "sulfonylurea-beta",
+        "dapagliflozin-insulin"
       ]
     }
   ]

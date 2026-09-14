@@ -57,5 +57,94 @@
     single("thyroxine-adrenal", "thyroxine", "禁忌", "左甲状腺素：未纠正的肾上腺功能不全", "可能诱发急性肾上腺危象。", "先纠正肾上腺功能不全，再由医师评估甲状腺激素治疗。", "thyroxine"),
     single("sertraline-maoi", "sertraline", "禁忌", "舍曲林：MAOI 或匹莫齐特相关禁忌", "正在使用或停用 MAOI 未满 14 天（含利奈唑胺、静脉亚甲蓝），或合用匹莫齐特。", "禁用相关组合；即使另一药不在本药库中也须主动核对。", "sertraline")
   ];
+  const source20260914 = (label, setid) => Object.freeze({ ...source(label, setid), checkedAt: "2026-09-14" });
+  Object.assign(S, {
+    acei: source20260914("依那普利及 ACEI 类警示", "63187a94-9ac7-4320-ac70-0631e08c2b8d"),
+    arb: source20260914("氯沙坦及 RAS 类警示", "df4f55f0-fb11-4f6f-a7ed-127b50f955fc"),
+    metoprolol: source20260914("酒石酸美托洛尔 禁忌", "a401fe31-d51a-49d9-a062-c9d22088db56"),
+    metoprololSuccinate: source20260914("琥珀酸美托洛尔缓释片 禁忌", "151079c5-6360-45ed-8118-885543d6a4ad"),
+    amlodipine: source20260914("氨氯地平 低血压及主动脉瓣狭窄警示", "b6f298ba-2d7e-4a3c-9edb-8b60aba716d6"),
+    atorvastatin: source20260914("阿托伐他汀 禁忌", "a60cc18b-0631-4cf0-b021-9f52224ece65"),
+    rosuvastatin: source20260914("瑞舒伐他汀 禁忌", "325a5d0e-9a72-4015-9fcd-1655fb504cee"),
+    bisoprolol: source20260914("比索洛尔 禁忌及心衰警示", "83e4b4e5-9130-44c8-abab-fcd0db5d8c49"),
+    furosemide: source20260914("呋塞米 禁忌及电解质警示", "e9be5c3b-4b18-7ad2-e053-2995a90a4a8b"),
+    hctz: source20260914("氢氯噻嗪 禁忌及地高辛相互作用", "01ad3531-5ed9-434c-b7d5-02d72aa82e46"),
+    acarbose: source20260914("阿卡波糖 禁忌及相互作用", "067c0adc-7322-489d-9baa-1d061b37be36"),
+    glimepiride: source20260914("格列美脲及磺脲类低血糖警示", "0003458f-352a-46fa-9d99-230daa76ae29"),
+    humanInsulin: source20260914("人胰岛素 低血糖禁忌", "456e226e-e7b0-4850-b649-3d9e5533893c"),
+    dapagliflozin: source20260914("达格列净 §2.4、5", "01f90c94-71cb-4a1f-81ff-8004b850529b"),
+    ceftriaxone: source20260914("头孢曲松 新生儿与静脉钙限制", "467f49f7-1a35-49c1-88aa-acc2f27adc2b"),
+    azithromycin: source20260914("阿奇霉素 §4", "25bc2e78-9d0d-41c6-a55e-a267d4457967"),
+    metronidazole: source20260914("甲硝唑 禁忌与酒精", "f3ef765c-b531-4aaa-a86d-e32b7254ca48"),
+    ibuprofen: source20260914("布洛芬 过敏、消化道及 NSAID 警示", "e07d989d-1b0e-4cc1-abf2-93c8b208a29a"),
+    simvastatin: source20260914("辛伐他汀 剂量限制及肌病风险", "30fe2447-4dd3-43e6-bac5-0f754ab77c3a"),
+    clopidogrel: source20260914("氯吡格雷 活动性出血禁忌", "5da7468b-b829-4624-b84d-84bdebf61a0d"),
+    levoTendon: source20260914("左氧氟沙星 肌腱及重症肌无力警示", "f780bb91-483a-d1a6-e053-6294a90ab74b"),
+    nsaidPregnancy: Object.freeze({ status: "verified-regulator", label: "FDA：NSAID 妊娠约 20 周及以后风险通告（境外监管参考）", url: "https://www.fda.gov/drugs/drug-safety-and-availability/fda-recommends-avoiding-use-nsaids-pregnancy-20-weeks-or-later-because-they-can-result-low-amniotic", checkedAt: "2026-09-14" })
+  });
+  Object.assign(G, {
+    acei: group("贝那普利|培哚普利|依那普利|卡托普利|雷米普利|赖诺普利|福辛普利"),
+    enalapril: group("依那普利"),
+    arb: group("缬沙坦|氯沙坦|阿利沙坦|奥美沙坦|厄贝沙坦|替米沙坦|坎地沙坦|美阿沙坦|阿齐沙坦"),
+    metoprololTartrate: group("酒石酸美托洛尔", "oral"), bisoprolol: group("比索洛尔"),
+    metoprololSuccinate: group("琥珀酸美托洛尔", "oral"), atorvastatin: group("阿托伐他汀"), rosuvastatin: group("瑞舒伐他汀"),
+    furosemide: group("呋塞米"), hctz: group("氢氯噻嗪"),
+    acarbose: group("阿卡波糖", "oral"), acarboseHypoglycemia: group("胰岛素|格列美脲|格列吡嗪|格列齐特|格列喹酮"), sulfonylurea: group("格列美脲|格列吡嗪|格列齐特|格列喹酮"),
+    glimepiride: group("格列美脲"), humanInsulin: group("人胰岛素"),
+    dapagliflozin: group("达格列净"), secretagogueInsulin: group("胰岛素|格列美脲|格列吡嗪|格列齐特|格列喹酮|瑞格列奈"),
+    ceftriaxone: group("头孢曲松", "injection"), azithromycin: group("阿奇霉素"),
+    metronidazoleOral: group("甲硝唑", "oral"), ibuprofen: group("布洛芬", "oral"),
+    systemicSteroid: { ...group("地塞米松|泼尼松|泼尼松龙|甲泼尼龙|氢化可的松|曲安奈德"), routes: ["oral", "injection"] },
+    simvastatin: group("辛伐他汀"), amlodipine: { ...group("氨氯地平"), exclude: ["左氨氯地平"] }, fenofibrate: group("非诺贝特")
+  });
+  interactions.push(
+    pair("acei-nsaid-renal", "需监测", "ACEI 与全身用 NSAID：肾功能风险", "acei", "nsaid", "NSAID 可能减弱降压作用并影响肾灌注。", "肾功能恶化，尤其在老年、脱水或同时使用利尿剂时。", "核对联用必要性，监测肾功能、血钾与血压；脱水时及时评估。", "acei"),
+    pair("arb-nsaid-renal", "需监测", "ARB 成分与全身用 NSAID：肾功能风险", "arb", "nsaid", "对肾血流调节的影响叠加。", "急性肾损伤及降压效果减弱；合并利尿剂、脱水者风险更高。", "避免自行叠加止痛药，复核容量状态、肾功能和血钾。", "arb"),
+    pair("acei-arb-dual", "严重", "ACEI 与 ARB 成分：双重 RAS 阻断", "acei", "arb", "抑制同一调节系统的作用叠加。", "低血压、高钾、晕厥及肾功能损害增加。", "通常避免联用；沙库巴曲复方另须遵守 ACEI 换药间隔禁忌。", "arb"),
+    pair("furosemide-digoxin", "需监测", "呋塞米与地高辛：低钾相关毒性", "furosemide", "digoxin", "利尿所致低钾可增加心肌对地高辛的敏感性。", "心律失常或地高辛毒性风险增加。", "有指征时可联用，监测血钾、血镁、肾功能及地高辛相关症状。", "furosemide"),
+    pair("hctz-digoxin", "需监测", "氢氯噻嗪（含复方）与地高辛", "hctz", "digoxin", "低钾可增强洋地黄的心脏毒性。", "心律失常风险升高。", "监测电解质，出现乏力、恶心、心律异常及时评估。", "hctz"),
+    pair("acarbose-digoxin", "需监测", "阿卡波糖与地高辛", "acarbose", "digoxin", "阿卡波糖可改变地高辛的生物利用度。", "地高辛暴露及疗效可能改变。", "联用或停用时复核地高辛浓度和临床反应，由医师决定是否调量。", "acarbose"),
+    pair("acarbose-hypoglycemia", "需监测", "阿卡波糖与胰岛素/磺脲类", "acarbose", "acarboseHypoglycemia", "合用其他降糖治疗可增加低血糖风险。", "低血糖；蔗糖分解受抑制，纠正低血糖可能延迟。", "监测血糖；发生低血糖优先使用葡萄糖，不能以蔗糖替代。", "acarbose"),
+    pair("sulfonylurea-beta", "需监测", "磺脲类与 β 受体阻滞剂", "sulfonylurea", "beta", "β 阻滞剂可能掩盖部分低血糖预警症状。", "低血糖不易及时识别。", "加强血糖监测，不以有无心悸或心动过速判断是否低血糖。", "glimepiride"),
+    pair("dapagliflozin-insulin", "需监测", "达格列净（含复方）与胰岛素/促泌剂", "dapagliflozin", "secretagogueInsulin", "联合降糖作用增加。", "低血糖风险增加。", "监测血糖，由医师调整胰岛素或促泌剂；不要自行大幅减停胰岛素。", "dapagliflozin"),
+    pair("dapagliflozin-loop", "需监测", "达格列净与呋塞米：容量不足", "dapagliflozin", "furosemide", "利尿及容量减少作用可能叠加。", "脱水、低血压及肾功能变化。", "开始或调整时复核容量状态、血压和肾功能；按指征个体化调整。", "dapagliflozin"),
+    pair("levofloxacin-systemic-steroid", "严重", "全身用左氧氟沙星与全身用激素", "levofloxacin", "systemicSteroid", "糖皮质激素可进一步增加氟喹诺酮相关肌腱损伤风险。", "肌腱炎或肌腱断裂，老年或肾功能不全者尤其需注意。", "评估替代方案；出现肌腱疼痛、肿胀应停用左氧氟沙星、减少活动并及时就医。", "levoTendon"),
+    pair("simvastatin-amlodipine", "需监测", "辛伐他汀与氨氯地平：剂量限制", "simvastatin", "amlodipine", "联用可增加辛伐他汀暴露。", "肌病及横纹肌溶解风险增加。", "该境外说明书要求辛伐他汀不超过 20 mg/日；本品剂量限制须再按中国说明书核对。", "simvastatin"),
+    pair("simvastatin-fenofibrate", "需监测", "辛伐他汀与非诺贝特", "simvastatin", "fenofibrate", "两药均可能引起肌病。", "肌病或横纹肌溶解风险增加。", "仅在获益明确时联用，出现肌痛、无力或深色尿及时就医并评估 CK、肾功能。", "simvastatin")
+  );
+  contraindications.push(
+    single("metoprolol-succinate-contra", "metoprololSuccinate", "禁忌", "琥珀酸美托洛尔：严重心动过缓或失代偿", "严重心动过缓、Ⅱ/Ⅲ度房室阻滞、心源性休克、失代偿心衰或无永久起搏器的病窦综合征。", "存在相应情况时禁用；稳定慢性心衰可有适应症，长期用药不应自行骤停。", "metoprololSuccinate"),
+    single("amlodipine-hypotension", "amlodipine", "慎用", "氨氯地平：严重主动脉瓣狭窄或低血压", "严重主动脉瓣狭窄、易发生症状性低血压。", "谨慎评估并监测血压；含氨氯地平复方亦须检查其他降压成分。", "amlodipine"),
+    single("atorvastatin-liver", "atorvastatin", "禁忌", "阿托伐他汀：急性肝衰竭或失代偿肝硬化", "急性肝衰竭或失代偿肝硬化。", "禁用；一般脂肪肝不自动等同于本条禁忌，其他肝病依本品说明书评估。", "atorvastatin"),
+    single("rosuvastatin-liver", "rosuvastatin", "禁忌", "瑞舒伐他汀：急性肝衰竭或失代偿肝硬化", "急性肝衰竭或失代偿肝硬化。", "禁用；肾功能限制及剂量另按本品说明书核对，复方不能忽略本成分。", "rosuvastatin"),
+    single("acei-pregnancy", "acei", "严重", "ACEI：妊娠胎儿毒性警示", "妊娠期间使用作用于 RAS 的药物可能损害胎儿。", "备孕及时换药评估；发现妊娠应尽快联系医师停换本药。禁用范围按本品中国说明书核对。", "acei"),
+    single("enalapril-angioedema", "enalapril", "禁忌", "依那普利：相关血管性水肿病史", "既往 ACEI 相关血管性水肿，或遗传性/特发性血管性水肿。", "禁用；含依那普利复方同样需核对。", "acei"),
+    single("arb-pregnancy", "arb", "严重", "ARB 成分：妊娠胎儿毒性警示", "妊娠期，尤其妊娠中后期。", "备孕及时评估替代方案；发现妊娠应尽快联系医师停换，含 ARB 的复方也需核对。", "arb"),
+    single("metoprolol-contra", "metoprololTartrate", "禁忌", "酒石酸美托洛尔：严重心动过缓或失代偿", "严重心动过缓、Ⅱ/Ⅲ度房室阻滞、无起搏器的病窦综合征、心源性休克或失代偿心衰。", "存在相应情况时禁用；稳定期心衰不能一概按此禁忌处理，长期用药勿自行骤停。", "metoprolol"),
+    single("bisoprolol-conduction", "bisoprolol", "禁忌", "比索洛尔：明显心动过缓或传导阻滞", "明显窦性心动过缓、Ⅱ/Ⅲ度房室传导阻滞或心源性休克。", "禁用并评估循环状态；起搏器等特殊情况须专科复核。", "bisoprolol"),
+    single("bisoprolol-hf", "bisoprolol", "严重", "比索洛尔：急性失代偿心衰需专科评估", "急性心衰或循环不稳定；境内外心衰适应症表述可能不同。", "不能直接新启用或加量；稳定慢性心衰可有治疗指征，勿将所有心衰一概列为禁忌。", "bisoprolol"),
+    single("furosemide-anuria", "furosemide", "禁忌", "呋塞米：无尿", "无尿。", "禁用，并明确肾功能及梗阻等原因。", "furosemide"),
+    single("furosemide-depletion", "furosemide", "慎用", "呋塞米：容量与电解质不足", "脱水、低血压、低钾或低镁等。", "先评估容量和电解质，监测肾功能及治疗反应，避免过度利尿。", "furosemide"),
+    single("hctz-anuria", "hctz", "禁忌", "氢氯噻嗪：无尿", "无尿，含氢氯噻嗪复方同样需核对。", "禁用；不能仅因复方名中含降压成分而忽略利尿剂限制。", "hctz"),
+    single("acarbose-gut", "acarbose", "禁忌", "阿卡波糖：肠道疾病与梗阻风险", "炎症性肠病、结肠溃疡、部分肠梗阻或梗阻倾向等。", "禁用；存在严重消化吸收障碍时核对完整说明书。", "acarbose"),
+    single("acarbose-dka-liver", "acarbose", "禁忌", "阿卡波糖：酮症酸中毒或肝硬化", "糖尿病酮症酸中毒或肝硬化。", "禁用，不能依靠本药处理酮症酸中毒。", "acarbose"),
+    single("sulfonylurea-low-glucose", "sulfonylurea", "慎用", "磺脲类：严重低血糖风险", "高龄、肝肾功能受损、进食不足或联合其他降糖药时。", "核对剂量、进食和肝肾功能，增加血糖监测。不同磺脲药的具体禁忌须逐品核对。", "glimepiride"),
+    single("glimepiride-allergy", "glimepiride", "禁忌", "格列美脲：相关过敏史", "对格列美脲、本品成分或说明书所列磺酰胺衍生物过敏。", "禁用；不把这条特定说明书禁忌泛化到所有含磺酰胺结构的药物。", "glimepiride"),
+    single("human-insulin-low-glucose", "humanInsulin", "禁忌", "人胰岛素：正在发生低血糖", "当前正在低血糖发作。", "先处理低血糖，再由医师评估胰岛素时机和剂量；不等于长期停用胰岛素。", "humanInsulin"),
+    single("dapagliflozin-ketoacidosis", "dapagliflozin", "严重", "达格列净：酮症酸中毒警示", "出现恶心、呕吐、腹痛或呼吸困难，尤其在感染、禁食、脱水或减停胰岛素后。", "即使血糖不高也须评估酮症酸中毒，怀疑时停药并立即就医。", "dapagliflozin"),
+    single("dapagliflozin-surgery", "dapagliflozin", "慎用", "达格列净：手术或长时间禁食", "计划手术或需要长时间禁食的操作。", "该说明书建议尽可能提前至少 3 天暂停；临床稳定并恢复进食后再评估恢复用药。其他格列净不能照搬。", "dapagliflozin"),
+    single("ceftriaxone-neonatal", "ceftriaxone", "禁忌", "头孢曲松：特定新生儿禁忌", "高胆红素血症新生儿；或 ≤28 天且需要/预计需要静脉含钙治疗的新生儿。", "禁用；早产儿另须核对胎龄及出生后年龄。口服钙不等同于静脉钙。", "ceftriaxone"),
+    single("ceftriaxone-calcium", "ceftriaxone", "严重", "头孢曲松：静脉含钙溶液配伍限制", "计划与含钙静脉溶液混合或同时输注。", "禁止混合或同时经 Y 型接口输注；非新生儿序贯给药需充分冲管并按说明书执行。", "ceftriaxone"),
+    single("azithromycin-liver", "azithromycin", "禁忌", "阿奇霉素：既往相关肝损害", "曾因阿奇霉素发生胆汁淤积性黄疸或肝功能异常。", "禁用；一般肝病不自动等同于这一特定病史。", "azithromycin"),
+    single("azithromycin-allergy", "azithromycin", "禁忌", "阿奇霉素：大环内酯类相关过敏", "对阿奇霉素、红霉素、大环内酯或酮内酯类药物过敏。", "禁用并核对过敏反应类型。", "azithromycin"),
+    single("metronidazole-alcohol", "metronidazoleOral", "禁忌", "口服甲硝唑：酒精及双硫仑限制", "正在使用酒精/含丙二醇产品，或过去 2 周内使用过双硫仑。", "用药期间及停药后至少 3 天避免酒精/含丙二醇产品；近 2 周用过双硫仑者禁用。", "metronidazole"),
+    single("ibuprofen-allergy", "ibuprofen", "禁忌", "口服布洛芬：阿司匹林/NSAID 相关过敏", "服阿司匹林或其他 NSAID 后发生过哮喘、荨麻疹或过敏样反应。", "禁用；不要仅依据既往能否耐受另一种止痛药判断安全。", "ibuprofen"),
+    single("ibuprofen-cabg", "ibuprofen", "禁忌", "口服布洛芬：冠脉搭桥手术相关用药", "用于冠状动脉旁路移植术（CABG）围手术期疼痛。", "禁用，选择其他围手术期镇痛方案。", "ibuprofen"),
+    single("nsaid-pregnancy", "nsaid", "严重", "全身用非阿司匹林 NSAID：孕周相关风险", "妊娠约 20 周及以后；约 30 周及以后还涉及胎儿动脉导管风险。", "20–30 周仅在医师认为必要时短期最低有效剂量，30 周及以后避免使用；不能套用于医嘱低剂量阿司匹林。", "nsaidPregnancy"),
+    single("clopidogrel-active-bleeding", "clopidogrel", "禁忌", "氯吡格雷：活动性病理性出血", "正在发生消化道溃疡出血、颅内出血等活动性病理性出血。", "禁用并处理出血；无此情形时不应自行停用既定抗血小板治疗。", "clopidogrel"),
+    single("levofloxacin-mg", "levofloxacin", "严重", "全身用左氧氟沙星：重症肌无力", "既往有重症肌无力。", "应避免使用，可能加重肌无力及呼吸风险。", "levoTendon"),
+    single("simvastatin-myopathy", "simvastatin", "慎用", "辛伐他汀：肌病高风险因素", "高龄、未控制甲减、肾功能不全、高剂量或合并相关相互作用药物。", "核对剂量与联用药；出现无法解释的肌痛、无力或深色尿及时就医。", "simvastatin")
+  );
+
   window.MEDICATION_SAFETY = Object.freeze({ interactions: Object.freeze(interactions), contraindications: Object.freeze(contraindications) });
 })();

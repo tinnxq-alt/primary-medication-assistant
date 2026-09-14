@@ -59,6 +59,6 @@ for(const rule of window.MEDICATION_SAFETY.interactions) {
 }
 if (process.argv.includes('--report')) {
   fs.mkdirSync(new URL('docs/', root),{recursive:true});
-  fs.writeFileSync(new URL('docs/safety-coverage.json',root),JSON.stringify({checkedAt:'2026-09-13',note:'匹配重点规则不等于完整审核；空列表代表尚未覆盖，不能判断安全。',total:catalog.length,interactionRules:engine.rules.length,singleRules:window.MEDICATION_SAFETY.contraindications.length,drugs:coverage},null,2)+'\n');
+  fs.writeFileSync(new URL('docs/safety-coverage.json',root),JSON.stringify({checkedAt:'2026-09-14',note:'匹配重点规则不等于完整审核；空列表代表尚未覆盖，不能判断安全。',total:catalog.length,interactionRules:engine.rules.length,singleRules:window.MEDICATION_SAFETY.contraindications.length,drugs:coverage},null,2)+'\n');
 }
 console.log(`安全回归通过：${catalog.length} 品规，${engine.rules.length} 联用规则，${window.MEDICATION_SAFETY.contraindications.length} 单药规则，${coverage.filter(d=>d.contraindications.length).length} 品规有单药提示。`);

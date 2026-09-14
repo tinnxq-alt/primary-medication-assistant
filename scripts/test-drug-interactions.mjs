@@ -34,7 +34,7 @@ assert.ok(relevant.some(item => item.rule.id === "acei-arni-36h" && item.partner
 for (const rule of window.DRUG_INTERACTIONS.rules) {
   assert.ok(["禁忌", "严重", "需监测"].includes(rule.severity));
   assert.match(rule.source?.url || "", /^https:\/\//);
-  assert.match(rule.source?.checkedAt || "", /^2026-(08-26|09-13)$/);
+  assert.match(rule.source?.checkedAt || "", /^\d{4}-\d{2}-\d{2}$/);
   for (const field of ["mechanism", "consequence", "recommendation"]) assert.ok(rule[field]);
 }
 

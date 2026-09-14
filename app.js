@@ -1475,8 +1475,15 @@
         result.innerHTML = '<p class="notice danger">规则模块加载失败，请刷新重试。</p>'; return;
       }
       const findings = interactionEngine.findContraindications(drug);
+      const clinicalSource = drug.clinical?.source || drug.source;
+      const sourceUrl = drug.localEdited ? "" : safeExternalUrl(clinicalSource?.url);
+      const clinicalStatus = drug.localEdited ? "本机编辑，待复核" : VERIFIED_SOURCE_STATUSES.has(clinicalSource?.status) ? "既有来源资料" : "待核验资料";
+      const existingPrecautions = drug.clinical?.precautions
+        ? '<details class="card"><summary>本药已有注意事项 · ' + esc(clinicalStatus) + '</summary><p class="drug-sub" style="white-space:pre-wrap">' + esc(drug.clinical.precautions) + '</p><p class="muted">注意事项不等于完整禁忌清单，也不计入结构化规则覆盖。</p>' + (sourceUrl ? '<a href="' + esc(sourceUrl) + '" target="_blank" rel="noopener">' + esc(clinicalSource.label || '查看资料来源') + '</a>' : '') + '</details>'
+        : '<p class="muted">暂无已录入的注意事项，请核对本品说明书。</p>';
       result.innerHTML = '<h3>' + esc(drug.drugName) + '</h3>' + (findings.length ? findings.map(rule => interactionRuleCard(rule)).join('') : '<p class="notice">本药尚无结构化单药禁忌规则，不代表无禁忌。</p>')
         + (drug.contraindications ? '<p class="notice"><strong>本机禁忌补充（未核验）：</strong>' + esc(drug.contraindications) + '</p>' : '')
+        + existingPrecautions
         + '<button class="btn ghost" data-open-drug="' + esc(drug.id) + '">查看完整药品资料与来源</button>';
     };
     const form = document.getElementById("contraForm");
